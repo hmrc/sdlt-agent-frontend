@@ -4,4 +4,5 @@ service-type: frontend
 digital-service: Stamp Duty Land Tax
 test-repositories:
   - sdlt-agent-frontend-ui-tests
+  - sdlt-frontend-performance-tests
 tags: []
