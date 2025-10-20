@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package repositories
 
 import config.FrontendAppConfig
@@ -20,7 +36,7 @@ import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 
-class SessionRepositorySpec
+class SessionRepositoryISpec
   extends AnyFreeSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[UserAnswers]
@@ -32,7 +48,9 @@ class SessionRepositorySpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val testReturnId = "123456"
+  private val userAnswers = UserAnswers("id", data = Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswersWithReturnId = UserAnswers("id", Some(testReturnId), Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
@@ -62,7 +80,7 @@ class SessionRepositorySpec
 
     "when there is a record for this id" - {
 
-      "must update the lastUpdated time and get the record" in {
+      "must update the lastUpdated time and get the record no return id" in {
 
         insert(userAnswers).futureValue
 
@@ -71,6 +89,17 @@ class SessionRepositorySpec
 
         result.value mustEqual expectedResult
       }
+    }
+
+    "must update the lastUpdated time and get the record with return id" in {
+
+      insert(userAnswersWithReturnId).futureValue
+
+      val result = repository.get(userAnswersWithReturnId.id).futureValue
+      val expectedResult = userAnswersWithReturnId copy (lastUpdated = instant)
+
+      result.value mustEqual expectedResult
+      result.value.returnId mustBe Some(testReturnId)
     }
 
     "when there is no record for this id" - {
