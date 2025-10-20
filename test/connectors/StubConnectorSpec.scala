@@ -44,7 +44,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val mockAgentDetails = mock[AgentDetails]
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -53,16 +53,16 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.successful(mockAgentDetails))
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
-        val result = connector.stubManageAgentQuestions(testReturnId).futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         result mustBe mockAgentDetails
       }
 
-      "must construct correct URL with returnId parameter" in {
+      "must construct correct URL with detailsId parameter" in {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "TEST-123"
+        val testDetailsId = "TEST-123"
         val mockAgentDetails = mock[AgentDetails]
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -71,7 +71,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.successful(mockAgentDetails))
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         verify(mockHttpClient, times(1)).get(any())(any())
         verify(mockConfig, times(1)).baseUrl("stamp-duty-land-tax-stub")
@@ -81,7 +81,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val upstreamError = uk.gov.hmrc.http.UpstreamErrorResponse("Bad Request", 400)
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -91,7 +91,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
 
-        whenReady(connector.stubManageAgentQuestions(testReturnId).failed) { exception =>
+        whenReady(connector.stubManageAgentQuestions(testDetailsId).failed) { exception =>
           exception mustBe a[Throwable]
         }
 
@@ -102,7 +102,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val upstreamError = uk.gov.hmrc.http.UpstreamErrorResponse("Internal Server Error", 500)
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -112,7 +112,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
 
-        whenReady(connector.stubManageAgentQuestions(testReturnId).failed) { exception =>
+        whenReady(connector.stubManageAgentQuestions(testDetailsId).failed) { exception =>
           exception mustBe a[Throwable]
         }
 
@@ -123,7 +123,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val runtimeException = new RuntimeException("Connection failed")
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -133,7 +133,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
 
-        whenReady(connector.stubManageAgentQuestions(testReturnId).failed) { exception =>
+        whenReady(connector.stubManageAgentQuestions(testDetailsId).failed) { exception =>
           exception mustBe a[RuntimeException]
           exception.getMessage mustBe "Connection failed"
         }
@@ -141,10 +141,10 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         verify(mockHttpClient, times(1)).get(any())(any())
       }
 
-      "must handle different returnId formats" in {
-        val returnIds = List("123", "ABC-123", "test-return-id")
+      "must handle different detailsId formats" in {
+        val detailsIds = List("123", "ABC-123", "test-return-id")
 
-        returnIds.foreach { testReturnId =>
+        detailsIds.foreach { testDetailsId =>
           val mockHttpClient = mock[HttpClientV2]
           val mockConfig = mock[FrontendAppConfig]
           val mockRequestBuilder = mock[RequestBuilder]
@@ -156,7 +156,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
             .thenReturn(Future.successful(mockAgentDetails))
 
           val connector = new StubConnector(mockHttpClient, mockConfig)
-          val result = connector.stubManageAgentQuestions(testReturnId).futureValue
+          val result = connector.stubManageAgentQuestions(testDetailsId).futureValue
 
           result mustBe mockAgentDetails
         }
@@ -166,7 +166,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val mockAgentDetails = mock[AgentDetails]
         val customStubUrl = "http://custom-stub:8080"
 
@@ -176,7 +176,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.successful(mockAgentDetails))
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         verify(mockConfig, times(1)).baseUrl("stamp-duty-land-tax-stub")
       }
@@ -185,7 +185,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val mockAgentDetails = mock[AgentDetails]
         val customHc = HeaderCarrier(sessionId = Some(uk.gov.hmrc.http.SessionId("test-session")))
 
@@ -195,7 +195,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.successful(mockAgentDetails))
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
-        connector.stubManageAgentQuestions(testReturnId)(customHc, request).futureValue
+        connector.stubManageAgentQuestions(testDetailsId)(customHc, request).futureValue
 
         verify(mockHttpClient, times(1)).get(any())(any())
       }
@@ -204,7 +204,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val testException = new RuntimeException("Test error")
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -214,7 +214,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe a[Throwable]
         verify(mockRequestBuilder, times(1)).execute[AgentDetails](any(), any())
@@ -224,7 +224,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
         val mockHttpClient = mock[HttpClientV2]
         val mockConfig = mock[FrontendAppConfig]
         val mockRequestBuilder = mock[RequestBuilder]
-        val testReturnId = "123456"
+        val testDetailsId = "123456"
         val mockAgentDetails = mock[AgentDetails]
 
         when(mockConfig.baseUrl("stamp-duty-land-tax-stub")).thenReturn(testStubUrl)
@@ -233,7 +233,7 @@ class StubConnectorSpec extends SpecBase with MockitoSugar {
           .thenReturn(Future.successful(mockAgentDetails))
 
         val connector = new StubConnector(mockHttpClient, mockConfig)
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         verify(mockRequestBuilder, times(1)).execute[AgentDetails](any(), any())
       }

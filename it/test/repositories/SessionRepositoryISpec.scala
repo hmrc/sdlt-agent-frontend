@@ -48,9 +48,9 @@ class SessionRepositoryISpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val testReturnId = "123456"
+  private val testDetailsId = "123456"
   private val userAnswers = UserAnswers("id", data = Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
-  private val userAnswersWithReturnId = UserAnswers("id", Some(testReturnId), Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val userAnswersWithDetailsId = UserAnswers("id", Some(testDetailsId), Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
@@ -93,13 +93,13 @@ class SessionRepositoryISpec
 
     "must update the lastUpdated time and get the record with return id" in {
 
-      insert(userAnswersWithReturnId).futureValue
+      insert(userAnswersWithDetailsId).futureValue
 
-      val result = repository.get(userAnswersWithReturnId.id).futureValue
-      val expectedResult = userAnswersWithReturnId copy (lastUpdated = instant)
+      val result = repository.get(userAnswersWithDetailsId.id).futureValue
+      val expectedResult = userAnswersWithDetailsId copy (lastUpdated = instant)
 
       result.value mustEqual expectedResult
-      result.value.returnId mustBe Some(testReturnId)
+      result.value.detailsId mustBe Some(testDetailsId)
     }
 
     "when there is no record for this id" - {

@@ -54,11 +54,11 @@ class StubConnectorISpec
 
   private lazy val connector = app.injector.instanceOf[StubConnector]
 
-  private val testReturnId = "123456"
+  private val testDetailsId = "123456"
 
   // Complete JSON with all required fields
   private val prelimReturnJson: JsValue = Json.obj(
-    "stornId" -> testReturnId,
+    "stornId" -> testDetailsId,
     "name" -> "John Doe",
     "addressLine1" -> "Test Street",
     "addressLine2" -> JsNull,
@@ -75,7 +75,7 @@ class StubConnectorISpec
       "must return PrelimReturn when the stub returns 200 OK" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -84,22 +84,22 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         result mustBe a[AgentDetails]
 
         server.verify(
           getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
         )
       }
 
-      "must handle different returnId values" in {
-        val differentReturnIds = List("ABC-123", "TEST-789", "12345")
+      "must handle different detailsId values" in {
+        val differentDetailsIds = List("ABC-123", "TEST-789", "12345")
 
-        differentReturnIds.foreach { returnId =>
+        differentDetailsIds.foreach { detailsId =>
           val customJson = Json.obj(
-            "stornId" -> returnId,
+            "stornId" -> detailsId,
             "name" -> "John Doe",
             "addressLine1" -> "Test Street",
             "addressLine2" -> JsNull,
@@ -111,7 +111,7 @@ class StubConnectorISpec
 
           server.stubFor(
             get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-              .withQueryParam("returnId", equalTo(returnId))
+              .withQueryParam("detailsId", equalTo(detailsId))
               .willReturn(
                 aResponse()
                   .withStatus(200)
@@ -120,13 +120,13 @@ class StubConnectorISpec
               )
           )
 
-          val result = connector.stubManageAgentQuestions(returnId).futureValue
+          val result = connector.stubManageAgentQuestions(detailsId).futureValue
 
           result mustBe a[AgentDetails]
 
           server.verify(
             getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-              .withQueryParam("returnId", equalTo(returnId))
+              .withQueryParam("detailsId", equalTo(detailsId))
           )
         }
       }
@@ -134,7 +134,7 @@ class StubConnectorISpec
       "must throw BadRequestException when stub returns 400 Bad Request" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(400)
@@ -142,7 +142,7 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe an[UpstreamErrorResponse]
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 400
@@ -155,7 +155,7 @@ class StubConnectorISpec
       "must throw NotFoundException when stub returns 404 Not Found" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo("NONEXISTENT"))
+            .withQueryParam("detailsId", equalTo("NONEXISTENT"))
             .willReturn(
               aResponse()
                 .withStatus(404)
@@ -176,7 +176,7 @@ class StubConnectorISpec
       "must throw UpstreamErrorResponse when stub returns 500 Internal Server Error" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(500)
@@ -184,7 +184,7 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe an[UpstreamErrorResponse]
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 500
@@ -197,7 +197,7 @@ class StubConnectorISpec
       "must throw UpstreamErrorResponse when stub returns 502 Bad Gateway" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(502)
@@ -205,7 +205,7 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe an[UpstreamErrorResponse]
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 502
@@ -214,7 +214,7 @@ class StubConnectorISpec
       "must throw UpstreamErrorResponse when stub returns 503 Service Unavailable" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(503)
@@ -222,7 +222,7 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe an[UpstreamErrorResponse]
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 503
@@ -231,7 +231,7 @@ class StubConnectorISpec
       "must include correct headers in the request" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -240,7 +240,7 @@ class StubConnectorISpec
             )
         )
 
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         server.verify(
           getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
@@ -251,21 +251,21 @@ class StubConnectorISpec
       "must handle connection errors when service is unavailable" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withFault(com.github.tomakehurst.wiremock.http.Fault.CONNECTION_RESET_BY_PEER)
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe a[Throwable]
       }
 
       "must correctly parse JSON response into a AgentDetails model" in {
         val detailedPrelimReturnJson = Json.obj(
-          "stornId" -> testReturnId,
+          "stornId" -> testDetailsId,
           "name" -> "John Doe",
           "addressLine1" -> "Test Street",
           "addressLine2" -> JsNull,
@@ -277,7 +277,7 @@ class StubConnectorISpec
 
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo("TEST-123"))
+            .withQueryParam("detailsId", equalTo("TEST-123"))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -294,7 +294,7 @@ class StubConnectorISpec
       "must handle malformed JSON response" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -303,7 +303,7 @@ class StubConnectorISpec
             )
         )
 
-        val result = connector.stubManageAgentQuestions(testReturnId).failed.futureValue
+        val result = connector.stubManageAgentQuestions(testDetailsId).failed.futureValue
 
         result mustBe a[JsonParseException]
       }
@@ -311,7 +311,7 @@ class StubConnectorISpec
       "must make GET request to correct endpoint" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -320,7 +320,7 @@ class StubConnectorISpec
             )
         )
 
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         server.verify(
           1,
@@ -331,7 +331,7 @@ class StubConnectorISpec
       "must not make multiple requests for a single call" in {
         server.stubFor(
           get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withQueryParam("returnId", equalTo(testReturnId))
+            .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
                 .withStatus(200)
@@ -340,7 +340,7 @@ class StubConnectorISpec
             )
         )
 
-        connector.stubManageAgentQuestions(testReturnId).futureValue
+        connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         server.verify(
           1,

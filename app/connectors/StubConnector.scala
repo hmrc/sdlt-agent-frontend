@@ -35,10 +35,10 @@ class StubConnector @Inject()(val http: HttpClientV2,
 
   lazy val sdltStubUrl: String = config.baseUrl("stamp-duty-land-tax-stub")
 
-  def stubManageAgentQuestions(returnId: String)(implicit hc: HeaderCarrier,
-                                             request: Request[_]): Future[AgentDetails] = {
+  def stubManageAgentQuestions(detailsId: String)(implicit hc: HeaderCarrier,
+                                                  request: Request[_]): Future[AgentDetails] = {
     // TODO: Implement stub response
-    http.get(url"$sdltStubUrl/stamp-duty-land-tax-stub/manage-agent/details?returnId=$returnId")
+    http.get(url"$sdltStubUrl/stamp-duty-land-tax-stub/manage-agent/details?detailsId=$detailsId")
       .execute[AgentDetails]
       .recover{
         case e => throw logResponse(e, "stubPrelimQuestions")
