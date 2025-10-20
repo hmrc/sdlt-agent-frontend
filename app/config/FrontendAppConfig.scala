@@ -27,6 +27,36 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
 
+
+  protected lazy val rootServices = "microservice.services"
+
+  protected lazy val defaultProtocol: String =
+    configuration
+      .getOptional[String](s"$rootServices.protocol")
+      .getOrElse("http")
+
+  def getConfString(confKey: String, defString: => String): String =
+    configuration
+      .getOptional[String](s"$rootServices.$confKey")
+      .getOrElse(defString)
+
+  def getConfInt(confKey: String, defInt: => Int): Int =
+    configuration
+      .getOptional[Int](s"$rootServices.$confKey")
+      .getOrElse(defInt)
+
+  protected def config(serviceName: String): Configuration =
+    configuration
+      .getOptional[Configuration](s"$rootServices.$serviceName")
+      .getOrElse(throw new IllegalArgumentException(s"Configuration for service $serviceName not found"))
+
+  def baseUrl(serviceName: String): String = {
+    val protocol = getConfString(s"$serviceName.protocol", defaultProtocol)
+    val host = getConfString(s"$serviceName.host", throwConfigNotFoundError(s"$serviceName.host"))
+    val port = getConfInt(s"$serviceName.port", throwConfigNotFoundError(s"$serviceName.port"))
+    s"$protocol://$host:$port"
+  }
+
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "sdlt-agent-frontend"
 
@@ -52,4 +82,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  private def throwConfigNotFoundError(key: String) =
+    throw new RuntimeException(s"Could not find config key '$key'")
 }
