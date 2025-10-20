@@ -74,7 +74,7 @@ class StubConnectorISpec
 
       "must return PrelimReturn when the stub returns 200 OK" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -89,7 +89,7 @@ class StubConnectorISpec
         result mustBe a[AgentDetails]
 
         server.verify(
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
         )
       }
@@ -110,7 +110,7 @@ class StubConnectorISpec
           )
 
           server.stubFor(
-            get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+            get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
               .withQueryParam("detailsId", equalTo(detailsId))
               .willReturn(
                 aResponse()
@@ -125,7 +125,7 @@ class StubConnectorISpec
           result mustBe a[AgentDetails]
 
           server.verify(
-            getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+            getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
               .withQueryParam("detailsId", equalTo(detailsId))
           )
         }
@@ -133,7 +133,7 @@ class StubConnectorISpec
 
       "must throw BadRequestException when stub returns 400 Bad Request" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -148,13 +148,13 @@ class StubConnectorISpec
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 400
 
         server.verify(
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
         )
       }
 
       "must throw NotFoundException when stub returns 404 Not Found" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo("NONEXISTENT"))
             .willReturn(
               aResponse()
@@ -169,13 +169,13 @@ class StubConnectorISpec
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 404
 
         server.verify(
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
         )
       }
 
       "must throw UpstreamErrorResponse when stub returns 500 Internal Server Error" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -190,13 +190,13 @@ class StubConnectorISpec
         result.asInstanceOf[UpstreamErrorResponse].statusCode mustBe 500
 
         server.verify(
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
         )
       }
 
       "must throw UpstreamErrorResponse when stub returns 502 Bad Gateway" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -213,7 +213,7 @@ class StubConnectorISpec
 
       "must throw UpstreamErrorResponse when stub returns 503 Service Unavailable" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -230,7 +230,7 @@ class StubConnectorISpec
 
       "must include correct headers in the request" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -243,14 +243,14 @@ class StubConnectorISpec
         connector.stubManageAgentQuestions(testDetailsId).futureValue
 
         server.verify(
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withHeader("User-Agent", equalTo("sdlt-agent-frontend"))
         )
       }
 
       "must handle connection errors when service is unavailable" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -276,7 +276,7 @@ class StubConnectorISpec
         )
 
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo("TEST-123"))
             .willReturn(
               aResponse()
@@ -293,7 +293,7 @@ class StubConnectorISpec
 
       "must handle malformed JSON response" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -310,7 +310,7 @@ class StubConnectorISpec
 
       "must make GET request to correct endpoint" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -324,13 +324,13 @@ class StubConnectorISpec
 
         server.verify(
           1,
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
         )
       }
 
       "must not make multiple requests for a single call" in {
         server.stubFor(
-          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
             .withQueryParam("detailsId", equalTo(testDetailsId))
             .willReturn(
               aResponse()
@@ -344,7 +344,7 @@ class StubConnectorISpec
 
         server.verify(
           1,
-          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
+          getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agents/details"))
         )
       }
     }
