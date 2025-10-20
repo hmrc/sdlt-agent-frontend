@@ -80,7 +80,7 @@ class SessionRepositoryISpec
 
     "when there is a record for this id" - {
 
-      "must update the lastUpdated time and get the record no return id" in {
+      "must update the lastUpdated time and get the record no details id" in {
 
         insert(userAnswers).futureValue
 
@@ -91,7 +91,7 @@ class SessionRepositoryISpec
       }
     }
 
-    "must update the lastUpdated time and get the record with return id" in {
+    "must update the lastUpdated time and get the record with details id" in {
 
       insert(userAnswersWithDetailsId).futureValue
 
