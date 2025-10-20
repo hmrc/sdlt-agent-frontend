@@ -110,7 +110,7 @@ class StubConnectorISpec
           )
 
           server.stubFor(
-            get(urlPathEqualTo("/stamp-duty-land-tax-stub/prelim/returns"))
+            get(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
               .withQueryParam("returnId", equalTo(returnId))
               .willReturn(
                 aResponse()
@@ -244,7 +244,7 @@ class StubConnectorISpec
 
         server.verify(
           getRequestedFor(urlPathEqualTo("/stamp-duty-land-tax-stub/manage-agent/details"))
-            .withHeader("User-Agent", equalTo("sdlt-filing-frontend"))
+            .withHeader("User-Agent", equalTo("sdlt-agent-frontend"))
         )
       }
 
