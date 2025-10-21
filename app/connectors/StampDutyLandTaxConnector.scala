@@ -18,11 +18,9 @@ package connectors
 
 import models.AgentDetails
 import models.responses.SubmitAgentDetailsResponse
-import org.slf4j.{Logger, LoggerFactory}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import play.api.mvc.Request
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
