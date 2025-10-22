@@ -17,11 +17,12 @@
 package controllers
 
 import connectors.AddressLookupConnector
-import controllers.actions.IdentifierAction
+import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
+import play.api.Logger
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -33,14 +34,16 @@ class AddressLookupController @Inject()(
                                  view: IndexView
                                ) (implicit ec: ExecutionContext)  extends FrontendBaseController with I18nSupport {
 
-  def onAddressLookUp(): Action[AnyContent] = Action { implicit request =>
-    for {
-      initResult <- addressLookupConnector.initJourney
-    } yield {
-      println(initResult)
-      initResult
+  def onAddressLookUp(): Action[AnyContent] = Action.async { implicit request =>
+     addressLookupConnector.initJourney.map {
+      case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
+        Logger("application").info(s"[AddressLookupController] - OK: ${addressLookupLocation}")
+        Redirect(addressLookupLocation)
+      case _ =>
+        Logger("application").error(s"[AddressLookupController] - ERROR")
+        Ok(view())
     }
-    Ok(view())
+
   }
 
 }

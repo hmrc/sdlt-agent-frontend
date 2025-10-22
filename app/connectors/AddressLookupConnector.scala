@@ -45,26 +45,23 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "options" -> JsObject(
           Seq(
             "continueUrl" -> JsString("..."),
-            "homeNavHref" -> JsString("..."),
-            "signOutHref" -> JsString("..."),
-
-            "accessibilityFooterUrl" -> JsString("..."),
-            "phaseFeedbackLink" -> JsString("/help/alpha"),
-            "deskProServiceName" -> JsString("..."),
-            "showPhaseBanner" -> JsBoolean(false),
-            "alphaPhase" -> JsBoolean(false),
-            "disableTranslations" -> JsBoolean(true),
-            "showBackButtons" -> JsBoolean(false),
-            "includeHMRCBranding" -> JsBoolean(true),
-
-            "allowedCountryCodes" -> JsArray(Seq(JsString("GB"))),
-
+//            "homeNavHref" -> JsString("..."),
+//            "signOutHref" -> JsString("..."),
+//            "accessibilityFooterUrl" -> JsString("..."),
+//            "phaseFeedbackLink" -> JsString("/help/alpha"),
+//            "deskProServiceName" -> JsString("..."),
+//            "showPhaseBanner" -> JsBoolean(false),
+//            "alphaPhase" -> JsBoolean(false),
+//            "disableTranslations" -> JsBoolean(true),
+//            "showBackButtons" -> JsBoolean(false),
+//            "includeHMRCBranding" -> JsBoolean(true),
+//            "allowedCountryCodes" -> JsArray(Seq(JsString("GB"))),
             "ukMode" -> JsBoolean(true),
 
             "selectPageConfig" -> JsObject(
               Seq(
-                "proposalListLimit" -> JsNumber(30),
-                "showSearchLinkAgain" -> JsBoolean(true)
+//                "proposalListLimit" -> JsNumber(30),
+//                "showSearchLinkAgain" -> JsBoolean(true)
               )
             ),
 
@@ -93,8 +90,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                 "timeoutKeepAliveUrl" -> JsString("/keep-alive-uri")
               )
             ),
-
-            "pageHeadingStyle" -> JsString("govuk-heading-xl")
+//            "pageHeadingStyle" -> JsString("govuk-heading-xl")
 
           )
         ),
