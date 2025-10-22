@@ -26,11 +26,11 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.Logger
 
-
-class JourneyConnector @Inject()(val appConfig: FrontendAppConfig,
-                                 http: HttpClientV2,
-                                 val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
+class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
+                                       http: HttpClientV2,
+                                       val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
 
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
@@ -38,7 +38,7 @@ class JourneyConnector @Inject()(val appConfig: FrontendAppConfig,
   private val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
   //TODO: slice into smaller functions + sync actual config with Team-One|TL|Scott
-  private def getAddressJson: JsValue = {
+  private def getAddressJson(): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -57,7 +57,7 @@ class JourneyConnector @Inject()(val appConfig: FrontendAppConfig,
             "showBackButtons" -> JsBoolean(false),
             "includeHMRCBranding" -> JsBoolean(true),
 
-            "allowedCountryCodes" -> JsArray(Seq(JsString("GB"), JsString("FR"))),
+            "allowedCountryCodes" -> JsArray(Seq(JsString("GB"))),
 
             "ukMode" -> JsBoolean(true),
 
@@ -245,8 +245,13 @@ class JourneyConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 1: Journey start/init
   def initJourney(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
+    val payload: JsValue = getAddressJson()
 
-    val payload: JsValue = getAddressJson
+    // TODO: remove this code
+    val payloadStr =  Json.stringify(payload)
+
+    Logger("application").info(s"[AddressLookupConnector] - body: ${payloadStr}")
+
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]

@@ -17,7 +17,7 @@
 package models.responses.addresslookup
 
 import play.api.http.Status.{NOT_FOUND, OK}
-import play.api.libs.json.{JsResult, JsSuccess, Json, OFormat}
+import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.HttpReads
 
 
