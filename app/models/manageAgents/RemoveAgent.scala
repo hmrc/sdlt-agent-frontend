@@ -27,8 +27,8 @@ sealed trait RemoveAgent
 
 object RemoveAgent extends Enumerable.Implicits {
 
-  case object Option1 extends WithName("option1") with RemoveAgent
-  case object Option2 extends WithName("option2") with RemoveAgent
+  case object Option1 extends WithName("true") with RemoveAgent
+  case object Option2 extends WithName("false") with RemoveAgent
 
   val values: Seq[RemoveAgent] = Seq(
     Option1, Option2
