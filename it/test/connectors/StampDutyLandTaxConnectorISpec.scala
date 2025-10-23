@@ -66,16 +66,16 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val result = connector.getAgentDetails(storn).futureValue
-      result.storn        mustBe "STN001"
-      result.name         mustBe "Sunrise Realty"
-      result.houseNumber  mustBe "8B"
-      result.addressLine1 mustBe "Baker Street"
-      result.addressLine3 mustBe "Manchester"
-      result.postcode     mustBe Some("M1 2AB")
-      result.phoneNumber  mustBe "01611234567"
-      result.emailAddress mustBe "contact@sunriserealty.co.uk"
-      result.agentId      mustBe "3454354325"
-      result.isAuthorised mustBe 1
+      result.map(_.storn       ) mustBe Some("STN001")
+      result.map(_.name        ) mustBe Some("Sunrise Realty")
+      result.map(_.houseNumber ) mustBe Some("8B")
+      result.map(_.addressLine1) mustBe Some("Baker Street")
+      result.map(_.addressLine3) mustBe Some("Manchester")
+      result.flatMap(_.postcode) mustBe Some("M1 2AB")
+      result.map(_.phoneNumber ) mustBe Some("01611234567")
+      result.map(_.emailAddress) mustBe Some("contact@sunriserealty.co.uk")
+      result.map(_.agentId     ) mustBe Some("3454354325")
+      result.map(_.isAuthorised) mustBe Some(1)
     }
 
     "fail when BE returns 200 with invalid JSON" in {

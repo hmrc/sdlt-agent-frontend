@@ -20,17 +20,15 @@ import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
-import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.RemoveAgentPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist.*
 import views.html.manageAgents.RemoveAgentView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -81,6 +79,7 @@ class RemoveAgentController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveAgentPage, value))
                 _              <- sessionRepository.set(updatedAnswers)
+                // TODO: RemoveAgent BE call
               } yield Redirect(controllers.routes.HomeController.onPageLoad())
           )
         case None => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
