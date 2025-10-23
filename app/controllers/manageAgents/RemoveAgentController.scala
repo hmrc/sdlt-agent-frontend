@@ -59,8 +59,6 @@ class RemoveAgentController @Inject()(
       }
   }
 
-  // TODO: Create endpoint in BE for agent deletion
-  // TODO: Create dummy endpoint in stub to simulate agent deletion
   def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       stampDutyLandTaxService.getAgentDetails(storn) flatMap {
