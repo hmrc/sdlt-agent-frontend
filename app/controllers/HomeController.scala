@@ -36,11 +36,11 @@ class HomeController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
 
-      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("123456").url
+      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
 
         Future.successful(Ok(Html(
           s"""
-            |<a href=$removeAgentUrl> $removeAgentUrl </a>
+            |<h1> removeAgentUrl: </h1> <a href=$removeAgentUrl> $removeAgentUrl </a>
             |""".stripMargin
         )))
   }
