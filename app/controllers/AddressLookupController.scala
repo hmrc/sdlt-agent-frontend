@@ -17,14 +17,18 @@
 package controllers
 
 import connectors.AddressLookupConnector
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.UserAnswers
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.JourneyResultFailure
 import models.responses.addresslookup.JourneyResultAddressModel
+import pages.AddressDetails
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
 import play.api.Logger
+import repositories.SessionRepository
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,38 +38,63 @@ import scala.util.Try
 class AddressLookupController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          val addressLookupConnector: AddressLookupConnector,
+                                         sessionRepository: SessionRepository,
+                                         identify: IdentifierAction,
                                          view: IndexView
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  private val fakeUserId : String = "111055"
+
+  // TODO: remove temp code :: UserAnswer set up
   def initJourney(): Action[AnyContent] = Action.async { implicit request =>
+
     addressLookupConnector.initJourney.map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
         Logger("application").info(s"[AddressLookupController] - OK: ${addressLookupLocation}")
-        Redirect(addressLookupLocation)
+        val userAnswers = UserAnswers(id = fakeUserId)
+        sessionRepository.set(userAnswers).map { _ =>
+          Redirect(addressLookupLocation)
+          //Results.Redirect(controllers.routes.HomeController.onPageLoad())
+        }
       case _ =>
         Logger("application").error(s"[AddressLookupController] - ERROR")
-        Ok(view())
-    }
+        Future{ Ok(view()) }
+    }.flatten
+
   }
 
   def collectAddressDetails(): Action[AnyContent] = Action.async { implicit request =>
     val idMaybe = Try { request.queryString.get("id").get(0) }.toOption
     Logger("application").info(s"[AddressLookupController] - Id  ${idMaybe}")
+
     // TODO: add logic to save extracted address to SessionService to be used in the next screen
     if (idMaybe.isEmpty){
       Future{ Ok(view()) }
     } else {
+
       addressLookupConnector.getJourneyOutcome(idMaybe.get).map {
         case Right(Some(address)) =>
-          Logger("application").info(s"[AddressLookupController] - AddressFound: ${address}")
-          Ok(view())
+
+          // Fake userId to be extracted via Actions
+          // Save session with update userAnswer
+          val userAnswers = UserAnswers(id = fakeUserId) // request.userId
+          val updateUserAnswer = userAnswers.set(AddressDetails, address).toOption.get
+
+          sessionRepository.set(updateUserAnswer).map( _ =>
+            Logger("application").info(s"[AddressLookupController] - AddressFound: ${address}")
+            Ok(view())
+          )
+
         case Right(None) =>
           Logger("application").error(s"[AddressLookupController] - Unable extract Address by Id")
-          Ok(view())
+          Future.successful { Ok(view()) }
+
         case Left(failure) =>
           Logger("application").error(s"[AddressLookupController] - failed to extract address: ${idMaybe.get} - ${failure}")
-          Ok(view())
-      }
+          Future.successful { Ok(view()) }
+
+      }.flatten
+
     }
   }
 
