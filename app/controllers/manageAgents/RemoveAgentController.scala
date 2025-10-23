@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
+import controllers.routes._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,7 +53,7 @@ class RemoveAgentController @Inject()(
       } recover {
         case ex =>
           logger.error("[onPageLoad] Unexpected failure", ex)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Redirect(JourneyRecoveryController.onPageLoad())
       }
   }
 
@@ -66,13 +67,13 @@ class RemoveAgentController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, agentDetails))),
             _ =>
-              Future.successful(Redirect(controllers.routes.HomeController.onPageLoad()))
+              Future.successful(Redirect(HomeController.onPageLoad()))
           )
         case None => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
       } recover {
         case ex =>
           logger.error("[onSubmit] Unexpected failure", ex)
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          Redirect(JourneyRecoveryController.onPageLoad())
       }
   }
 }
