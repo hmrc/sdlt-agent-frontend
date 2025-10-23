@@ -85,7 +85,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   def removeAgentDetails(storn: String)
                         (implicit hc: HeaderCarrier): Future[Boolean] =
     http
-      .get(getAgentDetailsUrl(storn))
+      .get(removeAgentDetailsUrl(storn))
       .execute[Boolean]
       .recover {
         case e: Throwable =>

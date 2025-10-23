@@ -24,6 +24,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import play.api.libs.json.{JsBoolean, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class StampDutyLandTaxConnectorISpec extends AnyWordSpec
@@ -290,4 +291,59 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "removeAgentDetails" should {
+
+    val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove/$storn"
+
+    "return true when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                Json.stringify(JsBoolean(true))
+              )
+          )
+      )
+
+      val result = connector.removeAgentDetails(storn).futureValue
+
+      result mustBe true
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeAgentDetails(storn).futureValue
+      }
+      ex.getMessage.toLowerCase must include("jsboolean")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeAgentDetails(storn).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }
