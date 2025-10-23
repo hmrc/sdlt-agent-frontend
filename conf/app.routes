@@ -19,3 +19,29 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
+
+GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = CheckMode)
+
+GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
+
+GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+
+GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
+
+GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
+POST        /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onSubmit()
+
+GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad()
+POST        /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit()
