@@ -85,6 +85,38 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
     }
   }
 
+  "removeAgentDetails" should {
+    "delegate to connector with the given storn and return the payload" in {
+
+      val (service, connector) = newService()
+
+      val payload = true
+
+      when(connector.removeAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.removeAgentDetails(sorn).futureValue
+      result mustBe payload
+
+      verify(connector).removeAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+    "propagate failures from the connector" in {
+
+      val (service, connector) = newService()
+
+      when(connector.removeAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = intercept[RuntimeException] {
+        service.removeAgentDetails(sorn).futureValue
+      }
+
+      ex.getMessage must include("boom")
+    }
+  }
+
   "getAllAgentDetails" should {
     "delegate to connector with the given storn and return the payload" in {
 
