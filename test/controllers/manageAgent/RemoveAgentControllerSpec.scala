@@ -91,6 +91,94 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to the Journey Recovery page for a GET when agent details are not found" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(GET, removeAgentRequestRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a GET when StampDutyLandTaxService fails unexpectedly" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(GET, removeAgentRequestRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a POST when agent details are not found" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(POST, removeAgentRequestRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a POST when StampDutyLandTaxService fails unexpectedly " in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(POST, removeAgentRequestRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -109,6 +197,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
       when(service.getAgentDetails(any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
+      when(service.removeAgentDetails(any())(any()))
+        .thenReturn(Future.successful(true))
+
       running(application) {
         val request =
           FakeRequest(POST, removeAgentRequestRoute)
@@ -117,7 +208,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual routes.HomeController.onPageLoad().url
       }
     }
 
@@ -182,6 +273,33 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
         when(service.getAgentDetails(any())(any()))
           .thenReturn(Future.successful(Some(testAgentDetails)))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "redirect to Journey Recovery for a POST if stampDutyLandTaxService fails to remove the agent" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, removeAgentRequestRoute)
+            .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
+
+        when(service.getAgentDetails(any())(any()))
+          .thenReturn(Future.successful(Some(testAgentDetails)))
+
+        when(service.removeAgentDetails(any())(any()))
+          .thenReturn(Future.successful(false))
 
         val result = route(application, request).value
 

@@ -49,7 +49,9 @@ class RemoveAgentController @Inject()(
       stampDutyLandTaxService
         .getAgentDetails(storn) map {
           case Some(agentDetails) => Ok(view(form, agentDetails))
-          case None               => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
+          case None               =>
+            logger.error(s"[onPageLoad] Failed to retrieve details for agent with storn: $storn")
+            Redirect(JourneyRecoveryController.onPageLoad())
       } recover {
         case ex =>
           logger.error("[onPageLoad] Unexpected failure", ex)
@@ -67,9 +69,18 @@ class RemoveAgentController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, agentDetails))),
             _ =>
-              Future.successful(Redirect(HomeController.onPageLoad()))
+              stampDutyLandTaxService.removeAgentDetails(storn) flatMap {
+                case true =>
+                  logger.info(s"[onSubmit] Successfully removed agent with storn: $storn")
+                  Future.successful(Redirect(HomeController.onPageLoad()))
+                case false =>
+                  logger.error(s"[onSubmit] Failed to remove agent with storn: $storn")
+                  Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+              }
           )
-        case None => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
+        case None =>
+          logger.error(s"[onSubmit] Failed to retrieve details for agent with storn: $storn")
+          Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       } recover {
         case ex =>
           logger.error("[onSubmit] Unexpected failure", ex)
