@@ -22,4 +22,4 @@ GET         /unauthorised                                controllers.Unauthorise
 
 #Address Lookup integration / dummy endpoint
 GET         /address-lookup/init                         controllers.AddressLookupController.initJourney()
-GET         /address-lookup/continue                     controllers.AddressLookupController.collectAddressDetails(id: String)
+GET         /address-lookup/continue                     controllers.AddressLookupController.collectAddressDetails()

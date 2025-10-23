@@ -38,7 +38,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
   // TODO: check where to get base url for this service
-  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails("").url
+  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails().url
 
   //TODO: slice into smaller functions + sync actual config with Team-One|TL|Scott
   private def getAddressJson(): JsValue = {
@@ -259,6 +259,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 2: Extract journey result/outcome
   def getJourneyOutcome(id: String)
                        (implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
+    Logger("application").info(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
     http.get(url"${addressLookupOutcomeUrl(id)}").execute[AddressLookupJourneyOutcome]
   }
 

@@ -25,10 +25,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
 import play.api.Logger
-import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 // TODO: this is temporarily controller to test AddressLookupConnector
 class AddressLookupController @Inject()(
@@ -48,17 +48,24 @@ class AddressLookupController @Inject()(
     }
   }
 
-  def collectAddressDetails(id: String): Action[AnyContent] = Action.async { implicit request =>
-    addressLookupConnector.getJourneyOutcome(id).map {
-      case Right(Some(address)) =>
-        Logger("application").info(s"[AddressLookupController] - AddressFound: ${address}")
-        Ok(view())
-      case Right(None) =>
-        Logger("application").error(s"[AddressLookupController] - Empty result")
-        Ok(view())
-      case Left(failure) =>
-        Logger("application").error(s"[AddressLookupController] - failed to extract address: ${id} - ${failure}")
-        Ok(view())
+  def collectAddressDetails(): Action[AnyContent] = Action.async { implicit request =>
+    val idMaybe = Try { request.queryString.get("id").get(0) }.toOption
+    Logger("application").info(s"[AddressLookupController] - Id  ${idMaybe}")
+    // TODO: add logic to save extracted address to SessionService to be used in the next screen
+    if (idMaybe.isEmpty){
+      Future{ Ok(view()) }
+    } else {
+      addressLookupConnector.getJourneyOutcome(idMaybe.get).map {
+        case Right(Some(address)) =>
+          Logger("application").info(s"[AddressLookupController] - AddressFound: ${address}")
+          Ok(view())
+        case Right(None) =>
+          Logger("application").error(s"[AddressLookupController] - Unable extract Address by Id")
+          Ok(view())
+        case Left(failure) =>
+          Logger("application").error(s"[AddressLookupController] - failed to extract address: ${idMaybe.get} - ${failure}")
+          Ok(view())
+      }
     }
   }
 
