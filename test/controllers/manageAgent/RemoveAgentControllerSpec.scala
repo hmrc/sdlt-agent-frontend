@@ -17,11 +17,8 @@
 package controllers.manageAgent
 
 import base.SpecBase
-import connectors.StampDutyLandTaxConnector
-import models.{AgentDetails, UserAnswers}
+import models.AgentDetails
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -30,13 +27,12 @@ import repositories.SessionRepository
 import controllers.routes
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
-import pages.manageAgents.RemoveAgentPage
 import play.api.data.Form
 import play.api.mvc.Call
 import services.StampDutyLandTaxService
 import views.html.manageAgents.RemoveAgentView
 import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
@@ -92,32 +88,6 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, testAgentDetails)(request, messages(application)).toString
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(RemoveAgentPage, RemoveAgent.values.head).success.value
-
-      val application =
-        applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(
-            bind[StampDutyLandTaxService].toInstance(service)
-          )
-          .build()
-
-      when(service.getAgentDetails(any())(any()))
-        .thenReturn(Future.successful(Some(testAgentDetails)))
-
-      running(application) {
-        val request = FakeRequest(GET, removeAgentRequestRoute)
-
-        val view = application.injector.instanceOf[RemoveAgentView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(RemoveAgent.values.head), testAgentDetails)(request, messages(application)).toString
       }
     }
 
