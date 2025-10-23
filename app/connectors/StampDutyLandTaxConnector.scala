@@ -45,8 +45,8 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
-  private val removeAgentDetailsUrl: String => URL = storn =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove/$storn"
+  private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
   
   def getAgentDetails(storn: String)
                      (implicit hc: HeaderCarrier): Future[Option[AgentDetails]] =
@@ -82,10 +82,10 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def removeAgentDetails(storn: String)
+  def removeAgentDetails(storn: String, agentReferenceNumber: String)
                         (implicit hc: HeaderCarrier): Future[Boolean] =
     http
-      .get(removeAgentDetailsUrl(storn))
+      .get(removeAgentDetailsUrl(storn, agentReferenceNumber))
       .execute[Boolean]
       .recover {
         case e: Throwable =>

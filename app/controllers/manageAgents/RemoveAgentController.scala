@@ -67,13 +67,21 @@ class RemoveAgentController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, agentDetails))),
             _ =>
-              stampDutyLandTaxService.removeAgentDetails(storn) flatMap {
-                case true =>
-                  logger.info(s"[onSubmit] Successfully removed agent with storn: $storn")
-                  Future.successful(Redirect(HomeController.onPageLoad()))
-                case false =>
-                  logger.error(s"[onSubmit] Failed to remove agent with storn: $storn")
-                  Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+              lazy val agentReferenceNumber =
+                agentDetails.agentReferenceNumber
+                  .getOrElse {
+                    val msg = s"agentReferenceNumber missing for storn=$storn userId=${request.userId}"
+                    logger.error(msg)
+                    throw IllegalStateException(msg)
+                  }
+              stampDutyLandTaxService
+                .removeAgentDetails(storn, agentReferenceNumber) flatMap {
+                  case true =>
+                    logger.info(s"[onSubmit] Successfully removed agent with storn: $storn")
+                    Future.successful(Redirect(HomeController.onPageLoad()))
+                  case false =>
+                    logger.error(s"[onSubmit] Failed to remove agent with storn: $storn")
+                    Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
               }
           )
         case None =>

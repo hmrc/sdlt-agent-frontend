@@ -39,6 +39,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   }
 
   val sorn = "SN001"
+  
+  val agentReferenceNumber = "ARN001"
 
   "getAgentDetails" should {
     "delegate to connector with the given storn and return the payload" in {
@@ -92,13 +94,13 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val payload = true
 
-      when(connector.removeAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
-      val result = service.removeAgentDetails(sorn).futureValue
+      val result = service.removeAgentDetails(sorn, agentReferenceNumber).futureValue
       result mustBe payload
 
-      verify(connector).removeAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verify(connector).removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
 
@@ -106,11 +108,11 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      when(connector.removeAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
-        service.removeAgentDetails(sorn).futureValue
+        service.removeAgentDetails(sorn, agentReferenceNumber).futureValue
       }
 
       ex.getMessage must include("boom")

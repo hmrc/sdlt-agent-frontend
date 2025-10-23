@@ -19,18 +19,19 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class AgentDetails(
-                         storn        : String,
-                         name         : String,
-                         houseNumber  : String,
-                         addressLine1 : String,
-                         addressLine2 : Option[String],
-                         addressLine3 : String,
-                         addressLine4 : Option[String],
-                         postcode     : Option[String],
-                         phoneNumber  : String,
-                         emailAddress : String,
-                         agentId      : String,
-                         isAuthorised : BigInt
+                         storn                : String,
+                         agentReferenceNumber : Option[String] = None,
+                         name                 : String,
+                         houseNumber          : String,
+                         addressLine1         : String,
+                         addressLine2         : Option[String],
+                         addressLine3         : String,
+                         addressLine4         : Option[String],
+                         postcode             : Option[String],
+                         phoneNumber          : String,
+                         emailAddress         : String,
+                         agentId              : String,
+                         isAuthorised         : BigInt
                        )
 
 object AgentDetails {

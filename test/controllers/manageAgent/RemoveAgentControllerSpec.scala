@@ -44,6 +44,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
   val testAgentDetails: AgentDetails = AgentDetails(
     storn = "STN001",
+    agentReferenceNumber = Some("ARN001"),
     name = "Harborview Estates",
     houseNumber = "22A",
     addressLine1 = "Queensway",
@@ -197,7 +198,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
       when(service.getAgentDetails(any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
-      when(service.removeAgentDetails(any())(any()))
+      when(service.removeAgentDetails(any(), any())(any()))
         .thenReturn(Future.successful(true))
 
       running(application) {
@@ -298,8 +299,34 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         when(service.getAgentDetails(any())(any()))
           .thenReturn(Future.successful(Some(testAgentDetails)))
 
-        when(service.removeAgentDetails(any())(any()))
+        when(service.removeAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(false))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "throw an Exception for a POST if the agentReferenceNumber is not present" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      val agentWithNoArn = testAgentDetails.copy(agentReferenceNumber = None)
+      
+      running(application) {
+        val request =
+          FakeRequest(POST, removeAgentRequestRoute)
+            .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
+
+        when(service.getAgentDetails(any())(any()))
+          .thenReturn(Future.successful(Some(agentWithNoArn)))
 
         val result = route(application, request).value
 

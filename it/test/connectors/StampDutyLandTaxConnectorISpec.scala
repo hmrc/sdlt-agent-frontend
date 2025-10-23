@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, stubFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.AgentDetails
 import models.responses.SubmitAgentDetailsResponse
@@ -38,6 +38,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
   val connector: StampDutyLandTaxConnector = app.injector.instanceOf[StampDutyLandTaxConnector]
 
   private val storn = "STN001"
+
+  private val agentReferenceNumber = "STN001"
 
   "getAgentDetails" should {
 
@@ -294,11 +296,13 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   "removeAgentDetails" should {
 
-    val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove/$storn"
+    val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove"
 
     "return true when BE returns 200 with valid JSON" in {
       stubFor(
         get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -308,7 +312,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           )
       )
 
-      val result = connector.removeAgentDetails(storn).futureValue
+      val result = connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
 
       result mustBe true
     }
@@ -316,6 +320,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
     "fail when BE returns 200 with invalid JSON" in {
       stubFor(
         get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -324,7 +330,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.removeAgentDetails(storn).futureValue
+        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
       }
       ex.getMessage.toLowerCase must include("jsboolean")
     }
@@ -332,6 +338,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
     "propagate an upstream error when BE returns 500" in {
       stubFor(
         get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -340,7 +348,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.removeAgentDetails(storn).futureValue
+        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
       }
       ex.getMessage must include("returned 500")
     }
