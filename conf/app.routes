@@ -21,4 +21,5 @@ GET         /account/signed-out                          controllers.auth.Signed
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
 #Address Lookup integration / dummy endpoint
-GET         /address-lookup                              controllers.AddressLookupController.onAddressLookUp()
+GET         /address-lookup/init                         controllers.AddressLookupController.initJourney()
+GET         /address-lookup/continue                     controllers.AddressLookupController.collectAddressDetails(id: String)

@@ -37,6 +37,9 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
   private val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
+  // TODO: check where to get base url for this service
+  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails("").url
+
   //TODO: slice into smaller functions + sync actual config with Team-One|TL|Scott
   private def getAddressJson(): JsValue = {
     JsObject(
@@ -44,7 +47,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "version" -> JsNumber(2),
         "options" -> JsObject(
           Seq(
-            "continueUrl" -> JsString("..."),
+            "continueUrl" -> JsString(continueUrl),
 //            "homeNavHref" -> JsString("..."),
 //            "signOutHref" -> JsString("..."),
 //            "accessibilityFooterUrl" -> JsString("..."),
