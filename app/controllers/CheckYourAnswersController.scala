@@ -22,7 +22,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist.*
-import views.html.manageAgent.CheckYourAnswersView
+import views.html.manageAgents.CheckYourAnswersView
+import viewmodels.manageAgents.checkAnswers.*
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
@@ -37,7 +38,12 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
 
       val list = SummaryListViewModel(
-        rows = Seq.empty
+        rows = Seq(
+          AnswerSummary.row("John Doe", "agentName"),
+          AnswerSummary.row("123 Nowhere Lane", "address"),
+          AnswerSummary.row("07123456789", "contactTelephoneNumber"),
+          AnswerSummary.row("john.doe@example.com", "contactEmail")
+        ).flatten
       )
 
       Ok(view(list))

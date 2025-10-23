@@ -32,10 +32,17 @@ index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
 manageAgents.caption = Manage Agents
+manageAgent.agentName.checkYourAnswersLabel =
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.submitSection.button = Save and continue
+
+checkYourAnswers.agentName.label = Agent name
+checkYourAnswers.address.label = Address
+checkYourAnswers.contactTelephoneNumber.label = Contact telephone number
+checkYourAnswers.contactEmail.label = Contact Email
+
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
