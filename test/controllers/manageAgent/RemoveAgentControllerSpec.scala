@@ -17,7 +17,8 @@
 package controllers.manageAgent
 
 import base.SpecBase
-import models.UserAnswers
+import connectors.StampDutyLandTaxConnector
+import models.{AgentDetails, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -32,7 +33,10 @@ import models.manageAgents.RemoveAgent
 import pages.manageAgents.RemoveAgentPage
 import play.api.data.Form
 import play.api.mvc.Call
+import services.StampDutyLandTaxService
 import views.html.manageAgents.RemoveAgentView
+import org.mockito.Mockito.*
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 
 import scala.concurrent.Future
 
@@ -40,9 +44,28 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
 
-  lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad().url
+  val storn: String = "STN001"
+
+  val testAgentDetails: AgentDetails = AgentDetails(
+    storn = "STN001",
+    name = "Harborview Estates",
+    houseNumber = "22A",
+    addressLine1 = "Queensway",
+    addressLine2 = None,
+    addressLine3 = "Birmingham",
+    addressLine4 = None,
+    postcode = Some("B2 4ND"),
+    phoneNumber = "01214567890",
+    emailAddress = "info@harborviewestates.co.uk",
+    agentId = "AGT001",
+    isAuthorised = 1
+  )
+
+  lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(storn).url
 
   val formProvider = new RemoveAgentFormProvider()
+
+  val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
   val form: Form[RemoveAgent] = formProvider()
 
@@ -50,7 +73,15 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request = FakeRequest(GET, removeAgentRequestRoute)
@@ -60,7 +91,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[RemoveAgentView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, testAgentDetails)(request, messages(application)).toString
       }
     }
 
@@ -68,7 +99,15 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId).set(RemoveAgentPage, RemoveAgent.values.head).success.value
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request = FakeRequest(GET, removeAgentRequestRoute)
@@ -78,7 +117,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(RemoveAgent.values.head))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(RemoveAgent.values.head), testAgentDetails)(request, messages(application)).toString
       }
     }
 
@@ -92,9 +131,13 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[StampDutyLandTaxService].toInstance(service)
           )
           .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request =
@@ -110,7 +153,15 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request =
@@ -124,12 +175,21 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, testAgentDetails)(request, messages(application)).toString
       }
     }
+
     "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request = FakeRequest(GET, removeAgentRequestRoute)
@@ -150,10 +210,12 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, removeAgentRequestRoute)
             .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
 
+        when(service.getAgentDetails(any())(any()))
+          .thenReturn(Future.successful(Some(testAgentDetails)))
+
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }

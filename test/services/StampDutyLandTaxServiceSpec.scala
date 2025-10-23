@@ -45,7 +45,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      val payload = AgentDetails(
+      val payload = Some(AgentDetails(
         storn = "STN001",
         name = "Acme Property Agents Ltd",
         houseNumber = "42",
@@ -58,7 +58,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         emailAddress = "info@acmeagents.co.uk",
         agentId = "AGT001",
         isAuthorised = 1
-      )
+      ))
 
       when(connector.getAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))

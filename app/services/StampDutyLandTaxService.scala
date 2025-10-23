@@ -31,15 +31,15 @@ class StampDutyLandTaxService @Inject() (
 
   // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
   
-  def getAgentDetails(sorn: String)
-                     (implicit headerCarrier: HeaderCarrier): Future[AgentDetails] =
+  def getAgentDetails(storn: String)
+                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetails]] =
     stampDutyLandTaxConnector
-      .getAgentDetails(sorn)
+      .getAgentDetails(storn)
     
-  def getAllAgentDetails(sorn: String)
+  def getAllAgentDetails(storn: String)
                         (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetails]] =
     stampDutyLandTaxConnector
-      .getAllAgentDetails(sorn)
+      .getAllAgentDetails(storn)
     
   def submitAgentDetails(agentDetails: AgentDetails)
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =

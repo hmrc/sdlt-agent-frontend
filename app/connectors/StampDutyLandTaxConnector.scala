@@ -46,10 +46,10 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
   
   def getAgentDetails(storn: String)
-                     (implicit hc: HeaderCarrier): Future[AgentDetails] =
+                     (implicit hc: HeaderCarrier): Future[Option[AgentDetails]] =
     http
       .get(getAgentDetailsUrl(storn))
-      .execute[AgentDetails]
+      .execute[Option[AgentDetails]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAgentDetails]: ${e.getMessage}")

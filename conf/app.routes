@@ -22,5 +22,5 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
 
-GET         /manage-agents/remove                        controllers.manageAgents.RemoveAgentController.onPageLoad()
-POST        /manage-agents/remove                        controllers.manageAgents.RemoveAgentController.onSubmit()
+GET         /manage-agents/remove/:storn                  controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
+POST        /manage-agents/remove/:storn                  controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)

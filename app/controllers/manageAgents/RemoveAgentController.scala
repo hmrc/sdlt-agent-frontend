@@ -20,13 +20,15 @@ import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
-import models.{Mode, NormalMode}
+import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.RemoveAgentPage
+import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist.*
 import views.html.manageAgents.RemoveAgentView
@@ -41,13 +43,14 @@ class RemoveAgentController @Inject()(
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        formProvider: RemoveAgentFormProvider,
+                                       stampDutyLandTaxService: StampDutyLandTaxService,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: RemoveAgentView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   val form: Form[RemoveAgent] = formProvider()
 
-  def onPageLoad(sorn: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(RemoveAgentPage) match {
@@ -55,21 +58,35 @@ class RemoveAgentController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm))
+      stampDutyLandTaxService.getAgentDetails(storn) map {
+        case Some(agentDetails) => Ok(view(preparedForm, agentDetails))
+        case None               => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
+      } recover { case ex =>
+        logger.error("[onPageLoad] Unexpected failure", ex)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  // TODO: Create endpoint in BE for agent deletion
+  // TODO: Create dummy endpoint in stub to simulate agent deletion
+  def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      stampDutyLandTaxService.getAgentDetails(storn) flatMap {
+        case Some(agentDetails) =>
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, agentDetails))),
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveAgentPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.routes.HomeController.onPageLoad())
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(RemoveAgentPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(controllers.routes.HomeController.onPageLoad())
+          )
+        case None => throw new IllegalStateException(s"Failed to retrieve details for agent with storn: $storn")
+      } recover { case ex =>
+        logger.error("[onSubmit] Unexpected failure", ex)
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      }
   }
 }
