@@ -47,3 +47,11 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+manageAgents.caption = Manage Agents
+
+agentName.title = Agent Name
+agentName.heading = What is the agent's name?
+agentName.manageAgentsHeader = Manage agents
+agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
+agentName.button = Continue
