@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.manageAgents
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
@@ -22,8 +22,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist.*
-import views.html.manageAgents.CheckYourAnswersView
 import viewmodels.manageAgents.checkAnswers.*
+import views.html.manageAgents.CheckYourAnswersView
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,

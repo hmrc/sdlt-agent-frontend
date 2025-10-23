@@ -37,11 +37,14 @@ manageAgent.agentName.checkYourAnswersLabel =
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
 checkYourAnswers.submitSection.button = Save and continue
-
 checkYourAnswers.agentName.label = Agent name
 checkYourAnswers.address.label = Address
 checkYourAnswers.contactTelephoneNumber.label = Contact telephone number
 checkYourAnswers.contactEmail.label = Contact Email
+checkYourAnswers.agentName.change.hidden = Confirm your agent's name
+checkYourAnswers.address.change.hidden = Confirm your agent's address
+checkYourAnswers.contactTelephoneNumber.change.hidden = Confirm your agent's telephone number
+checkYourAnswers.contactEmail.change.hidden = Confirm your agent's email
 
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service

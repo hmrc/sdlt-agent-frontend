@@ -23,12 +23,24 @@ import viewmodels.implicits.*
 
 object AnswerSummary {
 
-  def row(answer: String, tag: String)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answer: String, tag: String)(implicit messages: Messages): Option[SummaryListRow] = {
+    val attribute = s"change-confirm-${tag.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase}"
+
     Some(
       SummaryListRowViewModel(
         key = messages(s"checkYourAnswers.$tag.label"),
-        value = ValueViewModel(messages(answer))
+        value = ValueViewModel(messages(answer)),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            "http://localhost:10911/stamp-duty-land-tax-agent"
+          )
+            .withVisuallyHiddenText(messages(s"checkYourAnswers.$tag.change.hidden"))
+            .withAttribute("id" -> attribute)
+        )
       )
     )
-
+  }
 }
+
+
