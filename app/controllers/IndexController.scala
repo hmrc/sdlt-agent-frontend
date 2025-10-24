@@ -34,6 +34,10 @@ class IndexController @Inject()(
   extends FrontendBaseController
     with I18nSupport {
 
+  // TODO: This Controller provides a route to access the service
+  // TODO: This route must be hit in order to authenticate the user to access other pages
+  // TODO: Essentially the entry point to the service
+
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
 
     val userAnswers = UserAnswers(id = request.userId)
