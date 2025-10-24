@@ -33,6 +33,12 @@ class HomeController @Inject()(
                                 val controllerComponents: MessagesControllerComponents
                               ) extends FrontendBaseController with I18nSupport {
 
+  // TODO: TO BE REMOVED
+
+  // TODO: This is dummy page which we use temporarily to redirect to on successful submission of a form
+
+  // TODO: This is dummy page is also used as a temporary landing page - as the landing page has not been implemented yet
+
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
 
