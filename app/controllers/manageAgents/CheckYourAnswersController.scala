@@ -48,4 +48,8 @@ class CheckYourAnswersController @Inject()(
 
       Ok(view(list))
   }
+
+  def onSubmit(): Action[AnyContent] = identify { implicit request => // (identify andThen getData andThen requireData)
+    NoContent
+  }
 }

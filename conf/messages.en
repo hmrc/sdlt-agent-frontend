@@ -31,21 +31,23 @@ index.title = sdlt-agent-frontend
 index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
-manageAgents.caption = Manage Agents
-manageAgent.agentName.checkYourAnswersLabel =
+manageAgents.caption = Manage agents
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
-checkYourAnswers.submitSection.button = Save and continue
-checkYourAnswers.agentName.label = Agent name
-checkYourAnswers.address.label = Address
-checkYourAnswers.contactTelephoneNumber.label = Contact telephone number
-checkYourAnswers.contactEmail.label = Contact Email
-checkYourAnswers.agentName.change.hidden = Confirm your agent's name
-checkYourAnswers.address.change.hidden = Confirm your agent's address
-checkYourAnswers.contactTelephoneNumber.change.hidden = Confirm your agent's telephone number
-checkYourAnswers.contactEmail.change.hidden = Confirm your agent's email
+manageAgents.agentName.checkYourAnswersLabel = Agent name
+manageAgents.agentName.change.hidden = confirm agent's name
 
+manageAgents.address.checkYourAnswersLabel = Address
+manageAgents.address.change.hidden = confirm agent's address
+
+manageAgents.contactTelephoneNumber.checkYourAnswersLabel = Contact telephone number
+manageAgents.contactTelephoneNumber.change.hidden = confirm agent's telephone number
+
+manageAgents.contactEmail.checkYourAnswersLabel = Contact email
+manageAgents.contactEmail.change.hidden = confirm agent's email
+
+manageAgents.checkYourAnswers.title = Check your answers
+manageAgents.checkYourAnswers.heading = Check your answers
+manageAgents.checkYourAnswers.submitSection.button = Save and continue
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service

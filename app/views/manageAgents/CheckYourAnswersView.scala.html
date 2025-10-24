@@ -25,13 +25,13 @@
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages) // list: SummaryList
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+@layout(pageTitle = titleNoForm(messages("manageAgents.checkYourAnswers.title"))) {
 
-    @h1("checkYourAnswers.heading")
+    @h1("manageAgents.checkYourAnswers.heading")
 
     @govukSummaryList(list)
 
     @govukButton(
-        ButtonViewModel(messages("checkYourAnswers.submitSection.button"))
+        ButtonViewModel(messages("manageAgents.checkYourAnswers.submitSection.button"))
     )
 }

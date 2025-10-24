@@ -16,6 +16,8 @@
 
 package viewmodels.manageAgents.checkAnswers
 
+import controllers.manageAgents.{AgentNameController, AgentOverviewController}
+import models.CheckMode
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
@@ -26,14 +28,20 @@ object AnswerSummary {
   def row(answer: String, tag: String)(implicit messages: Messages): Option[SummaryListRow] = {
     val attribute = s"change-confirm-${tag.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase}"
 
+    val changeCall = tag match {
+      case "agentName" => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode).url
+      case "address" => controllers.manageAgents.routes.AddressLookupController.onPageLoad(CheckMode).url
+      case _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+    }
+
     Some(
       SummaryListRowViewModel(
-        key = messages(s"checkYourAnswers.$tag.label"),
+        key = messages(s"manageAgents.$tag.checkYourAnswersLabel"),
         value = ValueViewModel(messages(answer)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            "http://localhost:10911/stamp-duty-land-tax-agent"
+            changeCall
           )
             .withVisuallyHiddenText(messages(s"checkYourAnswers.$tag.change.hidden"))
             .withAttribute("id" -> attribute)
