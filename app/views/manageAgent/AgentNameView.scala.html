@@ -16,6 +16,7 @@
 
 @this(
         layout: templates.Layout,
+        formHelper: FormWithCSRF,
         govukInput: GovukInput,
         h1: components.H1,
         govukButton: GovukButton,
@@ -23,22 +24,25 @@
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
-@*()(implicit request: Request[_], messages: Messages)*@
 
 @layout(
-    pageTitle = titleNoForm(messages("manageAgents.agentName.title"))) {
-    @h1("manageAgents.agentName.heading")
+    pageTitle = title(form, messages("manageAgents.agentName.title"))) {
+    @formHelper(action = controllers.manageAgents.routes.AgentNameController.onSubmit(mode)) {
 
- @govukInput(Input(
-  id = "agent-name-input",
-  name = "agentNameinput",
-  label = Label(
-   content = Text(messages("manageAgents.agentName.tip"))
-  )
- ))
+        @h1("manageAgents.agentName.heading")
 
-    @govukButton(Button(
-        content = Text(messages("manageAgents.agentName.button"))
-    ))
-    @break()
+        @govukInput(Input(
+            id = "agent-name-input",
+            name = "agentNameinput",
+            label = Label(
+                content = Text(messages("manageAgents.agentName.tip"))
+            )
+        ))
+
+        @govukButton(Button(
+            content = Text(messages("manageAgents.agentName.button"))
+        ))
+
+        @break()
+    }
 }
