@@ -34,14 +34,13 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
-  private val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
+  val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
   private val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
   // TODO: check where to get base url for this service
   private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails().url
 
-  //TODO: slice into smaller functions + sync actual config with Team-One|TL|Scott
-  private def getAddressJson(): JsValue = {
+  private def getAddressJson: JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -244,13 +243,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 1: Journey start/init
   def initJourney(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
-    val payload: JsValue = getAddressJson()
-
-    // TODO: remove this code
-    val payloadStr =  Json.stringify(payload)
-
-    Logger("application").info(s"[AddressLookupConnector] - body: ${payloadStr}")
-
+    val payload: JsValue = getAddressJson
+    Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]

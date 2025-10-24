@@ -36,6 +36,7 @@ trait ApplicationWithWiremock
       "microservice.services.auth.port"                -> WireMockConstants.stubPort,
       "microservice.services.stamp-duty-land-tax.host" -> WireMockConstants.stubHost,
       "microservice.services.stamp-duty-land-tax.port" -> WireMockConstants.stubPort
+//      "address-lookup.baseUrl" -> ""
     )
   }
 

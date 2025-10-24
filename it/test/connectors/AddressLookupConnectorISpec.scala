@@ -16,40 +16,60 @@
 
 package connectors
 
+import config.FrontendAppConfig
 import itutil.ApplicationWithWiremock
-import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
+import mocks.MockHttpV2
+import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
+import play.api.i18n.MessagesApi
 import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext
 
 class AddressLookupConnectorISpec extends AnyWordSpec
   with Matchers
   with ScalaFutures
   with IntegrationPatience
-  with ApplicationWithWiremock {
+  with ApplicationWithWiremock
+  with MockHttpV2 {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
+  // TODO: move this under TestHelper?
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   private val storn = "STN001"
-  val addressLookUpInit = "/stamp-duty-land-tax-agent/address-lookup/init"
 
-  // JourneyInitFailureResponse, JourneyInitSuccessResponse
-  "Initiate Address Lookup Journey:: success" should {
-    // TODO: add stub ?
-    val expectedLocation : String = "someDummyLocation"
-    val result = connector.initJourney.futureValue
-    result mustBe JourneyInitSuccessResponse(Some(expectedLocation))
+  object TestAddressLookupConnector extends AddressLookupConnector(appConfig, mockHttpClient, messagesApi)
+
+
+  "Initiate Address Lookup Journey" should {
+
+    "return location details on success" in {
+      setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+        Right(JourneyInitSuccessResponse(Some("Some location")))
+      )
+      val result = TestAddressLookupConnector.initJourney.futureValue
+      result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
+    }
+
+    "return location details on failure" in {
+      setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+        Left( JourneyInitFailureResponse(INTERNAL_SERVER_ERROR) )
+      )
+      val result = TestAddressLookupConnector.initJourney.futureValue
+      result mustBe Left( JourneyInitFailureResponse(INTERNAL_SERVER_ERROR) )
+    }
   }
 
-  "Initiate Address Lookup Journey:: failed" should {
-
-  }
-
-  "Extract Address Details upon Journey completion" should {
-
-  }
+// TODO: continue with this part of the test on Monday
+//  "Extract Address Details upon Journey completion" should {
+//
+//  }
 
 }
