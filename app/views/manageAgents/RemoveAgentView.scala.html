@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
@@ -39,11 +41,19 @@
         }
 
         @govukRadios(
-            RadiosViewModel.yesNo(
+            RadiosViewModel(
                 field = form("value"),
-                legend = LegendViewModel(
-                    messages("manageAgents.removeAgent.heading", agentDetails.name)
-                ).asPageHeading()
+                legend = LegendViewModel(messages("manageAgents.removeAgent.heading", agentDetails.name)).asPageHeading(),
+                items = Seq(
+                    RadioItem(
+                        value = Some("true"),
+                        content = Text(messages("site.yes"))
+                    ),
+                    RadioItem(
+                        value = Some("false"),
+                        content = Text(messages("site.no"))
+                    )
+                )
             )
         )
 
