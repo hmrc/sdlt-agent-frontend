@@ -16,22 +16,54 @@
 
 package controllers.ManageAgents
 
-import controllers.actions.IdentifierAction
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import forms.manageAgents.AgentNameFormProvider
+import models.Mode
+import navigation.Navigator
+import pages.manageAgents.AgentNamePage
+
 import javax.inject.Inject
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgent.AgentNameView
 
+import scala.concurrent.{ExecutionContext, Future}
+
 class AgentNameController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 identify: IdentifierAction,
-                                 view: AgentNameView
-                               ) extends FrontendBaseController with I18nSupport {
+                                     override val messagesApi: MessagesApi,
+                                     val controllerComponents: MessagesControllerComponents,
+                                     sessionRepository: SessionRepository,
+                                     identify: IdentifierAction,
+                                     getData: DataRetrievalAction,
+                                     requireData: DataRequiredAction,
+                                     formProvider: AgentNameFormProvider,
+                                     view: AgentNameView,
+                                     navigator: Navigator,
+                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
+  val form = formProvider()
 
-    //val form = formProvider()
-    Ok(view())
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData){
+    implicit request =>
+      val form = formProvider()
+      Ok(view(form, mode))
+      //Ok(view(preparedForm, mode))
+  }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+//          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+      } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
+    )
   }
 }

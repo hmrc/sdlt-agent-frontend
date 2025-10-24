@@ -15,30 +15,30 @@
  *@
 
 @this(
-    layout: templates.Layout,
-        govukInput : GovukInput,
+        layout: templates.Layout,
+        govukInput: GovukInput,
         h1: components.H1,
-        govukButton : GovukButton,
+        govukButton: GovukButton,
         break: components.SectionBreak
 )
 
-@()(implicit request: Request[_], messages: Messages )
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@*()(implicit request: Request[_], messages: Messages)*@
 
 @layout(
-    pageTitle = titleNoForm(messages("agentName.title")),
-) {
- @h1("agentName.heading")
+    pageTitle = titleNoForm(messages("manageAgents.agentName.title"))) {
+    @h1("manageAgents.agentName.heading")
 
  @govukInput(Input(
   id = "agent-name-input",
   name = "agentNameinput",
   label = Label(
-   content = Text(messages("agentName.tip"))
+   content = Text(messages("manageAgents.agentName.tip"))
   )
  ))
 
- @govukButton(Button(
-  content = Text(messages("agentName.button"))
- ))
-  @break()
+    @govukButton(Button(
+        content = Text(messages("manageAgents.agentName.button"))
+    ))
+    @break()
 }

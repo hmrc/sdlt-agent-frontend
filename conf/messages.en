@@ -50,8 +50,12 @@ unauthorised.heading = You can’t access this service with this account
 
 manageAgents.caption = Manage Agents
 
-agentName.title = Agent Name
-agentName.heading = What is the agent's name?
-agentName.manageAgentsHeader = Manage agents
-agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
-agentName.button = Continue
+manageAgents.agentName.error.invalid = Your entry for 'Agent's name' contains an invalid character. Please amend.
+manageAgents.agentName.error.length = Your input for 'Agent's name' contains too many characters. Please amend.
+manageAgents.agentName.error.required = Please complete 'Agent's name'.
+
+manageAgents.agentName.title = Manage agents - what is the agent's name - GOV.UK
+manageAgents.agentName.heading = What is the agent's name?
+manageAgents.agentName.manageAgentsHeader = Manage agents
+manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
+manageAgents.agentName.button = Continue

@@ -20,4 +20,4 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET         /agent-name                                  controllers.ManageAgents.AgentNameController.onPageLoad()
+GET         /manage-agents/agent-name                    controllers.ManageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
