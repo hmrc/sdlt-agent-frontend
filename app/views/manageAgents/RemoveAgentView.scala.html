@@ -30,7 +30,7 @@
         messages: Messages
 )
 
-@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title"))) {
+@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title", agentDetails.name))) {
 
     @formHelper(action = controllers.manageAgents.routes.RemoveAgentController.onSubmit(agentDetails.storn), Symbol("autoComplete") -> "off") {
 

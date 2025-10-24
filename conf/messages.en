@@ -1,4 +1,4 @@
-service.name = sdlt-agent-frontend
+service.name = Stamp Taxes Online
 
 site.back = Back
 site.remove = Remove
@@ -49,5 +49,5 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-manageAgents.removeAgent.title   = Are you sure you want to remove {0}?
+manageAgents.removeAgent.title   = Manage agents – Delete agent
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
