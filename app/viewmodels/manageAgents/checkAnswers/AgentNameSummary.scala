@@ -16,38 +16,31 @@
 
 package viewmodels.manageAgents.checkAnswers
 
-import controllers.manageAgents.{AgentNameController, AgentOverviewController}
-import models.CheckMode
+import models.{CheckMode, UserAnswers}
+import pages.manageAgents.AgentNamePage
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AnswerSummary {
+object AgentNameSummary {
 
-  def row(answer: String, tag: String)(implicit messages: Messages): Option[SummaryListRow] = {
-    val attribute = s"change-confirm-${tag.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase}"
-
-    val changeCall = tag match {
-      case "agentName" => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode).url
-      case "address" => controllers.manageAgents.routes.AddressLookupController.onPageLoad(CheckMode).url
-      case _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
-    }
-
-    Some(
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(AgentNamePage).map { answer =>
       SummaryListRowViewModel(
-        key = messages(s"manageAgents.$tag.checkYourAnswersLabel"),
-        value = ValueViewModel(messages(answer)),
+        key = "manageAgents.agentName.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            changeCall
+            controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages(s"checkYourAnswers.$tag.change.hidden"))
-            .withAttribute("id" -> attribute)
+            .withVisuallyHiddenText(messages("manageAgents.agentName.change.hidden"))
+            .withAttribute("id" -> "change-agent-name")
         )
       )
-    )
+    }
   }
 }
 

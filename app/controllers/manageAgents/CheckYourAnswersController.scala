@@ -18,6 +18,7 @@ package controllers.manageAgents
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,28 +29,28 @@ import views.html.manageAgents.CheckYourAnswersView
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             identify: IdentifierAction,
-//                                            getData: DataRetrievalAction,
-//                                            requireData: DataRequiredAction,
+                                            getData: DataRetrievalAction,
+                                            requireData: DataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { // (identify andThen getData andThen requireData)
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
       val list = SummaryListViewModel(
         rows = Seq(
-          AnswerSummary.row("John Doe", "agentName"),
-          AnswerSummary.row("123 Nowhere Lane", "address"),
-          AnswerSummary.row("07123456789", "contactTelephoneNumber"),
-          AnswerSummary.row("john.doe@example.com", "contactEmail")
+          AgentNameSummary.row(request.userAnswers),
+          AddressSummary.row(request.userAnswers),
+          ContactDetailsSummary.row(request.userAnswers, "contactTelephoneNumber"),
+          ContactDetailsSummary.row(request.userAnswers, "contactEmail")
         ).flatten
       )
 
       Ok(view(list))
   }
 
-  def onSubmit(): Action[AnyContent] = identify { implicit request => // (identify andThen getData andThen requireData)
-    NoContent
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(NormalMode))
   }
 }
