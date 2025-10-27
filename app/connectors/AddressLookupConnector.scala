@@ -241,7 +241,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   // Step 1: Journey start/init
-  def initJourney(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
+  def initJourney(storn: String)(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = getAddressJson
     Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")

@@ -19,20 +19,14 @@ package controllers.manageAgents
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
-import models.responses.addresslookup.JourneyOutcomeResponse.JourneyResultFailure
-import models.responses.addresslookup.JourneyResultAddressModel
 import models.{Mode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressDetails, AgentContactDetailsPage}
+import pages.manageAgents.AgentContactDetailsPage
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.AddressLookupService
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -47,7 +41,8 @@ class AddressLookupController @Inject()(
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    addressLookupService.initJourney().map {
+    // TODO: userId is the same as Sorn ???
+    addressLookupService.initJourney(request.userId).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
         Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)

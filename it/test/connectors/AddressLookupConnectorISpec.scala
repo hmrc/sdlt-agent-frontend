@@ -65,14 +65,14 @@ class AddressLookupConnectorISpec extends AnyWordSpec
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Right(JourneyInitSuccessResponse(Some("Some location")))
       )
-      val result = TestAddressLookupConnector.initJourney.futureValue
+      val result = TestAddressLookupConnector.initJourney(storn).futureValue
       result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
     }
     "return failure when attempt init Journey" in {
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
       )
-      val result = TestAddressLookupConnector.initJourney.futureValue
+      val result = TestAddressLookupConnector.initJourney(storn).futureValue
       result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
     }
 

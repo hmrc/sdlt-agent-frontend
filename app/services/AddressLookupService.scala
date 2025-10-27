@@ -37,10 +37,11 @@ class AddressLookupService @Inject()(
                                     )(implicit ec: ExecutionContext){
 
   // Step 1: Init AL journey
-  def initJourney()
+  // TODO: pass storn ID
+  def initJourney(sorn: String)
                  (implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
     Logger("application").debug(s"[AddressLookupService] - Init AddressLookUp journey")
-    addressLookUpConnector.initJourney()
+    addressLookUpConnector.initJourney(sorn)
   }
 
   // Step 2: extract and save AddressDetails
