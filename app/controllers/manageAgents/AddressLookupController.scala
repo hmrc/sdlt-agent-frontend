@@ -43,7 +43,6 @@ class AddressLookupController @Inject()(
                                          identify: IdentifierAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
-                                         view: IndexView,
                                          navigator: Navigator
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
@@ -54,12 +53,10 @@ class AddressLookupController @Inject()(
         Redirect(addressLookupLocation)
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
         Logger("application").error("[AddressLookupController] - Failed::Location not provided")
-        // TODO: redirect to default error page
-        Ok(view())
+        throw new RuntimeException("Failed::Location not provided")
       case Left(ex) =>
         Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
-        // TODO: redirect to default error page
-        Ok(view())
+        throw new RuntimeException(s"Failed to Init journey: $ex")
     }
   }
 
@@ -76,8 +73,7 @@ class AddressLookupController @Inject()(
       Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
-      // TODO: redirect to default error page
-      Ok(view())
+      throw new RuntimeException(s"failed to extract address: $ex")
     }
   }
 
