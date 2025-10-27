@@ -18,7 +18,9 @@ package controllers.manageAgents
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{Mode, NormalMode}
+import controllers.routes.JourneyRecoveryController
+import models.NormalMode
+import play.api.Logging
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
@@ -35,7 +37,7 @@ class StartAddAgentController @Inject()(
                                      requireData: DataRequiredAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                    )(implicit appConfig: FrontendAppConfig,
-                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private val MaxAgents = appConfig.maxNumberOfAgents
 
@@ -48,6 +50,10 @@ class StartAddAgentController @Inject()(
         } else {
           Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode))
         }
+      } recover {
+        case ex =>
+          logger.error("[onPageLoad] Unexpected failure", ex)
+          Redirect(JourneyRecoveryController.onPageLoad())
       }
     }
 }

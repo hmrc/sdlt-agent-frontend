@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.manageAgent
+package controllers.manageAgents
 
 import base.SpecBase
 import models.AgentDetails

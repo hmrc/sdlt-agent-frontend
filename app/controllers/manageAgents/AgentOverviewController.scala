@@ -27,6 +27,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
 import controllers.manageAgents.routes.*
+import controllers.routes.JourneyRecoveryController
+import play.api.Logging
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 
@@ -39,7 +41,7 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         view: AgentOverviewView
-                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport {
+                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
   def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
@@ -60,6 +62,10 @@ class AgentOverviewController @Inject()(
             ) { summary =>
               Ok(view(Some(summary), pagination, paginationText, postAction))
             }
-      }
+      } recover {
+      case ex =>
+        logger.error("[onPageLoad] Unexpected failure", ex)
+        Redirect(JourneyRecoveryController.onPageLoad())
+    }
   }
 }
