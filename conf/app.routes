@@ -20,6 +20,8 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
+GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
+
 GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/check-agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = CheckMode)
@@ -43,5 +45,5 @@ POST        /manage-agents/check-agent-contact-details         controllers.manag
 GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
 POST        /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onSubmit()
 
-GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad()
-POST        /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit()
+GET         /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
+POST        /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)

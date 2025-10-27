@@ -39,13 +39,15 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   }
 
   val sorn = "SN001"
+  
+  val agentReferenceNumber = "ARN001"
 
   "getAgentDetails" should {
     "delegate to connector with the given storn and return the payload" in {
 
       val (service, connector) = newService()
 
-      val payload = AgentDetails(
+      val payload = Some(AgentDetails(
         storn = "STN001",
         name = "Acme Property Agents Ltd",
         houseNumber = "42",
@@ -58,7 +60,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         emailAddress = "info@acmeagents.co.uk",
         agentId = "AGT001",
         isAuthorised = 1
-      )
+      ))
 
       when(connector.getAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
@@ -79,6 +81,38 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val ex = intercept[RuntimeException] {
         service.getAgentDetails(sorn).futureValue
+      }
+
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "removeAgentDetails" should {
+    "delegate to connector with the given storn and return the payload" in {
+
+      val (service, connector) = newService()
+
+      val payload = true
+
+      when(connector.removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.removeAgentDetails(sorn, agentReferenceNumber).futureValue
+      result mustBe payload
+
+      verify(connector).removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+    "propagate failures from the connector" in {
+
+      val (service, connector) = newService()
+
+      when(connector.removeAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = intercept[RuntimeException] {
+        service.removeAgentDetails(sorn, agentReferenceNumber).futureValue
       }
 
       ex.getMessage must include("boom")
