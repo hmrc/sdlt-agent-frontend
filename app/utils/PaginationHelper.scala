@@ -29,22 +29,18 @@ trait PaginationHelper {
   private val ROWS_ON_PAGE = 10
 
   def getPaginationInfoText(paginationIndex: Int, agentsList: Seq[AgentDetails])
-                           (implicit messages: Messages): Option[Html] = {
-    if (agentsList.isEmpty || paginationIndex <= 0) return None
+                           (implicit messages: Messages): Option[String] = {
 
-    val paged = agentsList.grouped(ROWS_ON_PAGE).toSeq
+    if (agentsList.length <= 10 || paginationIndex <= 0) { None }
+    else {
+      val paged = agentsList.grouped(ROWS_ON_PAGE).toSeq
 
-    paged.lift(paginationIndex - 1).map { detailsChunk =>
-      val total = agentsList.length
-      val start = (paginationIndex - 1) * ROWS_ON_PAGE + 1
-      val end = math.min(paginationIndex * ROWS_ON_PAGE, total)
-
-      Html(
-        s"""
-           |<p class="govuk-body>${messages("manageAgents.agentDetails.summaryInfo.partOne")} $start ${messages("manageAgents.agentDetails.summaryInfo.partTwo")} $end ${messages("manageAgents.agentDetails.summaryInfo.partThree")} $total
-           |</p>
-           |""".stripMargin
-      )
+      paged.lift(paginationIndex - 1).map { detailsChunk =>
+        val total = agentsList.length
+        val start = (paginationIndex - 1) * ROWS_ON_PAGE + 1
+        val end = math.min(paginationIndex * ROWS_ON_PAGE, total)
+        messages("manageAgents.agentDetails.summaryInfo.text", start, end, total)
+      }
     }
   }
 

@@ -53,7 +53,7 @@ class AgentOverviewController @Inject()(
 
           val numberOfPages:            Int                = getNumberOfPages(agentDetailsList)
           val pagination:               Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
-          val paginationText:           Option[Html]       = getPaginationInfoText(paginationIndex, agentDetailsList)
+          val paginationText:           Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(

@@ -23,6 +23,7 @@
         layout: templates.Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
+        govukNotificationBanner: GovukNotificationBanner,
         govukPagination: GovukPagination,
         p: Paragraph,
         hmrcPageHeading: HmrcPageHeading
@@ -30,7 +31,7 @@
 @(
         maybeSummaryList:   Option[SummaryList],
         pagination:         Option[Pagination],
-        paginationInfoText: String
+        paginationInfoText: Option[String]
 )(
         implicit request: Request[_],
         messages: Messages
@@ -46,7 +47,7 @@
     ))
 
     @p(messages("manageAgents.agentOverview.info.text"))
-    @p(messages("manageAgents.agentDetails.summaryInfo.text"))
+    @paginationInfoText.map(p(_))
 
     @{maybeSummaryList match {
         case Some(summary) => govukSummaryList(summary)
