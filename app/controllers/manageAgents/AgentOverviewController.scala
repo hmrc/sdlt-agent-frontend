@@ -21,7 +21,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PaginationHelper
@@ -46,9 +46,11 @@ class AgentOverviewController @Inject()(
 
   def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
+    val postAction: Call = controllers.manageAgents.routes.StartAddAgentController.onSubmit(storn)
+    
     stampDutyLandTaxService
       .getAllAgentDetails(storn).map {
-        case Nil              => Ok(view(None, None, None))
+        case Nil              => Ok(view(None, None, None, postAction))
         case agentDetailsList =>
 
           val numberOfPages:            Int                = getNumberOfPages(agentDetailsList)
@@ -59,7 +61,7 @@ class AgentOverviewController @Inject()(
             .fold(
               Redirect(AgentOverviewController.onPageLoad(storn, 1))
             ) { summary =>
-              Ok(view(Some(summary), pagination, paginationText))
+              Ok(view(Some(summary), pagination, paginationText, postAction))
             }
       }
   }

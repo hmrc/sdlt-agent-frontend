@@ -23,15 +23,17 @@
         layout: templates.Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        govukNotificationBanner: GovukNotificationBanner,
         govukPagination: GovukPagination,
+        govukErrorSummary: GovukErrorSummary,
+        formHelper: FormWithCSRF,
         p: Paragraph,
         hmrcPageHeading: HmrcPageHeading
 )
 @(
         maybeSummaryList:   Option[SummaryList],
         pagination:         Option[Pagination],
-        paginationInfoText: Option[String]
+        paginationInfoText: Option[String],
+        postAction:         Call
 )(
         implicit request: Request[_],
         messages: Messages
@@ -41,27 +43,41 @@
     pageTitle = titleNoForm(messages("manageAgents.agentOverview.title"))
 ) {
 
+    @request.flash.get("agentsLimitReached").map { _ =>
+        @govukErrorSummary(
+            ErrorSummary(
+                title = Text(messages("error.summary.title")),
+                errorList = Seq(
+                    ErrorLink(
+                        content = Text(messages("manageAgents.agentDetails.limitReached"))
+                    )
+                )
+            )
+        )
+    }
+
     @hmrcPageHeading(PageHeading(
         text    = messages("manageAgents.agentDetails.heading"),
         section = Some(messages("manageAgents.agentDetails.caption"))
     ))
 
     @p(messages("manageAgents.agentOverview.info.text"))
+
     @paginationInfoText.map(p(_))
 
     @{maybeSummaryList match {
         case Some(summary) => govukSummaryList(summary)
         case None          => p(messages("manageAgents.agentOverview.noAgents.text"))
-
     }}
 
     @pagination.map(govukPagination(_))
 
     <div>
-        @govukButton(
-            ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                .withCssClass("govuk-!-margin-top-2")
-                .asLink(AgentNameController.onPageLoad(NormalMode).url)
-        )
+        @formHelper(action = postAction) {
+            @govukButton(
+                ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
+                    .withCssClass("govuk-!-margin-top-2")
+            )
+        }
     </div>
 }

@@ -23,6 +23,7 @@ GET         /unauthorised                                controllers.Unauthorise
 GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
 
 GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(storn: String, paginationIndex: Int)
+POST        /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit(storn: String)
 
 GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
