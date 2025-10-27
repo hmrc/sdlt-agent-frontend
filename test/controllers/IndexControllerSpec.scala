@@ -17,28 +17,73 @@
 package controllers
 
 import base.SpecBase
+import models.UserAnswers
+import org.mockito.ArgumentMatchers.{any, argThat}
+import org.mockito.Mockito.{verify, when}
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.IndexView
+import play.api.test.Helpers.*
+import repositories.SessionRepository
+import controllers.routes._
 
-class IndexControllerSpec extends SpecBase {
+import scala.concurrent.Future
+
+class IndexControllerSpec extends SpecBase with MockitoSugar {
 
   "Index Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "onPageLoad" - {
+      s"must redirect to ${HomeController.onPageLoad().url} with the userId added to the session" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
 
-      running(application) {
-        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
 
-        val result = route(application, request).value
+        running(application) {
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-        val view = application.injector.instanceOf[IndexView]
+          val result = route(application, request).value
 
-        status(result) mustEqual OK
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.HomeController.onPageLoad().url
+          verify(mockSessionRepository).set(any[UserAnswers])
+        }
+      }
 
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+      "must update UserAnswers model with the userId pulled from the request" in {
+
+        val mockSessionRepository = mock[SessionRepository]
+        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          val captor = org.mockito.ArgumentCaptor.forClass(classOf[UserAnswers])
+          verify(mockSessionRepository).set(captor.capture())
+
+          val savedUserAnswers = captor.getValue
+          savedUserAnswers.id must not be empty
+
+          verify(mockSessionRepository).set(argThat((ua: UserAnswers) =>
+            ua.id.contains(savedUserAnswers.id)
+          ))
+        }
       }
     }
   }

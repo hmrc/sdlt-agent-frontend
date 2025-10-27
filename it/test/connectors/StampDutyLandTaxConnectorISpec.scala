@@ -16,7 +16,7 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo, urlPathMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.AgentDetails
 import models.responses.SubmitAgentDetailsResponse
@@ -24,6 +24,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
+import play.api.libs.json.{JsBoolean, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class StampDutyLandTaxConnectorISpec extends AnyWordSpec
@@ -37,6 +38,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
   val connector: StampDutyLandTaxConnector = app.injector.instanceOf[StampDutyLandTaxConnector]
 
   private val storn = "STN001"
+
+  private val agentReferenceNumber = "STN001"
 
   "getAgentDetails" should {
 
@@ -66,16 +69,16 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val result = connector.getAgentDetails(storn).futureValue
-      result.storn        mustBe "STN001"
-      result.name         mustBe "Sunrise Realty"
-      result.houseNumber  mustBe "8B"
-      result.addressLine1 mustBe "Baker Street"
-      result.addressLine3 mustBe "Manchester"
-      result.postcode     mustBe Some("M1 2AB")
-      result.phoneNumber  mustBe "01611234567"
-      result.emailAddress mustBe "contact@sunriserealty.co.uk"
-      result.agentId      mustBe "3454354325"
-      result.isAuthorised mustBe 1
+      result.map(_.storn       ) mustBe Some("STN001")
+      result.map(_.name        ) mustBe Some("Sunrise Realty")
+      result.map(_.houseNumber ) mustBe Some("8B")
+      result.map(_.addressLine1) mustBe Some("Baker Street")
+      result.map(_.addressLine3) mustBe Some("Manchester")
+      result.flatMap(_.postcode) mustBe Some("M1 2AB")
+      result.map(_.phoneNumber ) mustBe Some("01611234567")
+      result.map(_.emailAddress) mustBe Some("contact@sunriserealty.co.uk")
+      result.map(_.agentId     ) mustBe Some("3454354325")
+      result.map(_.isAuthorised) mustBe Some(1)
     }
 
     "fail when BE returns 200 with invalid JSON" in {
@@ -290,4 +293,65 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       ex.getMessage must include("returned 500")
     }
   }
+
+  "removeAgentDetails" should {
+
+    val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove"
+
+    "return true when BE returns 200 with valid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(
+                Json.stringify(JsBoolean(true))
+              )
+          )
+      )
+
+      val result = connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+
+      result mustBe true
+    }
+
+    "fail when BE returns 200 with invalid JSON" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{ "unexpectedField": true }""")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+      }
+      ex.getMessage.toLowerCase must include("jsboolean")
+    }
+
+    "propagate an upstream error when BE returns 500" in {
+      stubFor(
+        get(urlPathEqualTo(removeAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+      val ex = intercept[Exception] {
+        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+      }
+      ex.getMessage must include("returned 500")
+    }
+  }
+
 }

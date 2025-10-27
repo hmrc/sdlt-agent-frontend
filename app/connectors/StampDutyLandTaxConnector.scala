@@ -44,12 +44,15 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
 
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
+
+  private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
   
   def getAgentDetails(storn: String)
-                     (implicit hc: HeaderCarrier): Future[AgentDetails] =
+                     (implicit hc: HeaderCarrier): Future[Option[AgentDetails]] =
     http
       .get(getAgentDetailsUrl(storn))
-      .execute[AgentDetails]
+      .execute[Option[AgentDetails]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAgentDetails]: ${e.getMessage}")
@@ -76,6 +79,17 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .recover {
         case e: Throwable =>
           logger.error(s"[submitAgentDetails]: ${e.getMessage}")
+          throw new RuntimeException(e.getMessage)
+      }
+
+  def removeAgentDetails(storn: String, agentReferenceNumber: String)
+                        (implicit hc: HeaderCarrier): Future[Boolean] =
+    http
+      .get(removeAgentDetailsUrl(storn, agentReferenceNumber))
+      .execute[Boolean]
+      .recover {
+        case e: Throwable =>
+          logger.error(s"[removeAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 }
