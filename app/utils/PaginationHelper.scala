@@ -18,6 +18,7 @@ package utils
 
 import models.AgentDetails
 import play.api.i18n.Messages
+import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
@@ -27,13 +28,33 @@ trait PaginationHelper {
 
   private val ROWS_ON_PAGE = 10
 
+  def getPaginationInfoText(paginationIndex: Int, agentsList: Seq[AgentDetails])
+                           (implicit messages: Messages): Option[Html] = {
+    if (agentsList.isEmpty || paginationIndex <= 0) return None
+
+    val paged = agentsList.grouped(ROWS_ON_PAGE).toSeq
+
+    paged.lift(paginationIndex - 1).map { detailsChunk =>
+      val total = agentsList.length
+      val start = (paginationIndex - 1) * ROWS_ON_PAGE + 1
+      val end = math.min(paginationIndex * ROWS_ON_PAGE, total)
+
+      Html(
+        s"""
+           |<p class="govuk-body>${messages("manageAgents.agentDetails.summaryInfo.partOne")} $start ${messages("manageAgents.agentDetails.summaryInfo.partTwo")} $end ${messages("manageAgents.agentDetails.summaryInfo.partThree")} $total
+           |</p>
+           |""".stripMargin
+      )
+    }
+  }
+
   def getNumberOfPages(agentDetailsList: List[AgentDetails]): Int = agentDetailsList.grouped(ROWS_ON_PAGE).size
 
   def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetails])
                           (implicit messages: Messages): Option[SummaryList] = {
     
     val paged: Seq[Seq[AgentDetails]] = agents.grouped(ROWS_ON_PAGE).toSeq
-    
+
     val currentPage: Option[Seq[AgentDetails]] = paged.lift(paginationIndex - 1)
 
     currentPage.map(pageAgents =>
@@ -127,7 +148,7 @@ trait PaginationHelper {
         )
       )
     }
-  
+
   
   
 }

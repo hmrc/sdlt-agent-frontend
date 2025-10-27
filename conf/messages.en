@@ -64,3 +64,7 @@ manageAgents.agentOverview.title                 = Manage Agents - Agent Details
 manageAgents.agentDetails.heading                = Agent details
 manageAgents.agentDetails.caption                = Manage agents
 manageAgents.agentDetails.addAgentButtonText     = Add an Agent
+manageAgents.agentDetails.summaryInfo.partOne    = Showing
+manageAgents.agentDetails.summaryInfo.partTwo    = to
+manageAgents.agentDetails.summaryInfo.partThree  = of
+manageAgents.agentDetails.summaryInfo.partFour   = records

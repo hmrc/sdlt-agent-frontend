@@ -30,7 +30,7 @@
 @(
         maybeSummaryList:   Option[SummaryList],
         pagination:         Option[Pagination],
-        showAddAgentButton: Boolean
+        paginationInfoText: String
 )(
         implicit request: Request[_],
         messages: Messages
@@ -46,6 +46,7 @@
     ))
 
     @p(messages("manageAgents.agentOverview.info.text"))
+    @p(messages("manageAgents.agentDetails.summaryInfo.text"))
 
     @{maybeSummaryList match {
         case Some(summary) => govukSummaryList(summary)
@@ -55,13 +56,11 @@
 
     @pagination.map(govukPagination(_))
 
-    @if(showAddAgentButton) {
-      <div>
-          @govukButton(
-              ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                  .withCssClass("govuk-!-margin-top-2")
-                  .asLink(AgentNameController.onPageLoad(NormalMode).url)
-          )
-      </div>
-    }
+    <div>
+        @govukButton(
+            ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
+                .withCssClass("govuk-!-margin-top-2")
+                .asLink(AgentNameController.onPageLoad(NormalMode).url)
+        )
+    </div>
 }

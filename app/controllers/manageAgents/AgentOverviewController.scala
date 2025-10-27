@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
 import controllers.manageAgents.routes.*
+import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 
 import scala.concurrent.ExecutionContext
@@ -47,18 +48,18 @@ class AgentOverviewController @Inject()(
 
     stampDutyLandTaxService
       .getAllAgentDetails(storn).map {
-        case Nil              => Ok(view(None, None, showAddAgentButton = true))
+        case Nil              => Ok(view(None, None, None))
         case agentDetailsList =>
 
           val numberOfPages:            Int                = getNumberOfPages(agentDetailsList)
           val pagination:               Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
-          val shouldShowAddAgentButton: Boolean            = agentDetailsList.length < appConfig.maxNumberOfAgents
+          val paginationText:           Option[Html]       = getPaginationInfoText(paginationIndex, agentDetailsList)
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
               Redirect(AgentOverviewController.onPageLoad(storn, 1))
             ) { summary =>
-              Ok(view(Some(summary), pagination, shouldShowAddAgentButton))
+              Ok(view(Some(summary), pagination, paginationText))
             }
       }
   }
