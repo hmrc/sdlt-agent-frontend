@@ -50,9 +50,9 @@ class AgentOverviewController @Inject()(
         case Nil              => Ok(view(None, None, None, postAction))
         case agentDetailsList =>
 
-          val numberOfPages:            Int                = getNumberOfPages(agentDetailsList)
-          val pagination:               Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
-          val paginationText:           Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
+          val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
+          val pagination:     Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
+          val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
