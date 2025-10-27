@@ -26,18 +26,18 @@ import pages.manageAgents.AgentNamePage
 @Singleton
 class Navigator @Inject()() {
 
-  private val normalRoutes: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad()
-    case AgentNamePage => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
+  private val normalRoutes: Page => String => UserAnswers => Call = {
+    case _ => _ => _ => routes.IndexController.onPageLoad()
+    case AgentNamePage => storn => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, storn)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String): Call = mode match {
     case NormalMode =>
-      normalRoutes(page)(userAnswers)
+      normalRoutes(storn)(page)(userAnswers)
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }

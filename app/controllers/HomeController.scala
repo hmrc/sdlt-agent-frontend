@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.*
+import models.NormalMode
 
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -43,10 +44,12 @@ class HomeController @Inject()(
     implicit request =>
 
       val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
+      val agentNameURL = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, "").url
 
         Future.successful(Ok(Html(
           s"""
             |<h1> removeAgentUrl: </h1> <a href=$removeAgentUrl> $removeAgentUrl </a>
+            |<h1> agentNameURL: </h1> <a href=$agentNameURL> $agentNameURL </a>
             |""".stripMargin
         )))
   }

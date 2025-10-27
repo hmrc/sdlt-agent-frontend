@@ -47,57 +47,57 @@ class AgentNameController@Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val preparedForm = request.userAnswers.get(AgentNamePage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, storn))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
-
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
-      )
-  }
-}
+//  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
 //
-//def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
-//  val storn: String = ""
-//  form
-//    .bindFromRequest()
-//    .fold(
-//      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-//      value => {
-//        stampDutyLandTaxService
-//          .isDuplicate(storn: String, value)
-//          .flatMap {
-//            case true =>
-//              val dupForm =
-//                form
-//                  .fill(value)
-//                  .withError(
-//                    "value",
-//                    "DUPLICATE"
-//                  )
-//              Future.successful(BadRequest(view(dupForm, mode)))
-//            case false =>
-//              for {
-//                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-//                _ <- sessionRepository.set(updatedAnswers)
-//              } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
-//          }
-//      }
-//    )
+//    form
+//      .bindFromRequest()
+//      .fold(
+//        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+//        value =>
+//          for {
+//            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
+//            _ <- sessionRepository.set(updatedAnswers)
+//          } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
+//      )
+//  }
 //}
-//}
+
+def onSubmit(mode: Mode, storn: String): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+
+  form
+    .bindFromRequest()
+    .fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, storn))),
+      value => {
+        stampDutyLandTaxService
+          .isDuplicate(storn: String, value)
+          .flatMap {
+            case true =>
+              val dupForm =
+                form
+                  .fill(value)
+                  .withError(
+                    "value",
+                    "DUPLICATE"
+                  )
+              Future.successful(BadRequest(view(dupForm, mode, storn)))
+            case false =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
+          }
+      }
+    )
+}
+}

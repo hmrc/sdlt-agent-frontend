@@ -38,10 +38,11 @@ class IndexController @Inject()(
   // TODO: Essentially the entry point to the service
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
-    val userAnswers = UserAnswers(request.userId)
+
+    val userAnswers = UserAnswers(id = request.userId)
 
     sessionRepository.set(userAnswers).map { _ =>
-      Results.Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode))
+      Results.Redirect(controllers.routes.HomeController.onPageLoad())
     }
   }
 }

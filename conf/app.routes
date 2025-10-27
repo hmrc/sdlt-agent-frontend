@@ -27,10 +27,10 @@ POST        /manage-agents/agent-overview                controllers.manageAgent
 GET         /manage-agents/check-agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/check-agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode, storn: String)
+POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode, storn: String)
+GET         /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode, storn: String)
+POST        /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode, storn: String)
 
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
