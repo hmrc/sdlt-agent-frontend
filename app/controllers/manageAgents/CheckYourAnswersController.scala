@@ -30,11 +30,7 @@ class CheckYourAnswersController @Inject()(
                                             view: IndexView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
-  }
-
-  def onSubmit(): Action[AnyContent] = identify { implicit request =>
+  def onPageLoad(storn: String): Action[AnyContent] = identify { implicit request =>
     Ok(view())
   }
 }

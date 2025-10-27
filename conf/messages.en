@@ -52,15 +52,15 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-manageAgents.agentDetails.title = Manage Agents - Agent Details
-manageAgents.agentDetails.heading = Agent Details
-manageAgents.agentDetails.title = Manage Agents - Agent Details
-manageAgents.agentDetails.title = Manage Agents - Agent Details
-manageAgents.agentDetails.title = Manage Agents - Agent Details
-manageAgents.agentDetails.title = Manage Agents - Agent Details
+
 
 manageAgents.removeAgent.title   = Manage agents – Delete agent
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
 
+manageAgents.agentOverview.noAgents.line1        = Any agents added can be linked to a purchaser within ‘About the purchaser’.
+manageAgents.agentOverview.noAgents.line2        = You have no agents listed.
 manageAgents.agentOverview.remove.visuallyHidden = Change {0}
-manageAgents.agentOverview.change.visuallyHidden = Remove {0} the list
+manageAgents.agentOverview.title                 = Manage Agents - Agent Details
+manageAgents.agentDetails.heading                = Agent Details
+manageAgents.agentDetails.caption                = Manage agents
+manageAgents.agentDetails.addAgentButtonText     = Add an Agent

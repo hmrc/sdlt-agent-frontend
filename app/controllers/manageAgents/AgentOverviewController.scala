@@ -16,26 +16,50 @@
 
 package controllers.manageAgents
 
-import controllers.actions.IdentifierAction
-import models.Mode
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+import config.FrontendAppConfig
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 
 import javax.inject.Inject
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StampDutyLandTaxService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.PaginationHelper
+import views.html.manageAgents.AgentOverviewView
+import controllers.manageAgents.routes.*
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+
+import scala.concurrent.ExecutionContext
 
 class AgentOverviewController @Inject()(
-                                         val controllerComponents: MessagesControllerComponents,
-                                         identify: IdentifierAction,
-                                         view: IndexView
-                                       ) extends FrontendBaseController with I18nSupport {
+                                        val controllerComponents: MessagesControllerComponents,
+                                        stampDutyLandTaxService: StampDutyLandTaxService,
+                                        identify: IdentifierAction,
+                                        getData: DataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        view: AgentOverviewView
+                                      )(
+                                        implicit executionContext: ExecutionContext,
+                                        appConfig: FrontendAppConfig,
+                                      ) extends FrontendBaseController with PaginationHelper with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+    stampDutyLandTaxService
+      .getAllAgentDetails(storn).map {
+        case Nil              => Ok(view(None, None, showAddAgentButton = true))
+        case agentDetailsList =>
+
+          val numberOfPages:            Int                = getNumberOfPages(agentDetailsList)
+          val pagination:               Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
+          val shouldShowAddAgentButton: Boolean            = agentDetailsList.length < appConfig.maxNumberOfAgents
+
+          generateAgentSummary(paginationIndex, agentDetailsList)
+            .fold(
+              Redirect(AgentOverviewController.onPageLoad(storn, 1))
+            ) { summary =>
+              Ok(view(Some(summary), pagination, shouldShowAddAgentButton))
+            }
+      }
   }
 }
