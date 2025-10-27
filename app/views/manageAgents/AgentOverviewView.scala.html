@@ -36,11 +36,6 @@
         messages: Messages
 )
 
-@noAgentsContent = {
-    @p(messages("manageAgents.agentOverview.noAgents.line1"))
-    @p(messages("manageAgents.agentOverview.noAgents.line2"))
-}
-
 @layout(
     pageTitle = titleNoForm(messages("manageAgents.agentOverview.title"))
 ) {
@@ -50,9 +45,11 @@
         section = Some(messages("manageAgents.agentDetails.caption"))
     ))
 
+    @p(messages("manageAgents.agentOverview.info.text"))
+
     @{maybeSummaryList match {
         case Some(summary) => govukSummaryList(summary)
-        case None          => noAgentsContent
+        case None          => p(messages("manageAgents.agentOverview.noAgents.text"))
 
     }}
 
@@ -62,7 +59,7 @@
       <div>
           @govukButton(
               ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                  .withCssClass("govuk-!-margin-top-5")
+                  .withCssClass("govuk-!-margin-top-2")
                   .asLink(AgentNameController.onPageLoad(NormalMode).url)
           )
       </div>
