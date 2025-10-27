@@ -19,7 +19,7 @@ package utils
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{PaginationItem, PaginationLink}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import controllers.manageAgents.routes
 import models.AgentDetails
