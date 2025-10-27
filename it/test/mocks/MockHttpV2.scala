@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{mock, reset, when}
 import org.mockito.stubbing.OngoingStubbing
+import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.StringContextOps
 
 import scala.concurrent.Future
@@ -30,16 +31,26 @@ trait MockHttpV2  {
   lazy val mockHttpClient: HttpClientV2 = mock(classOf[HttpClientV2])
   lazy val mockRequestBuilder: RequestBuilder = mock(classOf[RequestBuilder])
 
-//  override def beforeEach(): Unit = {
-//    super.beforeEach()
-//    reset(mockHttpClient)
-//    reset(mockRequestBuilder)
-//  }
-
-
   def setupMockHttpPost[T](url: String)(response: T): OngoingStubbing[Future[T]] = {
     when(mockHttpClient.post( ArgumentMatchers.eq(url"$url") )(any())).thenReturn(mockRequestBuilder)
     when(mockRequestBuilder.withBody(any())(any(), any(), any())).thenReturn(mockRequestBuilder)
     when(mockRequestBuilder.execute[T](any(), any())).thenReturn(Future.successful(response))
   }
+
+  def setupMockHttpGet[T](url: String)(response: T): OngoingStubbing[Future[T]] = {
+    when(mockHttpClient.get(ArgumentMatchers.eq(url"$url"))(ArgumentMatchers.any()))
+      .thenReturn(mockRequestBuilder)
+
+    when(mockRequestBuilder.setHeader(any[(String, String)]))
+      .thenReturn(mockRequestBuilder)
+
+    when(mockRequestBuilder
+      .setHeader(any[(String, String)]))
+      .thenReturn(mockRequestBuilder)
+
+    when(mockRequestBuilder
+      .execute[T](ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(response))
+  }
+
 }

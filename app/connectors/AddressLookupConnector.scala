@@ -35,7 +35,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
   val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
-  private val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
+  val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
   // TODO: check where to get base url for this service
   private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails().url

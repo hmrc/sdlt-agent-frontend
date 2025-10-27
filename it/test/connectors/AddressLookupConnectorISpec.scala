@@ -16,16 +16,21 @@
 
 package connectors
 
+
 import config.FrontendAppConfig
 import itutil.ApplicationWithWiremock
 import mocks.MockHttpV2
 import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
+import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.http.HeaderCarrier
+import org.mockito.Mockito.{reset}
 
 import scala.concurrent.ExecutionContext
 
@@ -34,22 +39,28 @@ class AddressLookupConnectorISpec extends AnyWordSpec
   with ScalaFutures
   with IntegrationPatience
   with ApplicationWithWiremock
-  with MockHttpV2 {
+  with MockHttpV2
+  with BeforeAndAfterEach {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  // TODO: move this under TestHelper?
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   private val storn = "STN001"
+  private val errorId = "errorId"
+  private val id = "someId"
+
+  override def beforeEach(): Unit = {
+      super.beforeEach()
+      reset(mockHttpClient)
+      reset(mockRequestBuilder)
+  }
 
   object TestAddressLookupConnector extends AddressLookupConnector(appConfig, mockHttpClient, messagesApi)
 
-
   "Initiate Address Lookup Journey" should {
-
     "return location details on success" in {
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Right(JourneyInitSuccessResponse(Some("Some location")))
@@ -57,19 +68,38 @@ class AddressLookupConnectorISpec extends AnyWordSpec
       val result = TestAddressLookupConnector.initJourney.futureValue
       result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
     }
-
-    "return location details on failure" in {
+    "return failure when attempt init Journey" in {
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
-        Left( JourneyInitFailureResponse(INTERNAL_SERVER_ERROR) )
+        Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
       )
       val result = TestAddressLookupConnector.initJourney.futureValue
-      result mustBe Left( JourneyInitFailureResponse(INTERNAL_SERVER_ERROR) )
+      result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
     }
+
   }
 
-// TODO: continue with this part of the test on Monday
-//  "Extract Address Details upon Journey completion" should {
-//
-//  }
+  "Extract Address Details upon Journey completion" should {
+    "return address details on success" in {
+
+      val expectedJourneyResultAddressModel =
+        JourneyResultAddressModel(auditRef = "auditRef",
+          address = Address(lines = Seq.empty, postcode = Some("Z9 3WW"))
+        )
+
+      setupMockHttpGet(TestAddressLookupConnector.addressLookupOutcomeUrl(id))(
+        Right(Some(expectedJourneyResultAddressModel))
+      )
+      val result = TestAddressLookupConnector.getJourneyOutcome(id).futureValue
+      result mustBe Right(Some(expectedJourneyResultAddressModel))
+    }
+    "return error details on failure" in {
+      setupMockHttpGet(TestAddressLookupConnector.addressLookupOutcomeUrl(errorId))(
+        Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))
+      )
+      val result = TestAddressLookupConnector.getJourneyOutcome(errorId).futureValue
+      result mustBe Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))
+    }
+
+  }
 
 }
