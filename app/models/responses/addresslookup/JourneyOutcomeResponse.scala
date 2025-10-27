@@ -41,9 +41,9 @@ object JourneyOutcomeResponse {
     }
   }
 
-  sealed trait JourneyResultFailure
+  sealed trait JourneyResultFailure extends Throwable
 
-  case object InvalidJson extends JourneyResultFailure
+  private case object InvalidJson extends JourneyResultFailure
 
   case class UnexpectedGetStatusFailure(status: Int) extends JourneyResultFailure
 

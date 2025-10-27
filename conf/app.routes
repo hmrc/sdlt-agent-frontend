@@ -32,10 +32,10 @@ POST        /manage-agents/agent-name                    controllers.manageAgent
 GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/address-lookup/init           controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/address-lookup/continue       controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/address-lookup/init           controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/address-lookup/continue       controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
@@ -47,7 +47,3 @@ POST        /manage-agents/check-your-answers            controllers.manageAgent
 
 GET         /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
 POST        /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)
-
-# Temp: Address Lookup integration / dummy endpoint
-GET         /address-lookup/init                         controllers.AddressLookupController.initJourney()
-GET         /address-lookup/continue

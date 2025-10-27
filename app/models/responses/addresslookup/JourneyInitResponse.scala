@@ -34,7 +34,6 @@ object JourneyInitResponse {
       override def read(method: String, url: String, response: HttpResponse): AddressLookupResponse = {
         response.status match {
           case ACCEPTED => Right(
-            // TODO: know env level bug:: case-sensitive / more clear fix???
             if (response.header(key = "location").isEmpty) {
               JourneyInitSuccessResponse(response.header(key = "Location"))
             } else {

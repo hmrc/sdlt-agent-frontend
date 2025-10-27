@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package services
 
-import models.responses.addresslookup.JourneyResultAddressModel
-import play.api.libs.json.JsPath
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.http.HeaderCarrier
 
-case object AddressDetails extends QuestionPage[JourneyResultAddressModel] {
+// TODO: implement required UTs
+class AddressLookupServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
-  override def path: JsPath = JsPath \ toString
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override def toString: String = "address_details"
 }

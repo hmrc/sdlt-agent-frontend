@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.NormalMode
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
 import play.api.i18n.MessagesApi
@@ -29,16 +30,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
 
 class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
-                                       http: HttpClientV2,
-                                       val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
-
+                                        http: HttpClientV2,
+                                        val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
   val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
-  val addressLookupOutcomeUrl = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
+  val addressLookupOutcomeUrl: String => String = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
-  // TODO: check where to get base url for this service
-  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" + controllers.routes.AddressLookupController.collectAddressDetails().url
+  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" +
+    controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode).url
 
   private def getAddressJson: JsValue = {
     JsObject(
@@ -62,8 +62,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
             "selectPageConfig" -> JsObject(
               Seq(
-//                "proposalListLimit" -> JsNumber(30),
-//                "showSearchLinkAgain" -> JsBoolean(true)
+                "proposalListLimit" -> JsNumber(30),
+                "showSearchLinkAgain" -> JsBoolean(true)
               )
             ),
 
