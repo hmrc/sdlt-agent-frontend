@@ -39,15 +39,12 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         view: AgentOverviewView
-                                      )(
-                                        implicit executionContext: ExecutionContext,
-                                        appConfig: FrontendAppConfig,
-                                      ) extends FrontendBaseController with PaginationHelper with I18nSupport {
+                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport {
 
   def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
     val postAction: Call = controllers.manageAgents.routes.StartAddAgentController.onSubmit(storn)
-    
+
     stampDutyLandTaxService
       .getAllAgentDetails(storn).map {
         case Nil              => Ok(view(None, None, None, postAction))

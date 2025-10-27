@@ -77,12 +77,12 @@ trait PaginationHelper {
                 Text(messages("site.change")),
                 controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(agentDetails.storn).url
               )
-                .withVisuallyHiddenText(messages("manageAgents.agentOverview.change.visuallyHidden")),
+                .withVisuallyHiddenText(agentDetails.name),
               ActionItemViewModel(
                 Text(messages("site.remove")),
                 controllers.manageAgents.routes.RemoveAgentController.onPageLoad(agentDetails.storn).url
               )
-                .withVisuallyHiddenText(messages("manageAgents.agentOverview.remove.visuallyHidden"))
+                .withVisuallyHiddenText(messages(agentDetails.name))
             ),
             actionClasses = "govuk-!-width-one-third"
           )
