@@ -52,8 +52,6 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-
-
 manageAgents.removeAgent.title   = Manage agents – Delete agent
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
 
