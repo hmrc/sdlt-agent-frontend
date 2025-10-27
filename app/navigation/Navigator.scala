@@ -28,7 +28,7 @@ class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case _ => _ => routes.IndexController.onPageLoad()
-    case AgentNamePage => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+    case AgentNamePage => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

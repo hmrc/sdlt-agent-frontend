@@ -60,6 +60,7 @@ class AgentNameController@Inject()(
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         value =>
+          println("ASDFASDF")
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
             _ <- sessionRepository.set(updatedAnswers)
