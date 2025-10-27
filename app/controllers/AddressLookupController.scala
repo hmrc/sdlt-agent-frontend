@@ -43,6 +43,7 @@ class AddressLookupController @Inject()(
                                          view: IndexView
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
+  // TODO: Should have working Auth instead
   private val fakeUserId : String = "111055"
 
   // TODO: remove temp code :: UserAnswer set up
