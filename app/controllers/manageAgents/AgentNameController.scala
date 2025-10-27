@@ -16,17 +16,20 @@
 
 package controllers.manageAgents
 
-import controllers.actions._
+import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.AgentNamePage
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgent.AgentNameView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class AgentNameController@Inject()(
@@ -37,6 +40,7 @@ class AgentNameController@Inject()(
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     formProvider: AgentNameFormProvider,
+                                    stampDutyLandTaxService: StampDutyLandTaxService,
                                     view: AgentNameView,
                                     navigator: Navigator,
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -60,7 +64,6 @@ class AgentNameController@Inject()(
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         value =>
-          println("ASDFASDF")
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
             _ <- sessionRepository.set(updatedAnswers)
@@ -68,4 +71,33 @@ class AgentNameController@Inject()(
       )
   }
 }
-
+//
+//def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+//  val storn: String = ""
+//  form
+//    .bindFromRequest()
+//    .fold(
+//      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+//      value => {
+//        stampDutyLandTaxService
+//          .isDuplicate(storn: String, value)
+//          .flatMap {
+//            case true =>
+//              val dupForm =
+//                form
+//                  .fill(value)
+//                  .withError(
+//                    "value",
+//                    "DUPLICATE"
+//                  )
+//              Future.successful(BadRequest(view(dupForm, mode)))
+//            case false =>
+//              for {
+//                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
+//                _ <- sessionRepository.set(updatedAnswers)
+//              } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
+//          }
+//      }
+//    )
+//}
+//}

@@ -37,3 +37,8 @@ case class AgentDetails(
 object AgentDetails {
   implicit val format: OFormat[AgentDetails] = Json.format[AgentDetails]
 }
+case class AgentDetailsResponse(AgentDetailsList: Seq[AgentDetails])
+
+object AgentDetailsResponse {
+  implicit val format: OFormat[AgentDetailsResponse] = Json.format[AgentDetailsResponse]
+}
