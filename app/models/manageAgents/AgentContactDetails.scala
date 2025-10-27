@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package pages.manageAgents
+package models.manageAgents
 
-import models.manageAgents.AgentContactDetails
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.OFormat
+import play.api.libs.json.*
 
-case object AgentContactDetailsPage extends QuestionPage[AgentContactDetails] {
+case class AgentContactDetails(contactTelephoneNumber: String, contactEmail: String)
 
-  override def path: JsPath = JsPath \ toString
+object AgentContactDetails {
 
-  override def toString: String = "agentContactDetails"
-  
+  implicit val format: OFormat[AgentContactDetails] = Json.format
 }

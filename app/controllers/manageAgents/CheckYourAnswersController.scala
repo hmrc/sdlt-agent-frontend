@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist.*
@@ -38,12 +39,22 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
+      val dummyData = request.userAnswers.copy(
+        data = Json.obj(
+          "agentName" -> "John",
+          "addressLookup" -> "123 Road",
+          "agentContactDetails" -> Json.obj(
+            "contactTelephoneNumber" -> "07123456789",
+            "contactEmail" -> "john@example.com"
+          )
+        )
+      )
       val list = SummaryListViewModel(
         rows = Seq(
-          AgentNameSummary.row(request.userAnswers),
-          AddressSummary.row(request.userAnswers),
-          ContactDetailsSummary.row(request.userAnswers, "contactTelephoneNumber"),
-          ContactDetailsSummary.row(request.userAnswers, "contactEmail")
+          AgentNameSummary.row(dummyData),
+          AddressSummary.row(dummyData),
+          ContactTelephoneNumberSummary.row(dummyData),
+          ContactEmailSummary.row(dummyData)
         ).flatten
       )
 

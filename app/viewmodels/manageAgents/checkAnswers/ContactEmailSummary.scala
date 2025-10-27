@@ -17,26 +17,27 @@
 package viewmodels.manageAgents.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.manageAgents.AddressLookupPage
+import pages.manageAgents.AgentContactDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.Aliases.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ContactDetailsSummary {
+object ContactEmailSummary {
 
-  def row(answers: UserAnswers, tag: String)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(AddressLookupPage).map { answer =>
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(AgentContactDetailsPage).map { answer =>
       SummaryListRowViewModel(
-        key = s"manageAgents.$tag.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = s"manageAgents.contactEmail.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer.contactEmail).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages(s"manageAgents.$tag.change.hidden"))
+            .withVisuallyHiddenText(messages(s"manageAgents.contactEmail.change.hidden"))
             .withAttribute("id" -> "change-agent-contact-details")
         )
       )
