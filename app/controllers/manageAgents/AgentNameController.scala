@@ -43,13 +43,18 @@ class AgentNameController@Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
+    val preparedForm = request.userAnswers.get(AgentNamePage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
+    }
 
-    Ok(view(form, mode))
+    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+
     form
       .bindFromRequest()
       .fold(
@@ -63,42 +68,3 @@ class AgentNameController@Inject()(
   }
 }
 
-
-/**
- class AgentNameController @Inject()(
- override val messagesApi: MessagesApi,
- val controllerComponents: MessagesControllerComponents,
- sessionRepository: SessionRepository,
- identify: IdentifierAction,
- getData: DataRetrievalAction,
- requireData: DataRequiredAction,
- formProvider: AgentNameFormProvider,
- view: AgentNameView,
- navigator: Navigator,
- )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
- val form = formProvider()
-
- def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData){
- implicit request =>
- val form = formProvider()
- Ok(view(form, mode))
- //Ok(view(preparedForm, mode))
- }
-
- def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
- implicit request =>
- form
- .bindFromRequest()
- .fold(
- //          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
- formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
- value =>
- for {
- updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
- _              <- sessionRepository.set(updatedAnswers)
- } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
- )
- }
- }
-*/
