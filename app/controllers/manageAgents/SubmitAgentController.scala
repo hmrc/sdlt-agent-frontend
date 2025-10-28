@@ -18,7 +18,6 @@ package controllers.manageAgents
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,6 +30,6 @@ class SubmitAgentController @Inject()(
                                           ) extends FrontendBaseController with I18nSupport {
 
   def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(NormalMode))
+    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
   }
 }
