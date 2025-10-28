@@ -39,19 +39,18 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
 
   private def agent(i: Int): AgentDetails =
     AgentDetails(
-      storn                = f"STN$i%03d",
-      agentReferenceNumber = Some(f"ARN$i%03d"),
-      name                 = s"Agent $i",
-      houseNumber          = s"$i",
-      addressLine1         = s"Address $i",
-      addressLine2         = None,
-      addressLine3         = s"Town $i",
-      addressLine4         = None,
-      postcode             = Some(f"PC$i%03d 1AA"),
-      phoneNumber          = f"0207$i%04d",
-      emailAddress         = s"agent$i@example.com",
-      agentId              = f"AGT$i%03d",
-      isAuthorised         = 1
+      storn         = "STN001",
+      name          = s"Agent $i",
+      houseNumber   = "64",
+      addressLine1  = "Zoo Lane",
+      addressLine2  = None,
+      addressLine3  = "Lazy Town",
+      addressLine4  = None,
+      postcode      = Some("SW44GFS"),
+      phoneNumber   = "0543534534543",
+      emailAddress  = "agent@example.com",
+      agentId       = "AN001",
+      isAuthorised  = 1
     )
 
   private def agents(n: Int): List[AgentDetails] = (1 to n).map(agent).toList
