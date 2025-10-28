@@ -17,7 +17,6 @@
 package controllers.manageAgents
 
 import cats.data.EitherT
-import controllers.JourneyRecoveryController
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{Mode, UserAnswers}
