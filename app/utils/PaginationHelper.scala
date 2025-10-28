@@ -30,7 +30,7 @@ trait PaginationHelper {
   def getPaginationInfoText(paginationIndex: Int, agentsList: Seq[AgentDetails])
                            (implicit messages: Messages): Option[String] = {
 
-    if (agentsList.length <= 10 || paginationIndex <= 0) { None }
+    if (agentsList.length <= ROWS_ON_PAGE || paginationIndex <= 0) { None }
     else {
       val paged = agentsList.grouped(ROWS_ON_PAGE).toSeq
 
