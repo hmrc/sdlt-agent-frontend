@@ -17,6 +17,7 @@
 package controllers.manageAgents
 
 import cats.data.EitherT
+import controllers.JourneyRecoveryController
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{Mode, UserAnswers}
@@ -27,6 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -49,9 +51,11 @@ class AddressLookupController @Inject()(
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
         Logger("application").error("[AddressLookupController] - Failed::Location not provided")
         throw new RuntimeException("Failed::Location not provided")
+      // TODO: switch to => Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
         Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
         throw new RuntimeException(s"Failed to Init journey: $ex")
+      // TODO: switch to => Redirect(JourneyRecoveryController.onPageLoad())
     }
   }
 
@@ -69,6 +73,7 @@ class AddressLookupController @Inject()(
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
       throw new RuntimeException(s"failed to extract address: $ex")
+      // TODO: switch to =>Redirect(JourneyRecoveryController.onPageLoad())
     }
   }
 
