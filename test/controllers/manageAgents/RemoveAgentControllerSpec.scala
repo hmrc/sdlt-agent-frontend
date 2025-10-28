@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.manageAgent
+package controllers.manageAgents
 
 import base.SpecBase
 import models.AgentDetails
@@ -33,32 +33,15 @@ import services.StampDutyLandTaxService
 import views.html.manageAgents.RemoveAgentView
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
+import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class RemoveAgentControllerSpec extends SpecBase with MockitoSugar {
+class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
   def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
-
-  val storn: String = "STN001"
-
-  val testAgentDetails: AgentDetails = AgentDetails(
-    storn = "STN001",
-    agentReferenceNumber = Some("ARN001"),
-    name = "Harborview Estates",
-    houseNumber = "22A",
-    addressLine1 = "Queensway",
-    addressLine2 = None,
-    addressLine3 = "Birmingham",
-    addressLine4 = None,
-    postcode = Some("B2 4ND"),
-    phoneNumber = "01214567890",
-    emailAddress = "info@harborviewestates.co.uk",
-    agentId = "AGT001",
-    isAuthorised = 1
-  )
-
-  lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(storn).url
+  
+  lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(testStorn).url
 
   val formProvider = new RemoveAgentFormProvider()
 
