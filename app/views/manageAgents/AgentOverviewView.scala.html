@@ -72,12 +72,10 @@
 
     @pagination.map(govukPagination(_))
 
-    <div>
-        @formHelper(action = postAction) {
-            @govukButton(
-                ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                    .withCssClass("govuk-!-margin-top-2")
-            )
-        }
-    </div>
+    @formHelper(action = postAction) {
+        @govukButton(
+            ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
+                .withCssClass("govuk-!-margin-top-2")
+        )
+    }
 }
