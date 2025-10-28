@@ -18,7 +18,6 @@ package testOnly
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.UserAnswers
-import pages.manageAgents.{AddressLookupPage, AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
