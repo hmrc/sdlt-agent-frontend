@@ -55,12 +55,13 @@ trait SummaryListFluency {
     def apply(
                key: Key,
                value: Value,
-               actions: Seq[ActionItem]
+               actions: Seq[ActionItem],
+               actionClasses: String = ""
              ): SummaryListRow =
       SummaryListRow(
         key     = key,
         value   = value,
-        actions = Some(Actions(items = actions))
+        actions = Some(Actions(classes = actionClasses, items = actions))
       )
   }
 

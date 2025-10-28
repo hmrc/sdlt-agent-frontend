@@ -22,28 +22,25 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
 
-GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(storn: String, paginationIndex: Int)
+POST        /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit(storn: String)
 
 GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-agent-name              controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-name              controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
-POST        /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onSubmit()
+GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(storn: String)
 
 GET         /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
 POST        /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)

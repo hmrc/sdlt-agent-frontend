@@ -16,26 +16,55 @@
 
 package controllers.manageAgents
 
-import controllers.actions.IdentifierAction
-import models.Mode
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 
 import javax.inject.Inject
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import services.StampDutyLandTaxService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.PaginationHelper
+import views.html.manageAgents.AgentOverviewView
+import controllers.routes.JourneyRecoveryController
+import play.api.Logging
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+import controllers.manageAgents.routes.*
+
+import scala.concurrent.ExecutionContext
 
 class AgentOverviewController @Inject()(
-                                         val controllerComponents: MessagesControllerComponents,
-                                         identify: IdentifierAction,
-                                         view: IndexView
-                                       ) extends FrontendBaseController with I18nSupport {
+                                        val controllerComponents: MessagesControllerComponents,
+                                        stampDutyLandTaxService: StampDutyLandTaxService,
+                                        identify: IdentifierAction,
+                                        getData: DataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        view: AgentOverviewView
+                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
-  }
+  def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+    val postAction: Call = StartAddAgentController.onSubmit(storn)
+
+    stampDutyLandTaxService
+      .getAllAgentDetails(storn).map {
+        case Nil              => Ok(view(None, None, None, postAction))
+        case agentDetailsList =>
+
+          generateAgentSummary(paginationIndex, agentDetailsList)
+            .fold(
+              Redirect(AgentOverviewController.onPageLoad(storn, 1))
+            ) { summary =>
+
+              val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
+              val pagination:     Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
+              val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
+
+              Ok(view(Some(summary), pagination, paginationText, postAction))
+            }
+      } recover {
+      case ex =>
+        logger.error("[onPageLoad] Unexpected failure", ex)
+        Redirect(JourneyRecoveryController.onPageLoad())
+    }
   }
 }
