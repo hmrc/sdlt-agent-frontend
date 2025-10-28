@@ -39,12 +39,12 @@ class StartAddAgentController @Inject()(
                                    )(implicit appConfig: FrontendAppConfig,
                                      executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  private val MaxAgents = appConfig.maxNumberOfAgents
+  private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
   def onSubmit(storn: String): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       stampDutyLandTaxService.getAllAgentDetails(storn).map { agents =>
-        if (agents.size >= MaxAgents) {
+        if (agents.size >= MAX_AGENTS) {
           Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
             .flashing("agentsLimitReached" -> "true")
         } else {
