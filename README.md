@@ -15,7 +15,7 @@ To start the server locally on `port 10911`: `sbt run`
 
 Run the command: `sbt run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes`
 
-This will give you access to the following test routes:
+This allows access to the following test routes:
 ```
 /stamp-duty-land-tax-agent/manage-agents/test-only/session/set
 /stamp-duty-land-tax-agent/manage-agents/test-only/session/clear
