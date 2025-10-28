@@ -31,6 +31,12 @@ GET         /manage-agents/agent-name                    controllers.manageAgent
 POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode, storn: String)
 GET         /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode, storn: String)
 POST        /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode, storn: String)
+GET         /manage-agents/warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/check-warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = CheckMode)
+
+
 
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)

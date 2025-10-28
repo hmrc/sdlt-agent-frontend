@@ -30,12 +30,13 @@ class Navigator @Inject()() {
     case _ => _ => _ => routes.IndexController.onPageLoad()
     case AgentNamePage => storn => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, storn)
   }
+  
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String = ""): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(storn)(userAnswers)
     case CheckMode =>

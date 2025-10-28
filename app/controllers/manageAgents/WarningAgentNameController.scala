@@ -21,17 +21,17 @@ import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentNamePage, AgentAddressPage}
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.manageAgent.AgentNameView
+import views.html.manageAgents.WarningAgentNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AgentNameController@Inject()(
+class WarningAgentNameController@Inject()(
                                     override val messagesApi: MessagesApi,
                                     val controllerComponents: MessagesControllerComponents,
                                     sessionRepository: SessionRepository,
@@ -40,42 +40,35 @@ class AgentNameController@Inject()(
                                     requireData: DataRequiredAction,
                                     formProvider: AgentNameFormProvider,
                                     stampDutyLandTaxService: StampDutyLandTaxService,
-                                    view: AgentNameView,
+                                    view: WarningAgentNameView,
                                     navigator: Navigator,
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
     val preparedForm = request.userAnswers.get(AgentNamePage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode, storn))
+    Ok(view(preparedForm, mode))
   }
-  
 
-  def onSubmit(mode: Mode, storn: String): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
 
-  form
-    .bindFromRequest()
-    .fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, storn))),
-      value => {
-        stampDutyLandTaxService
-          .isDuplicate(storn: String, value)
-          .flatMap {
-            case true =>
-              Future.successful(Redirect(controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)))
-            case false =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
-          }
-      }
-    )
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
+      )
+  }
 }
-}
+
+

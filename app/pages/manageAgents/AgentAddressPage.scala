@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package navigation
+package pages.manageAgents
 
-import play.api.mvc.Call
-import pages._
-import models.{Mode, UserAnswers}
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+case object AgentAddressPage extends QuestionPage[String] {
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String): Call =
-    desiredRoute
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "AgentAddressPage"
 }
