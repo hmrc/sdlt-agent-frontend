@@ -43,7 +43,10 @@ trait PaginationHelper {
     }
   }
 
-  def getNumberOfPages(agentDetailsList: List[AgentDetails]): Int = agentDetailsList.grouped(ROWS_ON_PAGE).size
+  def getNumberOfPages(agentDetailsList: List[AgentDetails]): Int =
+    agentDetailsList
+      .grouped(ROWS_ON_PAGE)
+      .size
 
   def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetails])
                           (implicit messages: Messages): Option[SummaryList] = {
@@ -90,7 +93,8 @@ trait PaginationHelper {
     )
   }
   
-  def generatePagination(storn: String, paginationIndex: Int, numberOfPages: Int)(implicit messages: Messages): Option[Pagination] =
+  def generatePagination(storn: String, paginationIndex: Int, numberOfPages: Int)
+                        (implicit messages: Messages): Option[Pagination] =
     if (numberOfPages < 2) None
     else
       Some(
@@ -118,9 +122,8 @@ trait PaginationHelper {
         )
       )
 
-  def generatePreviousLink(storn: String, paginationIndex: Int, numberOfPages: Int)(implicit
-                                                                     messages: Messages
-  ): Option[PaginationLink] =
+  def generatePreviousLink(storn: String, paginationIndex: Int, numberOfPages: Int)
+                          (implicit messages: Messages): Option[PaginationLink] =
     if (paginationIndex == 1) None
     else {
       Some(
@@ -132,7 +135,8 @@ trait PaginationHelper {
       )
     }
 
-  def generateNextLink(storn: String, paginationIndex: Int, numberOfPages: Int)(implicit messages: Messages): Option[PaginationLink] =
+  def generateNextLink(storn: String, paginationIndex: Int, numberOfPages: Int)
+                      (implicit messages: Messages): Option[PaginationLink] =
     if (paginationIndex == numberOfPages) None
     else {
       Some(
