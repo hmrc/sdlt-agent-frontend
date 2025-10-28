@@ -43,10 +43,12 @@ class HomeController @Inject()(
     implicit request =>
 
       val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
+      val checkYourAnswersUrl = controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad("").url
 
         Future.successful(Ok(Html(
           s"""
             |<h1> removeAgentUrl: </h1> <a href=$removeAgentUrl> $removeAgentUrl </a>
+            |<h1> checkYourAnswersUrl: </h1> <a href=$checkYourAnswersUrl> $checkYourAnswersUrl </a>
             |""".stripMargin
         )))
   }

@@ -19,36 +19,18 @@ package controllers.manageAgents
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist.*
-import viewmodels.manageAgents.checkAnswers.*
-import views.html.manageAgents.CheckYourAnswersView
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
+class SubmitAgentController @Inject()(
                                             identify: IdentifierAction,
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
-      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit(storn)
-
-      val list = SummaryListViewModel(
-        rows = Seq(
-          AgentNameSummary.row(request.userAnswers),
-          AddressSummary.row(request.userAnswers),
-          ContactTelephoneNumberSummary.row(request.userAnswers),
-          ContactEmailSummary.row(request.userAnswers)
-        ).flatten
-      )
-
-      Ok(view(list, postAction))
+  def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(NormalMode))
   }
 }

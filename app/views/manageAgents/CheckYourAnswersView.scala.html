@@ -24,17 +24,17 @@
     govukButton: GovukButton
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, postAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageAgents.checkYourAnswers.title"))) {
 
-    @formHelper(action = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit()) {
+    @formHelper(action = postAction) {
         @h1("manageAgents.checkYourAnswers.heading")
 
         @govukSummaryList(list)
 
         @govukButton(
-        ButtonViewModel(messages("manageAgents.checkYourAnswers.submitSection.button"))
+            ButtonViewModel(messages("site.saveAndContinue"))
         )
     }
 }

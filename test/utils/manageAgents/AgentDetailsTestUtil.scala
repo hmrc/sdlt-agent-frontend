@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package navigation
+package utils.manageAgents
 
-import play.api.mvc.Call
-import pages._
-import models.{Mode, UserAnswers}
+trait AgentDetailsTestUtil {
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+  val testStorn: String = "STN001"
 
-  override def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String): Call =
-    desiredRoute
 }
