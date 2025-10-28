@@ -95,7 +95,7 @@ def onSubmit(mode: Mode, storn: String): Action[AnyContent] = ( identify andThen
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers))
+              } yield Redirect(navigator.nextPage(AgentNamePage, mode, updatedAnswers, storn))
           }
       }
     )

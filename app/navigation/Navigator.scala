@@ -37,7 +37,7 @@ class Navigator @Inject()() {
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, storn: String): Call = mode match {
     case NormalMode =>
-      normalRoutes(storn)(page)(userAnswers)
+      normalRoutes(page)(storn)(userAnswers)
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
