@@ -17,47 +17,29 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import models.AgentDetails
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.StampDutyLandTaxService
+import utils.mangeAgents.AgentDetailsTestUtil
 import views.html.manageAgents.AgentOverviewView
 
 import scala.concurrent.Future
 
-class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
-
-  val storn = "STN001"
+class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
   private val service = mock[StampDutyLandTaxService]
 
   private def agentOverviewUrl(page: Int) =
-    controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, page).url
+    controllers.manageAgents.routes.AgentOverviewController.onPageLoad(testStorn, page).url
 
   private def startAddAgentJourneyUrl =
-    controllers.manageAgents.routes.StartAddAgentController.onSubmit(storn).url
+    controllers.manageAgents.routes.StartAddAgentController.onSubmit(testStorn).url
 
-  private def agent(i: Int): AgentDetails =
-    AgentDetails(
-      storn         = "STN001",
-      name          = s"Agent $i",
-      houseNumber   = "64",
-      addressLine1  = "Zoo Lane",
-      addressLine2  = None,
-      addressLine3  = "Lazy Town",
-      addressLine4  = None,
-      postcode      = Some("SW44GFS"),
-      phoneNumber   = "0543534534543",
-      emailAddress  = "agent@example.com",
-      agentId       = "AN001",
-      isAuthorised  = 1
-    )
-
-  private val agents22 = (1 to 22).map(agent)
+  private val agents22 = getAgentList(22)
 
   "AgentOverviewController.onPageLoad" - {
 
@@ -82,7 +64,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
             maybeSummaryList   = None,
             pagination         = None,
             paginationInfoText = None,
-            postAction         = controllers.manageAgents.routes.StartAddAgentController.onSubmit(storn)
+            postAction         = controllers.manageAgents.routes.StartAddAgentController.onSubmit(testStorn)
           )(request, messages(application)).toString
       }
     }
@@ -94,7 +76,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       when(service.getAllAgentDetails(any())(any()))
-        .thenReturn(Future.successful(agents22.toList))
+        .thenReturn(Future.successful(agents22))
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
@@ -122,7 +104,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       when(service.getAllAgentDetails(any())(any()))
-        .thenReturn(Future.successful(agents22.toList))
+        .thenReturn(Future.successful(agents22))
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 0))
@@ -140,7 +122,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       when(service.getAllAgentDetails(any())(any()))
-        .thenReturn(Future.successful(agents22.toList))
+        .thenReturn(Future.successful(agents22))
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 99))

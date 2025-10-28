@@ -19,44 +19,22 @@ package controllers.manageAgents
 import base.SpecBase
 import models.AgentDetails
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.StampDutyLandTaxService
+import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
-
-  private val storn = "STN001"
+class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
   private val service = mock[StampDutyLandTaxService]
 
-  private def postUrl: String =
-    routes.StartAddAgentController.onSubmit(storn).url
-
-  private def agent(i: Int): AgentDetails =
-    AgentDetails(
-      storn         = "STN001",
-      name          = s"Agent $i",
-      houseNumber   = "64",
-      addressLine1  = "Zoo Lane",
-      addressLine2  = None,
-      addressLine3  = "Lazy Town",
-      addressLine4  = None,
-      postcode      = Some("SW44GFS"),
-      phoneNumber   = "0543534534543",
-      emailAddress  = "agent@example.com",
-      agentId       = "AN001",
-      isAuthorised  = 1
-    )
-
-  private def agents(n: Int): List[AgentDetails] = (1 to n).map(agent).toList
-
-  private val Max = 25
-
+  private def postUrl: String = routes.StartAddAgentController.onSubmit(testStorn).url
+  
   "StartAddAgentController.onSubmit" - {
 
     "must redirect to AgentNameController when the number of agents is below the max" in {
@@ -66,7 +44,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       when(service.getAllAgentDetails(any())(any()))
-        .thenReturn(Future.successful(agents(Max - 1)))
+        .thenReturn(Future.successful(getAgentList(MAX_AGENTS - 1)))
 
       running(application) {
         val request = FakeRequest(POST, postUrl)
@@ -85,7 +63,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
       when(service.getAllAgentDetails(any())(any()))
-        .thenReturn(Future.successful(agents(Max)))
+        .thenReturn(Future.successful(getAgentList(MAX_AGENTS)))
 
       running(application) {
         val request = FakeRequest(POST, postUrl)
@@ -93,7 +71,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.AgentOverviewController.onPageLoad(storn, 1).url
+          routes.AgentOverviewController.onPageLoad(testStorn, 1).url
 
         flash(result).get("agentsLimitReached") mustBe Some("true")
       }
