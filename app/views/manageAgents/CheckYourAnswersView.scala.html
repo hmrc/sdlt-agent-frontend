@@ -18,6 +18,7 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     h1: components.H1,
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton
@@ -27,11 +28,13 @@
 
 @layout(pageTitle = titleNoForm(messages("manageAgents.checkYourAnswers.title"))) {
 
-    @h1("manageAgents.checkYourAnswers.heading")
+    @formHelper(action = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit()) {
+        @h1("manageAgents.checkYourAnswers.heading")
 
-    @govukSummaryList(list)
+        @govukSummaryList(list)
 
-    @govukButton(
+        @govukButton(
         ButtonViewModel(messages("manageAgents.checkYourAnswers.submitSection.button"))
-    )
+        )
+    }
 }
