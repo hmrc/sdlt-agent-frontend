@@ -29,7 +29,7 @@ trait AgentDetailsTestUtil {
       storn         = "STN001",
       name          = s"Agent $i",
       houseNumber   = "64",
-      addressLine1  = "Zoo Lane",
+      addressLine1  = s"Address $i",
       addressLine2  = None,
       addressLine3  = "Lazy Town",
       addressLine4  = None,
