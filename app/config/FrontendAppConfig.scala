@@ -26,6 +26,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
+  
+  val maxNumberOfAgents: Int = configuration.get[Int]("max-number-of-agents")
 
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "sdlt-agent-frontend"

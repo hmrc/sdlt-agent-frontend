@@ -12,6 +12,9 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 
+pagination.previous = Previous
+pagination.next     = Next
+
 date.day = Day
 date.month = Month
 date.year = Year
@@ -65,3 +68,14 @@ unauthorised.heading = You can’t access this service with this account
 
 manageAgents.removeAgent.title   = Manage agents – Delete agent
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
+
+manageAgents.agentOverview.noAgents.info.text       = Any agents added can be linked to a purchaser within ‘About the purchaser’.
+manageAgents.agentOverview.nonZeroAgents.info.text  = The agents below can be linked to a purchaser within ‘About the purchaser’.
+manageAgents.agentOverview.noAgents.text            = You have no agents listed.
+manageAgents.agentOverview.remove.visuallyHidden    = Change {0}
+manageAgents.agentOverview.title                    = Manage Agents - Agent Details
+manageAgents.agentDetails.heading                   = Agent details
+manageAgents.agentDetails.caption                   = Manage agents
+manageAgents.agentDetails.addAgentButtonText        = Add an Agent
+manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
+manageAgents.agentDetails.limitReached              = Currently you cannot add any more agents as the limit of 25 agents has been reached. If you wish to add another agent you will have to delete one of your existing agents.
