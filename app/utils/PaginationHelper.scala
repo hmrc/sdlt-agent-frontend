@@ -22,20 +22,21 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, FluentKey, FluentValue, KeyViewModel, SummaryListRowViewModel, SummaryListViewModel, ValueViewModel}
+import controllers.manageAgents.routes._
 
 trait PaginationHelper {
 
   private val ROWS_ON_PAGE = 10
-
-  def getPaginationInfoText(paginationIndex: Int, agentsList: Seq[AgentDetails])
-                           (implicit messages: Messages): Option[String] = {
-
-    if (agentsList.length <= ROWS_ON_PAGE || paginationIndex <= 0) { None }
+  
+  def getPaginationInfoText[A](paginationIndex: Int, itemList: Seq[A])
+                              (implicit messages: Messages): Option[String] = {
+    
+    if (itemList.length <= ROWS_ON_PAGE || paginationIndex <= 0) { None }
     else {
-      val paged = agentsList.grouped(ROWS_ON_PAGE).toSeq
+      val paged = itemList.grouped(ROWS_ON_PAGE).toSeq
 
       paged.lift(paginationIndex - 1).map { detailsChunk =>
-        val total = agentsList.length
+        val total = itemList.length
         val start = (paginationIndex - 1) * ROWS_ON_PAGE + 1
         val end = math.min(paginationIndex * ROWS_ON_PAGE, total)
         messages("manageAgents.agentDetails.summaryInfo.text", start, end, total)
@@ -43,8 +44,8 @@ trait PaginationHelper {
     }
   }
 
-  def getNumberOfPages(agentDetailsList: List[AgentDetails]): Int =
-    agentDetailsList
+  def getNumberOfPages[A](itemList: List[A]): Int =
+    itemList
       .grouped(ROWS_ON_PAGE)
       .size
 
@@ -62,27 +63,20 @@ trait PaginationHelper {
             key = KeyViewModel(
               Text(agentDetails.name)
             )
-              .withCssClass(
-                "govuk-!-width-one-third " +
-                  "govuk-!-font-weight-regular " +
-                  "hmrc-summary-list__key"
-              ),
+              .withCssClass("govuk-!-width-one-third govuk-!-font-weight-regular hmrc-summary-list__key"),
             value = ValueViewModel(
               Text(agentDetails.getFirstLineOfAddress)
             )
-              .withCssClass(
-                "govuk-summary-list__value" +
-                  "govuk-!-width-one-third"
-              ),
+              .withCssClass("govuk-summary-list__value govuk-!-width-one-third"),
             actions = Seq(
               ActionItemViewModel(
                 Text(messages("site.change")),
-                controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(agentDetails.storn).url
+                CheckYourAnswersController.onPageLoad(agentDetails.storn).url
               )
                 .withVisuallyHiddenText(agentDetails.name),
               ActionItemViewModel(
                 Text(messages("site.remove")),
-                controllers.manageAgents.routes.RemoveAgentController.onPageLoad(agentDetails.storn).url
+                RemoveAgentController.onPageLoad(agentDetails.storn).url
               )
                 .withVisuallyHiddenText(messages(agentDetails.name))
             ),
@@ -92,7 +86,7 @@ trait PaginationHelper {
       )
     )
   }
-  
+
   def generatePagination(storn: String, paginationIndex: Int, numberOfPages: Int)
                         (implicit messages: Messages): Option[Pagination] =
     if (numberOfPages < 2) None

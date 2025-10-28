@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 
 import javax.inject.Inject
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,9 +28,11 @@ import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
 import controllers.manageAgents.routes.*
 import controllers.routes.JourneyRecoveryController
+import models.AgentDetails
 import play.api.Logging
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+import controllers.manageAgents.routes.*
 
 import scala.concurrent.ExecutionContext
 
