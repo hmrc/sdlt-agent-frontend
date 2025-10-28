@@ -150,6 +150,24 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual agentOverviewUrl(page = 1)
       }
     }
+
+    "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[StampDutyLandTaxService].toInstance(service))
+          .build()
+
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(GET, agentOverviewUrl(page = 1))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 }
 

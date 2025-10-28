@@ -112,7 +112,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return 500 when StampDutyLandTaxService fails unexpectedly" in {
+    "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
