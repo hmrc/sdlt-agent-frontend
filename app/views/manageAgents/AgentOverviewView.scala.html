@@ -61,7 +61,11 @@
         section = Some(messages("manageAgents.agentDetails.caption"))
     ))
 
-    @p(messages("manageAgents.agentOverview.info.text"))
+
+    @{maybeSummaryList match {
+        case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
+        case None          => p(messages("manageAgents.agentOverview.noAgents.info.text"))
+    }}
 
     @paginationInfoText.map(p(_))
 
