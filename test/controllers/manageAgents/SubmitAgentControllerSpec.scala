@@ -34,9 +34,9 @@ import scala.concurrent.Future
 class SubmitAgentControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
 
   private def submitAgentUrl =
-    controllers.manageAgents.routes.SubmitAgentController.onSubmit(testStorn).url
+    controllers.manageAgents.routes.SubmitAgentController.onSubmit().url
 
-  private def onwardRoute = Call("GET", s"/stamp-duty-land-tax-agent/manage-agents/agent-overview?storn=$testStorn&paginationIndex=1")
+  private def onwardRoute = Call("GET", s"/stamp-duty-land-tax-agent/manage-agents/agent-overview?paginationIndex=1")
 
   "Submit Agent Controller" - {
 

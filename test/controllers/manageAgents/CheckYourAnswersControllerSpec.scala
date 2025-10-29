@@ -31,7 +31,7 @@ import views.html.manageAgents.CheckYourAnswersView
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
 
   private def checkYourAnswersUrl =
-    controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(testStorn).url
+    controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad().url
 
   "Check Your Answers Controller" - {
 
@@ -67,7 +67,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
                 ContactTelephoneNumberSummary.row(ua)(messages(application)).get,
                 ContactEmailSummary.row(ua)(messages(application)).get
               )),
-            postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit(testStorn)
+            postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
           )(request, messages(application)).toString
       }
     }

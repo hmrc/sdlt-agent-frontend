@@ -28,8 +28,8 @@ class SubmitAgentController @Inject()(
                                             requireData: DataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
                                           ) extends FrontendBaseController with I18nSupport {
-
-  def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
+  
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
   }
 }

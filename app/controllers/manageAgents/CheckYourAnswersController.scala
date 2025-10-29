@@ -35,10 +35,10 @@ class CheckYourAnswersController @Inject()(
                                             view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit(storn)
+      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
 
       val list = SummaryListViewModel(
         rows = Seq(
