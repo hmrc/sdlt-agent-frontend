@@ -56,6 +56,7 @@ class AuthenticatedIdentifierAction @Inject()(
         Retrievals.affinityGroup  and
         Retrievals.credentialRole
       ) {
+        //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
           hasSdltOrgEnrolment(enrolments)
             .map { storn =>
