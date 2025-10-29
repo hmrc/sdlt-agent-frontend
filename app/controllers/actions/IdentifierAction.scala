@@ -84,7 +84,7 @@ class AuthenticatedIdentifierAction @Inject()(
           case (Some(storn), true) =>
             Some(storn)
           case _ =>
-            logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
+            logger.error("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
             None
         }
       case _ => None
