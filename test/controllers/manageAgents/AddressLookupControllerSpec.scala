@@ -30,7 +30,7 @@
  * limitations under the License.
  */
 
-package controllers.manageAgent
+package controllers.manageAgents
 
 import base.SpecBase
 import models.{NormalMode, UserAnswers}
@@ -63,8 +63,9 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
     val id: String = "idToExtractAddress"
     val addressLookupExtract: String = controllers.manageAgents.routes.AddressLookupController.onSubmit(NormalMode).url + s"?id=$id"
+    val thereIsProblemUrl : String = controllers.routes.JourneyRecoveryController.onPageLoad(None).url()
 
-    val userId : String = "userID"
+    val userId: String = "userID"
 
     val userAnswers: UserAnswers = UserAnswers(id = userId)
   }
@@ -72,7 +73,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
   "AddressLookupController init AL journey" - {
 
     "return location on success" in new Fixture {
-      when(service.initJourney(any(), any())( any[HeaderCarrier], any[Messages] ))
+      when(service.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
         .thenReturn(Future.successful(Right(JourneyInitSuccessResponse(Some("locationUrl")))))
 
       running(app) {
@@ -83,38 +84,50 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual "locationUrl"
       }
+    }
+
+    "redirect to default error page: Journey Location is None" in new Fixture {
+
+      when(service.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
+        .thenReturn(Future.successful(Right(JourneyInitSuccessResponse(None))))
+
+      running(app) {
+        val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addressLookupInit)
+
+        val result = route(app, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual thereIsProblemUrl
+      }
 
     }
 
     "return failure status on error" in new Fixture {
 
-    when(service.initJourney(any(), any())( any[HeaderCarrier], any[Messages] ))
-        .thenReturn(Future.successful(Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR) )) )
+      when(service.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
+        .thenReturn(Future.successful(Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))))
 
       running(app) {
         val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, addressLookupInit)
 
         val result = route(app, request).value
 
-        // TODO: we should have redirect to the default Journey Error Page
-        //status(result) mustEqual INTERNAL_SERVER_ERROR
-        //redirectLocation(result).value mustEqual "locationUrl"
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual thereIsProblemUrl
       }
 
     }
-
   }
 
   "AddressLookupController get AL journey result" - {
 
     "return AddressDetails on success" in new Fixture {
-      when( service.getJourneyOutcome( any(), any() )(any[HeaderCarrier]) )
-        .thenReturn(Future.successful( Right(userAnswers) ))
+      when(service.getJourneyOutcome(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(userAnswers)))
 
       running(app) {
         val request =
           FakeRequest(POST, addressLookupExtract)
-            //.withFormUrlEncodedBody( ("id", id) )
+        //.withFormUrlEncodedBody( ("id", id) )
 
         val result = route(app, request).value
 
@@ -131,7 +144,6 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request =
           FakeRequest(POST, addressLookupExtract)
-        //.withFormUrlEncodedBody( ("id", id) )
 
         // TODO: we should have redirect to the default Journey Error Page
         route(app, request).value
