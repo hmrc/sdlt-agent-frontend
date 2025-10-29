@@ -48,7 +48,7 @@ class StartAddAgentController @Inject()(
           Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
             .flashing("agentsLimitReached" -> "true")
         } else {
-          Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode))
+          Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode, storn))
         }
       } recover {
         case ex =>
