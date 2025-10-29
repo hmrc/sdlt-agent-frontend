@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentNamePage, AgentAddressPage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -39,7 +39,6 @@ class WarningAgentNameController@Inject()(
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     formProvider: AgentNameFormProvider,
-                                    stampDutyLandTaxService: StampDutyLandTaxService,
                                     view: WarningAgentNameView,
                                     navigator: Navigator,
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {

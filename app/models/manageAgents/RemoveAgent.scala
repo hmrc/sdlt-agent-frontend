@@ -16,12 +16,11 @@
 
 package models.manageAgents
 
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import viewmodels.govuk.radios._
-import models.Enumerable
-import models.WithName
+import viewmodels.govuk.radios.*
 
 sealed trait RemoveAgent
 

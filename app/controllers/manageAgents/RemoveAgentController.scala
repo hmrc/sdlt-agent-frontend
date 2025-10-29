@@ -18,6 +18,7 @@ package controllers.manageAgents
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.routes.*
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
 import play.api.Logging
@@ -27,7 +28,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
-import controllers.routes._
 
 import scala.concurrent.{ExecutionContext, Future}
 

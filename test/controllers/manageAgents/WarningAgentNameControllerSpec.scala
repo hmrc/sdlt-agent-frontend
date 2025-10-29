@@ -109,7 +109,6 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        println(status(result))
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }

@@ -16,19 +16,21 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
-import pages.*
 import models.*
+import pages.*
 import pages.manageAgents.AgentNamePage
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => String => UserAnswers => Call = {
-    case _ => _ => _ => routes.IndexController.onPageLoad()
     case AgentNamePage => storn => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, storn)
+    case _ => _ => _ => routes.IndexController.onPageLoad()
+
   }
   
 
