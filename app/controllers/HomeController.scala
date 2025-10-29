@@ -40,16 +40,21 @@ class HomeController @Inject()(
 
   // TODO: This is dummy page is also used as a temporary landing page - as the landing page has not been implemented yet
 
+  // TODO: We can temporarily use this page to show the pages we have implemented
+
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
 
       val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
       val agentNameURL = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, "").url
+      val agentOverviewUrl = controllers.manageAgents.routes.AgentOverviewController.onPageLoad("", 1).url
+
 
         Future.successful(Ok(Html(
           s"""
             |<h1> removeAgentUrl: </h1> <a href=$removeAgentUrl> $removeAgentUrl </a>
             |<h1> agentNameURL: </h1> <a href=$agentNameURL> $agentNameURL </a>
+            |<h1> agentOverviewUrl: </h1> <a href=$agentOverviewUrl> $agentOverviewUrl </a>
             |""".stripMargin
         )))
   }

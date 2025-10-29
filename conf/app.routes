@@ -37,19 +37,17 @@ GET         /manage-agents/check-warning-agent-name                    controlle
 POST        /manage-agents/check-warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = CheckMode)
 
 
-
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/check-address-lookup                controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/check-address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/check-agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/check-agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
-POST        /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onSubmit()
+GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(storn: String)
 
 GET         /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
 POST        /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)
