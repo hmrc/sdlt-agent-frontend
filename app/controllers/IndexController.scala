@@ -43,7 +43,7 @@ class IndexController @Inject()(
     val userAnswers = UserAnswers(id = request.userId)
 
     sessionRepository.set(userAnswers).map { _ =>
-      Results.Redirect(controllers.routes.HomeController.onPageLoad())
+      Results.Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
     }
   }
 }

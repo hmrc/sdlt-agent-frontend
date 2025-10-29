@@ -41,22 +41,22 @@ class AgentOverviewController @Inject()(
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  def onPageLoad(storn: String, paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onPageLoad(paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
 
-    val postAction: Call = StartAddAgentController.onSubmit(storn)
+    val postAction: Call = StartAddAgentController.onSubmit()
 
     stampDutyLandTaxService
-      .getAllAgentDetails(storn).map {
+      .getAllAgentDetails(request.storn).map {
         case Nil              => Ok(view(None, None, None, postAction))
         case agentDetailsList =>
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
-              Redirect(AgentOverviewController.onPageLoad(storn, 1))
+              Redirect(AgentOverviewController.onPageLoad(1))
             ) { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
-              val pagination:     Option[Pagination] = generatePagination(storn, paginationIndex, numberOfPages)
+              val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
               val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
 
               Ok(view(Some(summary), pagination, paginationText, postAction))

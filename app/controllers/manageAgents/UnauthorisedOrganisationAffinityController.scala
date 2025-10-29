@@ -16,23 +16,23 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import config.FrontendAppConfig
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+import views.html.manageAgents.UnauthorisedOrgView
 
 import javax.inject.Inject
 
-class CheckYourAnswersController @Inject()(
-                                            val controllerComponents: MessagesControllerComponents,
-                                            identify: IdentifierAction,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            view: IndexView
-                                          ) extends FrontendBaseController with I18nSupport {
+class UnauthorisedOrganisationAffinityController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  view: UnauthorisedOrgView
+)(implicit appConfig: FrontendAppConfig)
+  extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
   }
 }
+

@@ -51,17 +51,21 @@ class AuthenticatedIdentifierAction @Inject()(
 
     authorised(defaultPredicate)
       .retrieve(
-        Retrievals.internalId and
-          Retrievals.allEnrolments and
-          Retrievals.affinityGroup and
-          Retrievals.credentialRole
+        Retrievals.internalId     and
+        Retrievals.allEnrolments  and
+        Retrievals.affinityGroup  and
+        Retrievals.credentialRole
       ) {
-        case Some(_) ~ _ ~ Some(Organisation) ~ Some(Assistant)                          =>
-          logger.info("EnrolmentAuthIdentifierAction - Organisation: Assistant login attempt")
-          Future.successful(Redirect(controllers.monthlyreturns.routes.UnauthorisedWrongRoleController.onPageLoad()))
-        //      _.map {
-//        internalId => block(IdentifierRequest(request, internalId))
-//      }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
+          hasSdltOrgEnrolment(enrolments)
+            .map { storn =>
+              block(IdentifierRequest(request, internalId, storn))
+            }
+            .getOrElse(
+              Future.successful(
+                Redirect(controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+              )
+            )
     } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
@@ -70,38 +74,18 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
-
-  private def hasCisOrgEnrolment[A](enrolments: Set[Enrolment]): Option[EmployerReference] =
-    enrolments.find(_.key == "HMRC-CIS-ORG") match {
+  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
+    enrolments.find(_.key == "IR-SDLT-ORG") match {
       case Some(enrolment) =>
-        val taxOfficeNumber = enrolment.identifiers.find(id => id.key == "TaxOfficeNumber").map(_.value)
-        val taxOfficeReference = enrolment.identifiers.find(id => id.key == "TaxOfficeReference").map(_.value)
+        val storn = enrolment.identifiers.find(id => id.key == "STORN").map(_.value)
         val isActivated = enrolment.isActivated
-        (taxOfficeNumber, taxOfficeReference, isActivated) match {
-          case (Some(number), Some(reference), true) =>
-            Some(EmployerReference(number, reference))
+        (storn, isActivated) match {
+          case (Some(storn), true) =>
+            Some(storn)
           case _ =>
-            logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve cis enrolments")
+            logger.warn("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
             None
         }
       case _ => None
     }
-}
-
-class SessionIdentifierAction @Inject()(
-                                         val parser: BodyParsers.Default
-                                       )
-                                       (implicit val executionContext: ExecutionContext) extends IdentifierAction {
-
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    hc.sessionId match {
-      case Some(session) =>
-        block(IdentifierRequest(request, session.value))
-      case None =>
-        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-    }
-  }
 }

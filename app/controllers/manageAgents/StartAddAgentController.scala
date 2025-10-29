@@ -41,11 +41,11 @@ class StartAddAgentController @Inject()(
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
-  def onSubmit(storn: String): Action[AnyContent] =
+  def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      stampDutyLandTaxService.getAllAgentDetails(storn).map { agents =>
+      stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agents =>
         if (agents.size >= MAX_AGENTS) {
-          Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
+          Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
             .flashing("agentsLimitReached" -> "true")
         } else {
           Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode))
