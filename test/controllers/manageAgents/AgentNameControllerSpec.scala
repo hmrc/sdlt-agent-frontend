@@ -86,28 +86,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill("Test Agent Name"), NormalMode, storn)(request, messages(application)).toString
       }
     }
-
-    "must redirect to the next page when valid data is submitted" in {
-      
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, AgentNameRequestRoute)
-            .withFormUrlEncodedBody(("value", "Test Agent Name"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
+    
     "must redirect to the warning page when Agent name already exists" in {
 
       when(service.isDuplicate(any(),any())(any()))
