@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import models.NormalMode
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -37,187 +37,88 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
   val addressLookupOutcomeUrl: String => String = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
-  private val addressLookupTimeoutAmount: Long = appConfig.addressLookupTimeoutAmount
+  private val sessionTimeout: Long = appConfig.sessionTimeOut
   private val addressLookupTimeoutUrl: String = appConfig.addressLookupTimeoutUrl
 
-  private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" +
-    controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode).url
+  private val langResourcePrefix : String = "manageAgents.addressLookup"
 
-  private def getAddressJson: JsValue = {
+  private val continueUrl = appConfig.loginContinueUrl +
+    controllers.manageAgents.routes.AddressLookupController.onSubmit(NormalMode).url
+
+  private def setJourneyOptions(): Seq[(String, JsValue)] = {
+    Seq(
+      "continueUrl" -> JsString(continueUrl),
+      "ukMode" -> JsBoolean(true),
+      "selectPageConfig" -> JsObject(
+        Seq(
+          "proposalListLimit" -> JsNumber(30),
+          "showSearchLinkAgain" -> JsBoolean(true)
+        )
+      ),
+      "confirmPageConfig" -> JsObject(
+        Seq(
+          "showChangeLink" -> JsBoolean(false),
+          "showSubHeadingAndInfo" -> JsBoolean(false),
+          "showSearchAgainLink" -> JsBoolean(false),
+          "showConfirmChangeText" -> JsBoolean(false),
+        )
+      ),
+      "manualAddressEntryConfig" -> JsObject(
+        Seq(
+          "line1MaxLength" -> JsNumber(255),
+          "line2MaxLength" -> JsNumber(255),
+          "line3MaxLength" -> JsNumber(255),
+          "townMaxLength" -> JsNumber(255)
+        )
+      ),
+      "timeoutConfig" -> JsObject(
+        Seq(
+          "timeoutAmount" -> JsNumber(sessionTimeout),
+          "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
+        )
+      )
+    )
+  }
+
+  private def setLabels(lang : Lang): Seq[(String, JsObject)] = {
+    Seq(
+      "selectPageLabels" -> JsObject(
+        Seq(
+          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.select.heading"))
+        )
+      ),
+      "lookupPageLabels" -> JsObject(
+        Seq(
+          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.lookup.heading"))
+        )
+      ),
+      "confirmPageLabels" -> JsObject(
+        Seq(
+          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.confirm.heading"))
+        )
+      ),
+      "editPageLabels" -> JsObject(
+        Seq(
+          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.edit.heading"))
+        )
+      )
+    )
+  }
+
+  private def buildConfig: JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
         "options" -> JsObject(
-          Seq(
-            "continueUrl" -> JsString(continueUrl),
-            "ukMode" -> JsBoolean(true),
-            "selectPageConfig" -> JsObject(
-              Seq(
-                "proposalListLimit" -> JsNumber(30),
-                "showSearchLinkAgain" -> JsBoolean(true)
-              )
-            ),
-            "confirmPageConfig" -> JsObject(
-              Seq(
-                "showChangeLink" -> JsBoolean(false),
-                "showSubHeadingAndInfo" -> JsBoolean(false),
-                "showSearchAgainLink" -> JsBoolean(false),
-                "showConfirmChangeText" -> JsBoolean(false),
-              )
-            ),
-            "manualAddressEntryConfig" -> JsObject(
-              Seq(
-                "line1MaxLength" -> JsNumber(255),
-                "line2MaxLength" -> JsNumber(255),
-                "line3MaxLength" -> JsNumber(255),
-                "townMaxLength" -> JsNumber(255)
-              )
-            ),
-            "timeoutConfig" -> JsObject(
-              Seq(
-                "timeoutAmount" -> JsNumber(addressLookupTimeoutAmount),
-                "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
-              )
-            )
-          )
+          setJourneyOptions()
         ),
         "labels" -> JsObject(
           Seq(
             "en" -> JsObject(
-              Seq(
-                "appLevelLabels" -> JsObject(
-                  Seq(
-                    "navTitle" -> JsString(""),
-                    "phaseBannerHtml" -> JsString("")
-                  )
-                ),
-                "countryPickerLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Custom title"),
-                    "heading" -> JsString("Custom heading"),
-                    "countryLabel" -> JsString("Custom country label"),
-                    "submitLabel" -> JsString("Custom submit label")
-                  )
-                ),
-                "selectPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Choose address"),
-                    "heading" -> JsString("Choose address"),
-                    "headingWithPostcode" -> JsString("foo"),
-                    "proposalListLabel" -> JsString("Please select one of the following addresses"),
-                    "submitLabel" -> JsString("Continue"),
-                    "searchAgainLinkText" -> JsString("Search again"),
-                    "editAddressLinkText" -> JsString("Enter address manually")
-                  )
-                ),
-                "lookupPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Find address"),
-                    "heading" -> JsString("Find address"),
-                    "afterHeadingText" -> JsString("We will use this address to send letters"),
-                    "filterLabel" -> JsString("Property name or number (optional)"),
-                    "postcodeLabel" -> JsString("Postcode"),
-                    "submitLabel" -> JsString("Find address"),
-                    "noResultsFoundMessage" -> JsString("Sorry, we couldn't find anything for that postcode."),
-                    "resultLimitExceededMessage" -> JsString("There were too many results. Please add additional details to limit the number of results."),
-                    "manualAddressLinkText" -> JsString("Enter the address manually")
-                  )
-                ),
-                "confirmPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Confirm address"),
-                    "heading" -> JsString("Review and confirm"),
-                    "infoSubheading" -> JsString("Your selected address"),
-                    "infoMessage" -> JsString("This is how your address will look. Please double-check it and, if accurate, click on the <kbd>Confirm</kbd> button."),
-                    "submitLabel" -> JsString("Confirm Address"),
-                    "searchAgainLinkText" -> JsString("Search again"),
-                    "changeLinkText" -> JsString("Edit address"),
-                    "confirmChangeText" -> JsString("By confirming this change, you agree that the information you have given is complete and correct.")
-                  )
-                ),
-                "editPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Enter address"),
-                    "heading" -> JsString("Enter address"),
-                    "organisationLabel" -> JsString("Organisation (optional)"),
-                    "line1Label" -> JsString("Address line 1"),
-                    "line2Label" -> JsString("Address line 2 (optional)"),
-                    "line3Label" -> JsString("Address line 3 (optional)"),
-                    "townLabel" -> JsString("Town/City"),
-                    "postcodeLabel" -> JsString("Postcode (optional)"),
-                    "countryLabel" -> JsString("Country"),
-                    "submitLabel" -> JsString("Continue")
-                  )
-                )
-              )
+              setLabels( Lang("en") )
             ),
             "cy" -> JsObject(
-              Seq(
-                "appLevelLabels" -> JsObject(
-                  Seq(
-                    "navTitle" -> JsString(""),
-                    "phaseBannerHtml" -> JsString("")
-                  )
-                ),
-                "countryPickerLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Custom title - Welsh"),
-                    "heading" -> JsString("Custom heading - Welsh"),
-                    "countryLabel" -> JsString("Custom country label - Welsh"),
-                    "submitLabel" -> JsString("Custom submit label - Welsh")
-                  )
-                ),
-                "selectPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Choose address Welsh"),
-                    "heading" -> JsString("Choose address Welsh"),
-                    "headingWithPostcode" -> JsString("foo"),
-                    "proposalListLabel" -> JsString("Please select one of the following addresses Welsh"),
-                    "submitLabel" -> JsString("Continue Welsh"),
-                    "searchAgainLinkText" -> JsString("Search again Welsh"),
-                    "editAddressLinkText" -> JsString("Enter address manually Welsh")
-                  )
-                ),
-                "lookupPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Find address Welsh"),
-                    "heading" -> JsString("Find address Welsh"),
-                    "afterHeadingText" -> JsString("We will use this address to send letters Welsh"),
-                    "filterLabel" -> JsString("Property name or number Welsh (optional)"),
-                    "postcodeLabel" -> JsString("Postcode Welsh"),
-                    "submitLabel" -> JsString("Find address Welsh"),
-                    "noResultsFoundMessage" -> JsString("Sorry, we couldn't find anything for that postcode. Welsh"),
-                    "resultLimitExceededMessage" -> JsString("There were too many results. Please add additional details to limit the number of results. Welsh"),
-                    "manualAddressLinkText" -> JsString("Enter the address manually Welsh")
-                  )
-                ),
-                "confirmPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Confirm address Welsh"),
-                    "heading" -> JsString("Review and confirm Welsh"),
-                    "infoSubheading" -> JsString("Your selected address Welsh"),
-                    "infoMessage" -> JsString("This is how your address will look. Please double-check it and, if accurate, click on the <kbd>Confirm</kbd> button. Welsh"),
-                    "submitLabel" -> JsString("Confirm Address Welsh"),
-                    "searchAgainLinkText" -> JsString("Search again Welsh"),
-                    "changeLinkText" -> JsString("Edit address Welsh"),
-                    "confirmChangeText" -> JsString("By confirming this change, you agree that the information you have given is complete and correct. Welsh")
-                  )
-                ),
-                "editPageLabels" -> JsObject(
-                  Seq(
-                    "title" -> JsString("Enter address Welsh"),
-                    "heading" -> JsString("Enter address Welsh"),
-                    "organisationLabel" -> JsString("Organisation (optional) Welsh"),
-                    "line1Label" -> JsString("Address line 1 Welsh"),
-                    "line2Label" -> JsString("Address line 2 (optional) Welsh"),
-                    "line3Label" -> JsString("Address line 3 (optional) Welsh"),
-                    "townLabel" -> JsString("Town/City Welsh"),
-                    "postcodeLabel" -> JsString("Postcode (optional) Welsh"),
-                    "countryLabel" -> JsString("Country Welsh"),
-                    "submitLabel" -> JsString("Continue Welsh")
-                  )
-                )
-              )
+              setLabels( Lang("cy"))
             )
           )
         )
@@ -228,7 +129,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 1: Journey start/init
   def initJourney(storn: String)(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
-    val payload: JsValue = getAddressJson
+    val payload: JsValue = buildConfig
     Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
