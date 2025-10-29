@@ -11,3 +11,6 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes
+
+GET        /stamp-duty-land-tax-agent/manage-agents/test-only/session/set         testOnly.StubSetSessionController.set()
+GET        /stamp-duty-land-tax-agent/manage-agents/test-only/session/clear       testOnly.StubSetSessionController.clear()
