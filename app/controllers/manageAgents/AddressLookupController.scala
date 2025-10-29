@@ -18,6 +18,7 @@ package controllers.manageAgents
 
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.routes.JourneyRecoveryController
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{Mode, UserAnswers}
 import navigation.Navigator
@@ -43,19 +44,16 @@ class AddressLookupController @Inject()(
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    // TODO: userId is the same as Sorn ???
-    addressLookupService.initJourney(request.userId).map {
+    addressLookupService.initJourney(request.storn).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
         Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
         Logger("application").error("[AddressLookupController] - Failed::Location not provided")
-        throw new RuntimeException("Failed::Location not provided")
-      // TODO: switch to => Redirect(JourneyRecoveryController.onPageLoad())
+        Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
         Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
-        throw new RuntimeException(s"Failed to Init journey: $ex")
-      // TODO: switch to => Redirect(JourneyRecoveryController.onPageLoad())
+        Redirect(JourneyRecoveryController.onPageLoad())
     }
   }
 
@@ -72,8 +70,7 @@ class AddressLookupController @Inject()(
       Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
-      throw new RuntimeException(s"failed to extract address: $ex")
-      // TODO: switch to =>Redirect(JourneyRecoveryController.onPageLoad())
+      Redirect(JourneyRecoveryController.onPageLoad())
     }
   }
 
