@@ -20,10 +20,15 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.mvc.Results._
-import play.api.mvc._
-import uk.gov.hmrc.auth.core._
+import play.api.Logging
+import play.api.mvc.Results.*
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -36,16 +41,32 @@ class AuthenticatedIdentifierAction @Inject()(
                                                config: FrontendAppConfig,
                                                val parser: BodyParsers.Default
                                              )
-                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
+                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions with Logging {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.internalId) {
-      _.map {
-        internalId => block(IdentifierRequest(request, internalId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
+    val defaultPredicate: Predicate = AuthProviders(GovernmentGateway)
+
+    authorised(defaultPredicate)
+      .retrieve(
+        Retrievals.internalId     and
+        Retrievals.allEnrolments  and
+        Retrievals.affinityGroup  and
+        Retrievals.credentialRole
+      ) {
+        //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
+          hasSdltOrgEnrolment(enrolments)
+            .map { storn =>
+              block(IdentifierRequest(request, internalId, storn))
+            }
+            .getOrElse(
+              Future.successful(
+                Redirect(controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+              )
+            )
     } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
@@ -53,22 +74,19 @@ class AuthenticatedIdentifierAction @Inject()(
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-}
 
-class SessionIdentifierAction @Inject()(
-                                         val parser: BodyParsers.Default
-                                       )
-                                       (implicit val executionContext: ExecutionContext) extends IdentifierAction {
-
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    hc.sessionId match {
-      case Some(session) =>
-        block(IdentifierRequest(request, session.value))
-      case None =>
-        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
+    enrolments.find(_.key == "IR-SDLT-ORG") match {
+      case Some(enrolment) =>
+        val storn = enrolment.identifiers.find(id => id.key == "STORN").map(_.value)
+        val isActivated = enrolment.isActivated
+        (storn, isActivated) match {
+          case (Some(storn), true) =>
+            Some(storn)
+          case _ =>
+            logger.error("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
+            None
+        }
+      case _ => None
     }
-  }
 }

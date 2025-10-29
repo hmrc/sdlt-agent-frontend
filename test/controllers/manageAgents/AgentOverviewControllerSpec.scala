@@ -34,10 +34,10 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
   private val service = mock[StampDutyLandTaxService]
 
   private def agentOverviewUrl(page: Int) =
-    controllers.manageAgents.routes.AgentOverviewController.onPageLoad(testStorn, page).url
+    controllers.manageAgents.routes.AgentOverviewController.onPageLoad(page).url
 
   private def startAddAgentJourneyUrl =
-    controllers.manageAgents.routes.StartAddAgentController.onSubmit(testStorn).url
+    controllers.manageAgents.routes.StartAddAgentController.onSubmit().url
 
   private val agents22 = getAgentList(22)
 
@@ -64,7 +64,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
             maybeSummaryList   = None,
             pagination         = None,
             paginationInfoText = None,
-            postAction         = controllers.manageAgents.routes.StartAddAgentController.onSubmit(testStorn)
+            postAction         = controllers.manageAgents.routes.StartAddAgentController.onSubmit()
           )(request, messages(application)).toString
       }
     }

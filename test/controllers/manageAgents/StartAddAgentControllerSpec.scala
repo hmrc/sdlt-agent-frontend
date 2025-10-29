@@ -33,7 +33,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
   private val service = mock[StampDutyLandTaxService]
 
-  private def postUrl: String = routes.StartAddAgentController.onSubmit(testStorn).url
+  private def postUrl: String = routes.StartAddAgentController.onSubmit().url
   
   "StartAddAgentController.onSubmit" - {
 
@@ -71,7 +71,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.AgentOverviewController.onPageLoad(testStorn, 1).url
+          routes.AgentOverviewController.onPageLoad(1).url
 
         flash(result).get("agentsLimitReached") mustBe Some("true")
       }
