@@ -16,7 +16,6 @@
 
 package models.manageAgents
 
-import play.api.libs.json.OFormat
 import play.api.libs.json.*
 
 case class AgentContactDetails(contactTelephoneNumber: String, contactEmail: String)

@@ -38,8 +38,8 @@ POST        /manage-agents/agent-contact-details         controllers.manageAgent
 GET         /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-POST        /manage-agents/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
 GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
+POST        /manage-agents/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
 
 GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad()
 POST        /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit()

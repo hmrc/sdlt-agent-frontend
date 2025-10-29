@@ -28,7 +28,6 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
-
 import scala.concurrent.Future
 
 class SubmitAgentControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {

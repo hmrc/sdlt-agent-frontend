@@ -39,13 +39,10 @@ manageAgents.caption = Manage agents
 
 manageAgents.agentName.checkYourAnswersLabel = Agent name
 manageAgents.agentName.change.hidden = 
-
 manageAgents.address.checkYourAnswersLabel = Address
 manageAgents.address.change.hidden = 
-
 manageAgents.contactTelephoneNumber.checkYourAnswersLabel = Contact telephone number
 manageAgents.contactTelephoneNumber.change.hidden = 
-
 manageAgents.contactEmail.checkYourAnswersLabel = Contact email
 manageAgents.contactEmail.change.hidden = 
 
