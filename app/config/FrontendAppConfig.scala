@@ -55,6 +55,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
+  // AddressLookup configuration
   val addressLookupBaseUrl: String = configuration.get[String]("address-lookup.baseUrl")
+  val addressLookupTimeoutAmount: Long = configuration.get[Long]("address-lookup.timeoutAmount")
+  val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup.timeoutUrl")
 
 }

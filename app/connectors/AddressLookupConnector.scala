@@ -37,6 +37,9 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
   val addressLookupOutcomeUrl: String => String = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
 
+  private val addressLookupTimeoutAmount: Long = appConfig.addressLookupTimeoutAmount
+  private val addressLookupTimeoutUrl: String = appConfig.addressLookupTimeoutUrl
+
   private val continueUrl = "http://localhost:10911/stamp-duty-land-tax-agent" +
     controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode).url
 
@@ -47,26 +50,13 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "options" -> JsObject(
           Seq(
             "continueUrl" -> JsString(continueUrl),
-//            "homeNavHref" -> JsString("..."),
-//            "signOutHref" -> JsString("..."),
-//            "accessibilityFooterUrl" -> JsString("..."),
-//            "phaseFeedbackLink" -> JsString("/help/alpha"),
-//            "deskProServiceName" -> JsString("..."),
-//            "showPhaseBanner" -> JsBoolean(false),
-//            "alphaPhase" -> JsBoolean(false),
-//            "disableTranslations" -> JsBoolean(true),
-//            "showBackButtons" -> JsBoolean(false),
-//            "includeHMRCBranding" -> JsBoolean(true),
-//            "allowedCountryCodes" -> JsArray(Seq(JsString("GB"))),
             "ukMode" -> JsBoolean(true),
-
             "selectPageConfig" -> JsObject(
               Seq(
                 "proposalListLimit" -> JsNumber(30),
                 "showSearchLinkAgain" -> JsBoolean(true)
               )
             ),
-
             "confirmPageConfig" -> JsObject(
               Seq(
                 "showChangeLink" -> JsBoolean(false),
@@ -75,7 +65,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                 "showConfirmChangeText" -> JsBoolean(false),
               )
             ),
-
             "manualAddressEntryConfig" -> JsObject(
               Seq(
                 "line1MaxLength" -> JsNumber(255),
@@ -84,16 +73,12 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                 "townMaxLength" -> JsNumber(255)
               )
             ),
-
             "timeoutConfig" -> JsObject(
               Seq(
-                "timeoutAmount" -> JsNumber(900),
-                "timeoutUrl" -> JsString("/timeout-uri"),
-                "timeoutKeepAliveUrl" -> JsString("/keep-alive-uri")
+                "timeoutAmount" -> JsNumber(addressLookupTimeoutAmount),
+                "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
               )
-            ),
-//            "pageHeadingStyle" -> JsString("govuk-heading-xl")
-
+            )
           )
         ),
         "labels" -> JsObject(
