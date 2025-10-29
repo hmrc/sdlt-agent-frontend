@@ -45,7 +45,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
+  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
   def warningRoute: Call = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
 
   "AgentNameController" - {
