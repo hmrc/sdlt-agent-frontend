@@ -22,11 +22,12 @@ import connectors.AddressLookupConnector
 import jakarta.inject.Inject
 import models.UserAnswers
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitSuccessResponse}
-import models.responses.addresslookup.JourneyResultAddressModel
-import pages.manageAgents.AgentAddressDetails
+import models.responses.addresslookup.{JourneyInitResponse, JourneyResultAddressModel}
+import pages.manageAgents.{AgentAddressDetails, AgentNamePage, StornPage}
 import uk.gov.hmrc.http.HeaderCarrier
 import repositories.SessionRepository
 import play.api.Logger
+import play.api.i18n.Messages
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,29 +35,31 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddressLookupService @Inject()(
                                       addressLookUpConnector: AddressLookupConnector,
                                       sessionRepository: SessionRepository,
-                                    )(implicit ec: ExecutionContext){
+                                    )(implicit ec: ExecutionContext) {
 
   // Step 1: Init AL journey
-  // TODO: pass storn ID
-  def initJourney(sorn: String)
-                 (implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
+  def initJourney(userAnswers: UserAnswers, storn: String)
+                 (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     Logger("application").debug(s"[AddressLookupService] - Init AddressLookUp journey")
-    addressLookUpConnector.initJourney(sorn)
+    for {
+      agentName <- Future.successful(userAnswers.get(AgentNamePage))
+      initJourneyRes <- addressLookUpConnector.initJourney(agentName) // set agentName as empty if nothing found
+    } yield initJourneyRes
   }
 
   // Step 2: extract and save AddressDetails
   private def saveAddressDetails(userId: String, addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
-          val userAnswers = UserAnswers(id = userId)
-          userAnswers.set(AgentAddressDetails, addressDetails).toEither match {
-            case Right(updatedAnswers) =>
-              Logger("application").debug(s"[AddressLookupService] - Update user session")
-              sessionRepository.set(userAnswers)
-                .map(res => Right( updatedAnswers )) // assume will always succeed
-            case Left(ex) =>
-              Future.successful(Left(Error("Failed to update user session")))
-          }
+        val userAnswers = UserAnswers(id = userId)
+        userAnswers.set(AgentAddressDetails, addressDetails).toEither match {
+          case Right(updatedAnswers) =>
+            Logger("application").debug(s"[AddressLookupService] - Update user session")
+            sessionRepository.set(userAnswers)
+              .map(res => Right(updatedAnswers)) // assume will always succeed
+          case Left(ex) =>
+            Future.successful(Left(Error("Failed to update user session")))
+        }
       case None =>
         Future.successful(Left(Error("No addressDetails found")))
     }

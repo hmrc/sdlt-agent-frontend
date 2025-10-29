@@ -44,7 +44,7 @@ class AddressLookupController @Inject()(
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    addressLookupService.initJourney(request.storn).map {
+    addressLookupService.initJourney(request.userAnswers, request.storn).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
         Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)

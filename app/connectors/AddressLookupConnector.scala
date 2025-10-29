@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import models.NormalMode
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
-import play.api.i18n.{Lang, MessagesApi}
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
@@ -48,6 +48,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private def setJourneyOptions(): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl),
+      "includeHMRCBranding" -> JsBoolean(true),
       "ukMode" -> JsBoolean(true),
       "selectPageConfig" -> JsObject(
         Seq(
@@ -77,24 +78,43 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
         )
       )
+//      "pageHeadingStyle" -> JsString("govuk-header")
     )
   }
 
-  private def setLabels(lang : Lang): Seq[(String, JsObject)] = {
+  private def setLabels(agentName: Option[String], lang : Lang)
+                       (implicit messages: Messages): Seq[(String, JsObject)] = {
     Seq(
+      "appLevelLabels" -> JsObject(
+        Seq(
+          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title"))
+        )
+      ),
       "selectPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.select.heading"))
+          "heading" -> JsString(
+            messages(
+              s"$langResourcePrefix.select.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+            )
+          )
         )
       ),
       "lookupPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.lookup.heading"))
+          "heading" -> JsString(
+            messages(
+              s"$langResourcePrefix.lookup.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+            )
+          )
         )
       ),
       "confirmPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.confirm.heading"))
+          "heading" -> JsString(
+            messages(
+              s"$langResourcePrefix.confirm.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+            )
+          )
         )
       ),
       "editPageLabels" -> JsObject(
@@ -105,7 +125,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     )
   }
 
-  private def buildConfig: JsValue = {
+  private def buildConfig(agentName: Option[String])
+      (implicit messages: Messages): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -115,10 +136,10 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "labels" -> JsObject(
           Seq(
             "en" -> JsObject(
-              setLabels( Lang("en") )
+              setLabels(agentName, Lang("en") )
             ),
             "cy" -> JsObject(
-              setLabels( Lang("cy"))
+              setLabels(agentName, Lang("cy"))
             )
           )
         )
@@ -127,9 +148,10 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   // Step 1: Journey start/init
-  def initJourney(storn: String)(implicit hc: HeaderCarrier): Future[AddressLookupResponse] = {
+  def initJourney(agentName: Option[String])
+                 (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
-    val payload: JsValue = buildConfig
+    val payload: JsValue = buildConfig(agentName)
     Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)

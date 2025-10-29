@@ -24,7 +24,7 @@ object JourneyInitResponse {
 
   case class JourneyInitSuccessResponse(location: Option[String])
 
-  case class JourneyInitFailureResponse(status: Int)
+  case class JourneyInitFailureResponse(status: Int) extends Throwable
   
   type AddressLookupResponse = Either[JourneyInitFailureResponse, JourneyInitSuccessResponse]
 
