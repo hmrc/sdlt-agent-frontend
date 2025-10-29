@@ -26,11 +26,10 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import scala.concurrent.Future
 
-class SubmitAgentControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
+class SubmitAgentControllerSpec extends SpecBase with SummaryListFluency {
 
   private def submitAgentUrl =
     controllers.manageAgents.routes.SubmitAgentController.onSubmit().url

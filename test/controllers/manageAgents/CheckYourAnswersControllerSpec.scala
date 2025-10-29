@@ -22,12 +22,11 @@ import models.UserAnswers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.libs.json.Json
-import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactTelephoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
+class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
 
   private def checkYourAnswersUrl =
     controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad().url

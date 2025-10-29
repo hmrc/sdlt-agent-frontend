@@ -24,7 +24,6 @@ import models._
 class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
-  val testStorn = "test"
 
   "Navigator" - {
 
