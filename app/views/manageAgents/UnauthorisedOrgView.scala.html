@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.requests
+@import config.FrontendAppConfig
+@import views.html.components._
 
-import play.api.mvc.{Request, WrappedRequest}
+@this(
+        layout: templates.Layout,
+        paragraph: Paragraph
+)
 
-case class IdentifierRequest[A] (
-  request: Request[A],
-  userId: String,
-  storn: String
-) extends WrappedRequest[A](request)
+
+@()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
+
+@layout(
+    pageTitle = titleNoForm(messages("manageAgents.unauthorised.org.title")),
+    showBackLink = false,
+    timeout = false
+) {
+
+    <h1>@messages("manageAgents.unauthorised.org.heading")</h1>
+}

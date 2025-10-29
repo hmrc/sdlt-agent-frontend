@@ -22,7 +22,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, FluentKey, FluentValue, KeyViewModel, SummaryListRowViewModel, SummaryListViewModel, ValueViewModel}
-import controllers.manageAgents.routes._
+import controllers.manageAgents.routes.*
+import models.requests.DataRequest
+import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 
 trait PaginationHelper {
 
@@ -71,12 +73,12 @@ trait PaginationHelper {
             actions = Seq(
               ActionItemViewModel(
                 Text(messages("site.change")),
-                CheckYourAnswersController.onPageLoad(agentDetails.storn).url
+                CheckYourAnswersController.onPageLoad().url
               )
                 .withVisuallyHiddenText(agentDetails.name),
               ActionItemViewModel(
                 Text(messages("site.remove")),
-                RemoveAgentController.onPageLoad(agentDetails.storn).url
+                RemoveAgentController.onPageLoad().url
               )
                 .withVisuallyHiddenText(messages(agentDetails.name))
             ),
@@ -87,27 +89,27 @@ trait PaginationHelper {
     )
   }
 
-  def generatePagination(storn: String, paginationIndex: Int, numberOfPages: Int)
+  def generatePagination(paginationIndex: Int, numberOfPages: Int)
                         (implicit messages: Messages): Option[Pagination] =
     if (numberOfPages < 2) None
     else
       Some(
         Pagination(
-          items = Some(generatePaginationItems(storn, paginationIndex, numberOfPages)),
-          previous = generatePreviousLink(storn, paginationIndex, numberOfPages),
-          next = generateNextLink(storn, paginationIndex, numberOfPages),
+          items = Some(generatePaginationItems(paginationIndex, numberOfPages)),
+          previous = generatePreviousLink(paginationIndex, numberOfPages),
+          next = generateNextLink(paginationIndex, numberOfPages),
           landmarkLabel = None,
           classes = "",
           attributes = Map.empty
         )
       )
 
-  def generatePaginationItems(storn: String, paginationIndex: Int, numberOfPages: Int): Seq[PaginationItem] =
+  def generatePaginationItems(paginationIndex: Int, numberOfPages: Int): Seq[PaginationItem] =
     Range
       .inclusive(1, numberOfPages)
       .map(pageIndex =>
         PaginationItem(
-          href = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, pageIndex).url,
+          href = AgentOverviewController.onPageLoad(pageIndex).url,
           number = Some(pageIndex.toString),
           visuallyHiddenText = None,
           current = Some(pageIndex == paginationIndex),
@@ -116,26 +118,26 @@ trait PaginationHelper {
         )
       )
 
-  def generatePreviousLink(storn: String, paginationIndex: Int, numberOfPages: Int)
+  def generatePreviousLink(paginationIndex: Int, numberOfPages: Int)
                           (implicit messages: Messages): Option[PaginationLink] =
     if (paginationIndex == 1) None
     else {
       Some(
         PaginationLink(
-          href = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, paginationIndex - 1).url,
+          href = AgentOverviewController.onPageLoad(paginationIndex - 1).url,
           text = Some(messages("pagination.previous")),
           attributes = Map.empty
         )
       )
     }
 
-  def generateNextLink(storn: String, paginationIndex: Int, numberOfPages: Int)
+  def generateNextLink(paginationIndex: Int, numberOfPages: Int)
                       (implicit messages: Messages): Option[PaginationLink] =
     if (paginationIndex == numberOfPages) None
     else {
       Some(
         PaginationLink(
-          href = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, paginationIndex + 1).url,
+          href = AgentOverviewController.onPageLoad(paginationIndex + 1).url,
           text = Some(messages("pagination.next")),
           attributes = Map.empty
         )

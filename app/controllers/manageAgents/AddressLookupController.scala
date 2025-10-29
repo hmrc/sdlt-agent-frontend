@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import cats.data.EitherT
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{Mode, UserAnswers}
 import navigation.Navigator
@@ -38,10 +38,11 @@ class AddressLookupController @Inject()(
                                          identify: IdentifierAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
+                                         stornRequiredAction: StornRequiredAction,
                                          navigator: Navigator
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     // TODO: userId is the same as Sorn ???
     addressLookupService.initJourney(request.userId).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
@@ -58,7 +59,7 @@ class AddressLookupController @Inject()(
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request => {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)

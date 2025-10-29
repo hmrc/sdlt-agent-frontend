@@ -17,24 +17,25 @@
 package controllers.actions
 
 import javax.inject.Inject
-import controllers.routes
-import models.requests.{DataRequest, OptionalDataRequest}
+import models.requests.DataRequest
+import pages.manageAgents.StornPage
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
+import controllers.manageAgents.routes._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionContext) extends DataRequiredAction {
+class StornRequiredActionImpl @Inject() (implicit val executionContext: ExecutionContext) extends StornRequiredAction {
 
-  override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
-
-    request.userAnswers match {
-      case None =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
-      case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.userId, data, request.storn)))
+  override protected def refine[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] =
+    request.userAnswers.get(StornPage) match {
+      case Some(storn) =>
+        Future.successful(Right(request))
+      case None        =>
+        Future.successful(
+          Left(Redirect(UnauthorisedOrganisationAffinityController.onPageLoad()))
+        )
     }
-  }
 }
 
-trait DataRequiredAction extends ActionRefiner[OptionalDataRequest, DataRequest]
+trait StornRequiredAction extends ActionRefiner[DataRequest, DataRequest]

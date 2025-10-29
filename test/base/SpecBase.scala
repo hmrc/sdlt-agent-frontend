@@ -16,7 +16,7 @@
 
 package base
 
-import controllers.actions._
+import controllers.actions.*
 import models.UserAnswers
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -26,6 +26,7 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 
 trait SpecBase
@@ -38,7 +39,11 @@ trait SpecBase
 
   val userAnswersId: String = "id"
 
-  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId)
+  val stornData = Json.obj(
+    "storn" -> "STN001"
+  )
+  
+  def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId, stornData)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
