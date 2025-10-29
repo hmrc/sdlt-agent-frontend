@@ -17,18 +17,19 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.manageAgents.routes.*
-import controllers.routes.JourneyRecoveryController
-import play.api.Logging
+
+import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
+import controllers.routes.JourneyRecoveryController
+import play.api.Logging
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+import controllers.manageAgents.routes.*
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class AgentOverviewController @Inject()(

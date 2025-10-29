@@ -46,7 +46,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
+  def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
 
   "AgentNameController" - {
     "must return OK and the correct view for a GET in NormalMode" in {

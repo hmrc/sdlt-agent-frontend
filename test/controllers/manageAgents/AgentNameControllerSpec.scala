@@ -45,7 +45,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
+  def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
   def warningRoute: Call = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
 
   "AgentNameController" - {
@@ -86,7 +86,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill("Test Agent Name"), NormalMode, storn)(request, messages(application)).toString
       }
     }
-    
+
     "must redirect to the warning page when Agent name already exists" in {
 
       when(service.isDuplicate(any(),any())(any()))

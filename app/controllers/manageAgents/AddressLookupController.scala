@@ -18,12 +18,12 @@ package controllers.manageAgents
 
 import controllers.actions.IdentifierAction
 import models.Mode
+
+import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IndexView
-
-import javax.inject.Inject
 
 class AddressLookupController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
