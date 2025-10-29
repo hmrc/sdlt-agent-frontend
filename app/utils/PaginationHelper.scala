@@ -16,7 +16,7 @@
 
 package utils
 
-import models.AgentDetails
+import models.AgentDetailsAfterCreation
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
@@ -51,19 +51,19 @@ trait PaginationHelper {
       .grouped(ROWS_ON_PAGE)
       .size
 
-  def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetails])
+  def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetailsAfterCreation])
                           (implicit messages: Messages): Option[SummaryList] = {
     
-    val paged: Seq[Seq[AgentDetails]] = agents.grouped(ROWS_ON_PAGE).toSeq
+    val paged: Seq[Seq[AgentDetailsAfterCreation]] = agents.grouped(ROWS_ON_PAGE).toSeq
 
-    val currentPage: Option[Seq[AgentDetails]] = paged.lift(paginationIndex - 1)
+    val currentPage: Option[Seq[AgentDetailsAfterCreation]] = paged.lift(paginationIndex - 1)
 
     currentPage.map(pageAgents =>
       SummaryListViewModel(
         rows = pageAgents.map { agentDetails =>
           SummaryListRowViewModel(
             key = KeyViewModel(
-              Text(agentDetails.name)
+              Text(agentDetails.agentName)
             )
               .withCssClass("govuk-!-width-one-third govuk-!-font-weight-regular hmrc-summary-list__key"),
             value = ValueViewModel(
@@ -75,12 +75,12 @@ trait PaginationHelper {
                 Text(messages("site.change")),
                 CheckYourAnswersController.onPageLoad().url
               )
-                .withVisuallyHiddenText(agentDetails.name),
+                .withVisuallyHiddenText(agentDetails.agentName),
               ActionItemViewModel(
                 Text(messages("site.remove")),
-                RemoveAgentController.onPageLoad().url
+                RemoveAgentController.onPageLoad(agentDetails.agentReferenceNumber).url
               )
-                .withVisuallyHiddenText(messages(agentDetails.name))
+                .withVisuallyHiddenText(messages(agentDetails.agentName))
             ),
             actionClasses = "govuk-!-width-one-third"
           )

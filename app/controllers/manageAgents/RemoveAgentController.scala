@@ -23,7 +23,7 @@ import models.manageAgents.RemoveAgent
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
@@ -45,11 +45,14 @@ class RemoveAgentController @Inject()(
 
   val form: Form[RemoveAgent] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
+  val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
+
+  def onPageLoad(agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
+      
       stampDutyLandTaxService
-        .getAgentDetails(request.storn) map {
-          case Some(agentDetails) => Ok(view(form, agentDetails))
+        .getAgentDetails(request.storn, agentReferenceNumber) map {
+          case Some(agentDetails) => Ok(view(form, postAction(agentReferenceNumber), agentDetails))
           case None               =>
             logger.error(s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
             Redirect(JourneyRecoveryController.onPageLoad())
@@ -60,22 +63,16 @@ class RemoveAgentController @Inject()(
       }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
+  def onSubmit(agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
-      stampDutyLandTaxService.getAgentDetails(request.storn) flatMap {
+      stampDutyLandTaxService.getAgentDetails(request.storn, agentReferenceNumber) flatMap {
         case Some(agentDetails) =>
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, agentDetails))),
+              Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
             _ =>
-              lazy val agentReferenceNumber =
-                agentDetails.agentReferenceNumber
-                  .getOrElse {
-                    logger.error(s"[RemoveAgentController][onSubmit]: agentReferenceNumber missing for storn=${request.storn} userId=${request.userId}")
-                    throw IllegalStateException("agentReferenceNumber missing")
-                  }
               stampDutyLandTaxService
-                .removeAgentDetails(request.storn, agentReferenceNumber) flatMap {
+                .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap {
                   case true =>
                     logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
                     Future.successful(Redirect(HomeController.onPageLoad()))

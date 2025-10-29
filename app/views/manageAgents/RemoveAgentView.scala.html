@@ -26,15 +26,16 @@
 
 @(
         form: Form[_],
-        agentDetails: AgentDetails
+        postAction: Call,
+        agentDetails: AgentDetailsAfterCreation
 )(
         implicit request: Request[_],
         messages: Messages
 )
 
-@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title", agentDetails.name))) {
+@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title", agentDetails.agentName))) {
 
-    @formHelper(action = controllers.manageAgents.routes.RemoveAgentController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = postAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -43,7 +44,7 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                legend = LegendViewModel(messages("manageAgents.removeAgent.heading", agentDetails.name)).asPageHeading(),
+                legend = LegendViewModel(messages("manageAgents.removeAgent.heading", agentDetails.agentName)).asPageHeading(),
                 items = Seq(
                     RadioItem(
                         value = Some("true"),
