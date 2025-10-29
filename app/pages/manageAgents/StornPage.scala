@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package pages.manageAgents
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import pages.QuestionPage
+import play.api.libs.json.*
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
-
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request.request, request.userId, "STN001", dataToReturn))
-
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+object StornPage extends QuestionPage[String] {
+  override def path: JsPath = JsPath \ "storn"
 }

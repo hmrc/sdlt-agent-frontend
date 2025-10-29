@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
 import play.api.Logging
@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
-import controllers.routes._
+import controllers.routes.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +36,7 @@ class RemoveAgentController @Inject()(
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
+                                       stornRequiredAction: StornRequiredAction,
                                        formProvider: RemoveAgentFormProvider,
                                        stampDutyLandTaxService: StampDutyLandTaxService,
                                        val controllerComponents: MessagesControllerComponents,
@@ -44,7 +45,7 @@ class RemoveAgentController @Inject()(
 
   val form: Form[RemoveAgent] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
       stampDutyLandTaxService
         .getAgentDetails(request.storn) map {
@@ -59,7 +60,7 @@ class RemoveAgentController @Inject()(
       }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
       stampDutyLandTaxService.getAgentDetails(request.storn) flatMap {
         case Some(agentDetails) =>

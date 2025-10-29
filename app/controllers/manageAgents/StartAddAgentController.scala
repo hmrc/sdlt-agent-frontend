@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import controllers.routes.JourneyRecoveryController
 import models.NormalMode
 import play.api.Logging
@@ -35,6 +35,7 @@ class StartAddAgentController @Inject()(
                                      identify: IdentifierAction,
                                      getData: DataRetrievalAction,
                                      requireData: DataRequiredAction,
+                                     stornRequiredAction: StornRequiredAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                    )(implicit appConfig: FrontendAppConfig,
                                      executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
@@ -42,7 +43,7 @@ class StartAddAgentController @Inject()(
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
   def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
       stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agents =>
         if (agents.size >= MAX_AGENTS) {
           Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
