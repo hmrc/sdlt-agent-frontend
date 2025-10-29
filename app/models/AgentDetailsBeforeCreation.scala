@@ -25,6 +25,7 @@ case class AgentDetailsBeforeCreation(
                                       addressLine2 : Option[String],
                                       addressLine3 : String,
                                       addressLine4 : Option[String],
+                                      postcode     : Option[String],
                                       phone        : Option[String],
                                       email        : String
 ) {

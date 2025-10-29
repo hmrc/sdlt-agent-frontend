@@ -22,13 +22,15 @@ import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import controllers.manageAgents.routes
-import models.AgentDetails
+import models.AgentDetailsAfterCreation
 import utils.mangeAgents.AgentDetailsTestUtil
 
 class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTestUtil {
 
   object TestHelper extends PaginationHelper
 
+  private val testAgentReferenceNumber: String = "ARN001"
+  
   private val messagesApi = new DefaultMessagesApi(
     Map(
       "en" -> Map(
@@ -43,8 +45,8 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
 
   implicit private val messages: Messages = MessagesImpl(Lang("en"), messagesApi)
 
-  private val twentyTwoAgents: Seq[AgentDetails] = getAgentList(22)
-  private val nineAgents: Seq[AgentDetails]      = getAgentList(9)
+  private val twentyTwoAgents: Seq[AgentDetailsAfterCreation] = getAgentList(22)
+  private val nineAgents: Seq[AgentDetailsAfterCreation]      = getAgentList(9)
 
   "getNumberOfPages" should {
     "return 1 when up to 10 items" in {
@@ -95,7 +97,7 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
       summary.rows.head.actions.get.items.size mustBe 2
       val hrefs = summary.rows.head.actions.get.items.map(_.href)
       hrefs.exists(_.contains(routes.CheckYourAnswersController.onPageLoad().url.stripPrefix("/"))) mustBe true
-      hrefs.exists(_.contains(routes.RemoveAgentController.onPageLoad().url.stripPrefix("/"))) mustBe true
+      hrefs.exists(_.contains(routes.RemoveAgentController.onPageLoad(testAgentReferenceNumber).url.stripPrefix("/"))) mustBe true
     }
     "return a SummaryList with 2 rows on page 3 when there are 22 items" in {
       val summary = TestHelper.generateAgentSummary(3, twentyTwoAgents).get

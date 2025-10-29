@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.AgentDetails
+import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -47,28 +47,26 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      val payload = Some(AgentDetails(
-        storn = "STN001",
-        name = "Acme Property Agents Ltd",
+      val payload = Some(AgentDetailsAfterCreation(
+        agentReferenceNumber = agentReferenceNumber,
+        agentName = "Acme Property Agents Ltd",
         houseNumber = "42",
         addressLine1 = "High Street",
         addressLine2 = Some("Westminster"),
         addressLine3 = "London",
         addressLine4 = Some("Greater London"),
         postcode = Some("SW1A 2AA"),
-        phoneNumber = "02079460000",
-        emailAddress = "info@acmeagents.co.uk",
-        agentId = "AGT001",
-        isAuthorised = 1
+        phone = Some("02079460000"),
+        email = "info@acmeagents.co.uk"
       ))
 
-      when(connector.getAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
-      val result = service.getAgentDetails(sorn).futureValue
+      val result = service.getAgentDetails(sorn, agentReferenceNumber).futureValue
       result mustBe payload
 
-      verify(connector).getAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verify(connector).getAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
 
@@ -76,11 +74,11 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      when(connector.getAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
-        service.getAgentDetails(sorn).futureValue
+        service.getAgentDetails(sorn, agentReferenceNumber).futureValue
       }
 
       ex.getMessage must include("boom")
@@ -125,33 +123,29 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       val (service, connector) = newService()
 
       val payload = List(
-        AgentDetails(
-          storn = "STN001",
-          name = "Acme Property Agents Ltd",
+        AgentDetailsAfterCreation(
+          agentReferenceNumber = "ARN002",
+          agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
           addressLine1 = "High Street",
           addressLine2 = Some("Westminster"),
           addressLine3 = "London",
           addressLine4 = Some("Greater London"),
           postcode = Some("SW1A 2AA"),
-          phoneNumber = "02079460000",
-          emailAddress = "info@acmeagents.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
         ),
-        AgentDetails(
-          storn = "STN001",
-          name = "Harborview Estates",
+        AgentDetailsAfterCreation(
+          agentReferenceNumber = "ARN002",
+          agentName = "Harborview Estates",
           houseNumber = "22A",
           addressLine1 = "Queensway",
           addressLine2 = None,
           addressLine3 = "Birmingham",
           addressLine4 = None,
           postcode = Some("B2 4ND"),
-          phoneNumber = "01214567890",
-          emailAddress = "info@harborviewestates.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("01214567890"),
+          email = "info@harborviewestates.co.uk"
         )
       )
 
@@ -181,39 +175,21 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "submitAgentDetails" should {
 
-    val payload = AgentDetails(
-      storn = "STN001",
-      name = "Acme Property Agents Ltd",
+    val payload = AgentDetailsBeforeCreation(
+      agentName = "Acme Property Agents Ltd",
       houseNumber = "42",
       addressLine1 = "High Street",
       addressLine2 = Some("Westminster"),
       addressLine3 = "London",
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phoneNumber = "02079460000",
-      emailAddress = "info@acmeagents.co.uk",
-      agentId = "AGT001",
-      isAuthorised = 1
+      phone = Some("02079460000"),
+      email = "info@acmeagents.co.uk"
     )
 
     "delegate to connector with the given AgentDetails and return the success json" in {
 
       val (service, connector) = newService()
-
-      val payload = AgentDetails(
-        storn = "STN001",
-        name = "Acme Property Agents Ltd",
-        houseNumber = "42",
-        addressLine1 = "High Street",
-        addressLine2 = Some("Westminster"),
-        addressLine3 = "London",
-        addressLine4 = Some("Greater London"),
-        postcode = Some("SW1A 2AA"),
-        phoneNumber = "02079460000",
-        emailAddress = "info@acmeagents.co.uk",
-        agentId = "AGT001",
-        isAuthorised = 1
-      )
 
       val response = SubmitAgentDetailsResponse(agentResourceRef = "ARN-001")
 

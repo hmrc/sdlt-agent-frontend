@@ -75,7 +75,7 @@ class RemoveAgentController @Inject()(
                 .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap {
                   case true =>
                     logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
-                    Future.successful(Redirect(HomeController.onPageLoad()))
+                    Future.successful(Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)))
                   case false =>
                     logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
                     Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
