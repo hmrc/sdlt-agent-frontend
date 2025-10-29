@@ -51,11 +51,11 @@ class RemoveAgentController @Inject()(
         .getAgentDetails(request.storn) map {
           case Some(agentDetails) => Ok(view(form, agentDetails))
           case None               =>
-            logger.error(s"[onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
+            logger.error(s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
             Redirect(JourneyRecoveryController.onPageLoad())
       } recover {
         case ex =>
-          logger.error("[onPageLoad] Unexpected failure", ex)
+          logger.error("[RemoveAgentController][onPageLoad] Unexpected failure", ex)
           Redirect(JourneyRecoveryController.onPageLoad())
       }
   }
@@ -78,19 +78,19 @@ class RemoveAgentController @Inject()(
               stampDutyLandTaxService
                 .removeAgentDetails(request.storn, agentReferenceNumber) flatMap {
                   case true =>
-                    logger.info(s"[onSubmit] Successfully removed agent with storn: ${request.storn}")
+                    logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
                     Future.successful(Redirect(HomeController.onPageLoad()))
                   case false =>
-                    logger.error(s"[onSubmit] Failed to remove agent with storn: ${request.storn}")
+                    logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
                     Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
               }
           )
         case None =>
-          logger.error(s"[onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
+          logger.error(s"[RemoveAgentController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
           Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       } recover {
         case ex =>
-          logger.error("[onSubmit] Unexpected failure", ex)
+          logger.error("[RemoveAgentController][onSubmit] Unexpected failure", ex)
           Redirect(JourneyRecoveryController.onPageLoad())
       }
   }
