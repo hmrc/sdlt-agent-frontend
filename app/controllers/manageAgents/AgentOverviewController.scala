@@ -42,7 +42,7 @@ class AgentOverviewController @Inject()(
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  def onPageLoad(paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+  def onPageLoad(paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
     val postAction: Call = StartAddAgentController.onSubmit()
 
