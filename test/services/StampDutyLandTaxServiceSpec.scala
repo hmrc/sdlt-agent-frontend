@@ -242,5 +242,82 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       ex.getMessage must include("boom")
     }
   }
-  
+
+  "isDuplicate" should {
+    "return true when the agent name already exists" in {
+      val (service, connector) = newService()
+
+      val payload = List(
+        AgentDetails(
+          storn = "STN001",
+          name = "Acme Property Agents Ltd",
+          houseNumber = "42",
+          addressLine1 = "High Street",
+          addressLine2 = Some("Westminster"),
+          addressLine3 = "London",
+          addressLine4 = Some("Greater London"),
+          postcode = Some("SW1A 2AA"),
+          phoneNumber = "02079460000",
+          emailAddress = "info@acmeagents.co.uk",
+          agentId = "AGT001",
+          isAuthorised = 1
+        ),
+        AgentDetails(
+          storn = "STN001",
+          name = "Harborview Estates",
+          houseNumber = "22A",
+          addressLine1 = "Queensway",
+          addressLine2 = None,
+          addressLine3 = "Birmingham",
+          addressLine4 = None,
+          postcode = Some("B2 4ND"),
+          phoneNumber = "01214567890",
+          emailAddress = "info@harborviewestates.co.uk",
+          agentId = "AGT001",
+          isAuthorised = 1
+        )
+      )
+
+      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.isDuplicate(sorn, "Harborview Estates").futureValue
+
+      result mustBe true
+
+      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+    "return false when the agent name does not exist" in {
+      val (service, connector) = newService()
+
+      val payload = List(
+        AgentDetails(
+          storn = "STN001",
+          name = "Acme Property Agents Ltd",
+          houseNumber = "42",
+          addressLine1 = "High Street",
+          addressLine2 = Some("Westminster"),
+          addressLine3 = "London",
+          addressLine4 = Some("Greater London"),
+          postcode = Some("SW1A 2AA"),
+          phoneNumber = "02079460000",
+          emailAddress = "info@acmeagents.co.uk",
+          agentId = "AGT001",
+          isAuthorised = 1
+        )
+      )
+
+      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.isDuplicate(sorn, "Nonexistent Agent").futureValue
+
+      result mustBe false
+
+      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+  }
 }
