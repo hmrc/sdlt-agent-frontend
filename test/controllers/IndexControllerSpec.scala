@@ -51,7 +51,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.HomeController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
           verify(mockSessionRepository).set(any[UserAnswers])
         }
       }
