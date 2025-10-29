@@ -71,9 +71,8 @@ class RemoveAgentController @Inject()(
               lazy val agentReferenceNumber =
                 agentDetails.agentReferenceNumber
                   .getOrElse {
-                    val msg = s"agentReferenceNumber missing for storn=${request.storn} userId=${request.userId}"
-                    logger.error(msg)
-                    throw IllegalStateException(msg)
+                    logger.error(s"[RemoveAgentController][onSubmit]: agentReferenceNumber missing for storn=${request.storn} userId=${request.userId}")
+                    throw IllegalStateException("agentReferenceNumber missing")
                   }
               stampDutyLandTaxService
                 .removeAgentDetails(request.storn, agentReferenceNumber) flatMap {
