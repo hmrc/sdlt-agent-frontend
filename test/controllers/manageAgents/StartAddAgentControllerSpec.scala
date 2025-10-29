@@ -35,6 +35,8 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
   private def postUrl: String = routes.StartAddAgentController.onSubmit(testStorn).url
   
+  val storn: String = "STN001"
+  
   "StartAddAgentController.onSubmit" - {
 
     "must redirect to AgentNameController when the number of agents is below the max" in {
@@ -52,7 +54,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.AgentNameController.onPageLoad(mode = models.NormalMode).url
+          routes.AgentNameController.onPageLoad(mode = models.NormalMode, storn).url
       }
     }
 
