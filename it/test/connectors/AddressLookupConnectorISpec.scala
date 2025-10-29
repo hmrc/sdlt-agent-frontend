@@ -28,9 +28,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import uk.gov.hmrc.http.HeaderCarrier
-import org.mockito.Mockito.{reset}
+import org.mockito.Mockito.reset
+import play.api.test.Helpers.stubMessages
 
 import scala.concurrent.ExecutionContext
 
@@ -46,16 +47,17 @@ class AddressLookupConnectorISpec extends AnyWordSpec
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages = stubMessages()
   implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
-  private val storn = "STN001"
+  private val agentName: Option[String] = Some("agentName")
   private val errorId = "errorId"
   private val id = "someId"
 
   override def beforeEach(): Unit = {
-      super.beforeEach()
-      reset(mockHttpClient)
-      reset(mockRequestBuilder)
+    super.beforeEach()
+    reset(mockHttpClient)
+    reset(mockRequestBuilder)
   }
 
   object TestAddressLookupConnector extends AddressLookupConnector(appConfig, mockHttpClient, messagesApi)
@@ -65,17 +67,16 @@ class AddressLookupConnectorISpec extends AnyWordSpec
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Right(JourneyInitSuccessResponse(Some("Some location")))
       )
-      val result = TestAddressLookupConnector.initJourney(storn).futureValue
+      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
       result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
     }
     "return failure when attempt init Journey" in {
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
       )
-      val result = TestAddressLookupConnector.initJourney(storn).futureValue
+      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
       result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
     }
-
   }
 
   "Extract Address Details upon Journey completion" should {
