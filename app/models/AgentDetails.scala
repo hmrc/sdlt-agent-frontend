@@ -32,7 +32,11 @@ case class AgentDetails(
                          emailAddress         : String,
                          agentId              : String,
                          isAuthorised         : BigInt
-                       )
+                       ) {
+
+  def getFirstLineOfAddress: String =
+    s"$houseNumber $addressLine1"
+}
 
 object AgentDetails {
   implicit val format: OFormat[AgentDetails] = Json.format[AgentDetails]

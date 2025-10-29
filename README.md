@@ -7,7 +7,7 @@ This is the new sdlt-agent-frontend repository
 
 Service Manager: `sm2 --start SDLT_ALL`
 
-To run all tests and coverage: `sbt clean compile coverage test coverageOff coverageReport`
+To run all tests and coverage: `sbt clean compile coverage test it/test coverageOff coverageReport`
 
 To start the server locally on `port 10911`: `sbt run`
 
