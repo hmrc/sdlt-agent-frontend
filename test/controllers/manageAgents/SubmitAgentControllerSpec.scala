@@ -36,7 +36,7 @@ class SubmitAgentControllerSpec extends SpecBase with SummaryListFluency with Ag
   private def submitAgentUrl =
     controllers.manageAgents.routes.SubmitAgentController.onSubmit(testStorn).url
 
-  private def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/agent-overview")
+  private def onwardRoute = Call("GET", s"/stamp-duty-land-tax-agent/manage-agents/agent-overview?storn=$testStorn&paginationIndex=1")
 
   "Submit Agent Controller" - {
 
