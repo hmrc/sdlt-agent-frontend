@@ -65,7 +65,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
       ),
       "confirmPageConfig" -> JsObject(
         Seq(
-          "showChangeLink" -> JsBoolean(false),
+          "showChangeLink" -> JsBoolean(true),
           "showSubHeadingAndInfo" -> JsBoolean(false),
           "showSearchAgainLink" -> JsBoolean(false),
           "showConfirmChangeText" -> JsBoolean(false),
@@ -121,7 +121,12 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
             messages(
               s"$langResourcePrefix.confirm.heading", agentName.getOrElse("")
             )
-          )
+          ),
+          "changeLinkText" -> JsString(
+            messages(
+              s"$langResourcePrefix.confirm.changeLinkText", agentName.getOrElse("")
+            )
+          ),
         )
       ),
       "editPageLabels" -> JsObject(
