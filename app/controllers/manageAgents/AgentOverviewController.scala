@@ -29,6 +29,9 @@ import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
+import models.NormalMode
+import navigation.Navigator
+import pages.manageAgents.AgentOverviewPage
 
 import scala.concurrent.ExecutionContext
 
@@ -39,10 +42,12 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         stornRequiredAction: StornRequiredAction,
+                                        navigator: Navigator,
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  def onPageLoad(paginationIndex: Int): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+  def onPageLoad(paginationIndex: Int): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
     val postAction: Call = StartAddAgentController.onSubmit()
 
@@ -53,7 +58,7 @@ class AgentOverviewController @Inject()(
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
-              Redirect(AgentOverviewController.onPageLoad(1))
+              Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
             ) { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
@@ -63,9 +68,9 @@ class AgentOverviewController @Inject()(
               Ok(view(Some(summary), pagination, paginationText, postAction))
             }
       } recover {
-      case ex =>
-        logger.error("[onPageLoad] Unexpected failure", ex)
-        Redirect(JourneyRecoveryController.onPageLoad())
+        case ex =>
+          logger.error("[onPageLoad] Unexpected failure", ex)
+          Redirect(JourneyRecoveryController.onPageLoad())
     }
   }
 }
