@@ -16,7 +16,7 @@
 
 package utils
 
-import models.AgentDetailsAfterCreation
+import models.AgentDetailsResponse
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
@@ -51,12 +51,12 @@ trait PaginationHelper {
       .grouped(ROWS_ON_PAGE)
       .size
 
-  def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetailsAfterCreation])
+  def generateAgentSummary(paginationIndex: Int, agents: Seq[AgentDetailsResponse])
                           (implicit messages: Messages): Option[SummaryList] = {
     
-    val paged: Seq[Seq[AgentDetailsAfterCreation]] = agents.grouped(ROWS_ON_PAGE).toSeq
+    val paged: Seq[Seq[AgentDetailsResponse]] = agents.grouped(ROWS_ON_PAGE).toSeq
 
-    val currentPage: Option[Seq[AgentDetailsAfterCreation]] = paged.lift(paginationIndex - 1)
+    val currentPage: Option[Seq[AgentDetailsResponse]] = paged.lift(paginationIndex - 1)
 
     currentPage.map(pageAgents =>
       SummaryListViewModel(

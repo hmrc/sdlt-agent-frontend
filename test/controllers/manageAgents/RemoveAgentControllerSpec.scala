@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import models.AgentDetailsAfterCreation
+import models.AgentDetailsResponse
 import navigation.{FakeNavigator, Navigator}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind

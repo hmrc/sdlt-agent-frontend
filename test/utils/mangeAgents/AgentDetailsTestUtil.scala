@@ -16,7 +16,7 @@
 
 package utils.mangeAgents
 
-import models.AgentDetailsAfterCreation
+import models.AgentDetailsResponse
 
 trait AgentDetailsTestUtil {
 
@@ -24,8 +24,8 @@ trait AgentDetailsTestUtil {
   
   val MAX_AGENTS = 25
 
-  private def agent(i: Int): AgentDetailsAfterCreation =
-    AgentDetailsAfterCreation(
+  private def agent(i: Int): AgentDetailsResponse =
+    AgentDetailsResponse(
       agentReferenceNumber = "ARN001",
       agentName            = s"Agent $i",
       houseNumber          = "64",
@@ -38,9 +38,9 @@ trait AgentDetailsTestUtil {
       email                = "agent@example.com"
     )
 
-  def getAgentList(n: Int): List[AgentDetailsAfterCreation] = (1 to n).map(agent).toList
+  def getAgentList(n: Int): List[AgentDetailsResponse] = (1 to n).map(agent).toList
 
-  val testAgentDetails: AgentDetailsAfterCreation = AgentDetailsAfterCreation(
+  val testAgentDetails: AgentDetailsResponse = AgentDetailsResponse(
     agentReferenceNumber = "ARN001",
     agentName            = "Harborview Estates",
     houseNumber          = "22A",

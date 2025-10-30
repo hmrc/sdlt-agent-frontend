@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -47,7 +47,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      val payload = Some(AgentDetailsAfterCreation(
+      val payload = Some(AgentDetailsResponse(
         agentReferenceNumber = agentReferenceNumber,
         agentName = "Acme Property Agents Ltd",
         houseNumber = "42",
@@ -123,7 +123,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       val (service, connector) = newService()
 
       val payload = List(
-        AgentDetailsAfterCreation(
+        AgentDetailsResponse(
           agentReferenceNumber = "ARN002",
           agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
@@ -135,7 +135,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           phone = Some("02079460000"),
           email = "info@acmeagents.co.uk"
         ),
-        AgentDetailsAfterCreation(
+        AgentDetailsResponse(
           agentReferenceNumber = "ARN002",
           agentName = "Harborview Estates",
           houseNumber = "22A",
@@ -175,7 +175,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "submitAgentDetails" should {
 
-    val payload = AgentDetailsBeforeCreation(
+    val payload = AgentDetailsRequest(
       agentName = "Acme Property Agents Ltd",
       houseNumber = "42",
       addressLine1 = "High Street",

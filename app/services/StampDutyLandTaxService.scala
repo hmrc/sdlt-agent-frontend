@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -32,16 +32,16 @@ class StampDutyLandTaxService @Inject() (
   // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsAfterCreation]] =
+                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAgentDetails(storn, agentReferenceNumber)
     
   def getAllAgentDetails(storn: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsAfterCreation]] =
+                        (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAllAgentDetails(storn)
     
-  def submitAgentDetails(agentDetails: AgentDetailsBeforeCreation)
+  def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     stampDutyLandTaxConnector
       .submitAgentDetails(agentDetails)

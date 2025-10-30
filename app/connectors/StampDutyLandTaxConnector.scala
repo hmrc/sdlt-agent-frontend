@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import play.api.Logging
 import play.api.libs.json.Json
@@ -49,10 +49,10 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit hc: HeaderCarrier): Future[Option[AgentDetailsAfterCreation]] =
+                     (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     http
       .get(getAgentDetailsUrl(storn, agentReferenceNumber))
-      .execute[Option[AgentDetailsAfterCreation]]
+      .execute[Option[AgentDetailsResponse]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAgentDetails]: ${e.getMessage}")
@@ -60,17 +60,17 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
 
   def getAllAgentDetails(storn: String)
-                        (implicit hc: HeaderCarrier): Future[List[AgentDetailsAfterCreation]] =
+                        (implicit hc: HeaderCarrier): Future[List[AgentDetailsResponse]] =
     http
       .get(getAllAgentDetailsUrl(storn))
-      .execute[List[AgentDetailsAfterCreation]]
+      .execute[List[AgentDetailsResponse]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAllAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(agentDetails: AgentDetailsBeforeCreation)
+  def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit hc: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     http
       .post(submitAgentDetailsUrl)

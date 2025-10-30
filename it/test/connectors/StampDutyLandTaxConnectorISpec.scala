@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -153,7 +153,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val expected = List(
-        AgentDetailsAfterCreation(
+        AgentDetailsResponse(
           agentReferenceNumber = "ARN001",
           agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
@@ -165,7 +165,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           phone = Some("02079460000"),
           email = "info@acmeagents.co.uk"
         ),
-        AgentDetailsAfterCreation(
+        AgentDetailsResponse(
           agentReferenceNumber = "ARN002",
           agentName = "Harborview Estates",
           houseNumber = "22A",
@@ -221,7 +221,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
     val submitAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
-    val agentDetails = AgentDetailsBeforeCreation(
+    val agentDetails = AgentDetailsRequest(
       agentName = "Acme Property Agents Ltd",
       houseNumber = "42",
       addressLine1 = "High Street",
