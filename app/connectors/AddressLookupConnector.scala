@@ -48,9 +48,15 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private def setJourneyOptions(): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl),
-      "includeHMRCBranding" -> JsBoolean(true),
+
       "ukMode" -> JsBoolean(true),
       "disableTranslations" -> JsBoolean(true), // For some reason disable not working as expected
+
+      "showPhaseBanner" -> JsBoolean(true),
+      "alphaPhase" -> JsBoolean(true),
+
+      "includeHMRCBranding" -> JsBoolean(true),
+
       "selectPageConfig" -> JsObject(
         Seq(
           "proposalListLimit" -> JsNumber(30),
@@ -79,7 +85,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
         )
       ),
-      "pageHeadingStyle" -> JsString("govuk-heading-xl")
+      "pageHeadingStyle" -> JsString("govuk-heading-s")
     )
   }
 
