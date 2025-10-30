@@ -17,14 +17,14 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.StornPage
+import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import controllers.manageAgents.routes._
+import controllers.manageAgents.routes.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,6 +45,6 @@ class IndexController @Inject()(
     for {
       updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
       _              <- sessionRepository.set(updatedAnswers)
-    } yield Redirect(AgentOverviewController.onPageLoad(1))
+    } yield Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers))
   }
 }
