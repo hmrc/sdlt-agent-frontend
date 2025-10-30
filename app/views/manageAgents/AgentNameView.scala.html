@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukInput: GovukInput,
         govukErrorSummary: GovukErrorSummary,
-        h1: components.H1,
         govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading,
         break: components.SectionBreak
 )
 
@@ -34,7 +36,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @h1("manageAgents.agentName.heading")
+        @hmrcPageHeading(PageHeading(
+            text           = messages("manageAgents.agentName.heading"),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-xl"),
+            section        = Some(messages("manageAgents.agentDetails.caption"))
+        ))
 
         @govukInput(
             InputViewModel(
@@ -46,7 +53,5 @@
         @govukButton(Button(
             content = Text(messages("manageAgents.agentName.button"))
         ))
-
-        @break()
     }
 }
