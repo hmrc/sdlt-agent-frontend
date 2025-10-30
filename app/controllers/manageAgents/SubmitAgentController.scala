@@ -28,7 +28,9 @@ class SubmitAgentController @Inject()(
                                             requireData: DataRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
                                           ) extends FrontendBaseController with I18nSupport {
-  
+
+  // TODO: will need to be removed once we implement the backend submission call
+
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
   }
