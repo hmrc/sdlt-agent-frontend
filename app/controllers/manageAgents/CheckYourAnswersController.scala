@@ -37,6 +37,8 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
+      // TODO: This is a dummy postAction call -> must be replaced with an actual call to the BE
+
       val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
 
       val list = SummaryListViewModel(
