@@ -85,4 +85,4 @@ manageAgents.addressLookup.select.heading           = Choose {0}`s address
 manageAgents.addressLookup.lookup.heading           = Find {0}`s address
 manageAgents.addressLookup.confirm.heading          = Review and confirm {0}`s address
 manageAgents.addressLookup.confirm.changeLinkText   = Enter address
-manageAgents.addressLookup.edit.heading             = Enter {0}`s address
+manageAgents.addressLookup.edit.heading             = Edit {0}`s address
