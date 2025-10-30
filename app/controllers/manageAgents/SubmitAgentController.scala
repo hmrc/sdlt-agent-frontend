@@ -18,6 +18,9 @@ package controllers.manageAgents
 
 import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
+import navigation.Navigator
+import pages.manageAgents.AgentOverviewPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -26,12 +29,13 @@ class SubmitAgentController @Inject()(
                                             identify: IdentifierAction,
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
+                                            navigator: Navigator,
                                             val controllerComponents: MessagesControllerComponents,
                                           ) extends FrontendBaseController with I18nSupport {
 
   // TODO: will need to be removed once we implement the backend submission call
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
+    Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
   }
 }
