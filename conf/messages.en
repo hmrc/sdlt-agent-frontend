@@ -71,7 +71,7 @@ manageAgents.agentName.error.required = Please complete 'Agent's name'.
 manageAgents.agentName.warning = You cannot add this branch name as it already exists. Please check the details entered in the Maintain agent's details list
 
 manageAgents.agentName.title = Manage agents - what is the agent's name - GOV.UK
-manageAgents.agentName.heading = What is the agent's name?
+manageAgents.agentName.heading = What is the agent’s name?
 manageAgents.agentName.manageAgentsHeader = Manage agents
 manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
 manageAgents.agentName.button = Continue
