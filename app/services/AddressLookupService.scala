@@ -43,7 +43,7 @@ class AddressLookupService @Inject()(
     Logger("application").debug(s"[AddressLookupService] - Init AddressLookUp journey")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))
-      initJourneyRes <- addressLookUpConnector.initJourney(Some("agentName")) // set agentName as empty if nothing found
+      initJourneyRes <- addressLookUpConnector.initJourney(agentName) // set agentName as empty if nothing found
     } yield initJourneyRes
   }
 
