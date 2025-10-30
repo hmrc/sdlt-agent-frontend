@@ -20,11 +20,10 @@ import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentNamePage, AgentAddressPage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.WarningAgentNameView
 
@@ -39,9 +38,8 @@ class WarningAgentNameController@Inject()(
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     formProvider: AgentNameFormProvider,
-                                    stampDutyLandTaxService: StampDutyLandTaxService,
                                     view: WarningAgentNameView,
-                                    navigator: Navigator,
+                                    navigator: Navigator
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
@@ -65,10 +63,8 @@ class WarningAgentNameController@Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            _ <- sessionRepository.set(updatedAnswers)
+            _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
       )
   }
 }
-
-
