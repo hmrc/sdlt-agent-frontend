@@ -22,13 +22,13 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
 
-GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(storn: String, paginationIndex: Int)
-POST        /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit(storn: String)
+GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
+POST        /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit()
 
-GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode, storn: String)
-POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode, storn: String)
-GET         /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode, storn: String)
-POST        /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode, storn: String)
+GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
 GET         /manage-agents/warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/check-warning-agent-name                    controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = CheckMode)
@@ -45,7 +45,9 @@ POST        /manage-agents/agent-contact-details         controllers.manageAgent
 GET         /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(storn: String)
+GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
 
-GET         /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onPageLoad(storn: String)
-POST        /manage-agents/remove-agent/:storn           controllers.manageAgents.RemoveAgentController.onSubmit(storn: String)
+GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad()
+POST        /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit()
+
+GET         /manage-agents/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()

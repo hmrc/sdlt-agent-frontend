@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages.manageAgents
 
-import play.api.mvc.{Request, WrappedRequest}
+import pages.QuestionPage
+import play.api.libs.json.*
 
-case class IdentifierRequest[A] (
-  request: Request[A],
-  userId: String,
-  storn: String
-) extends WrappedRequest[A](request)
+object StornPage extends QuestionPage[String] {
+  override def path: JsPath = JsPath \ "storn"
+}

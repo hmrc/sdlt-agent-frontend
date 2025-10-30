@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
 import play.api.Logging
@@ -27,7 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
-import controllers.routes._
+import controllers.routes.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +36,7 @@ class RemoveAgentController @Inject()(
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
+                                       stornRequiredAction: StornRequiredAction,
                                        formProvider: RemoveAgentFormProvider,
                                        stampDutyLandTaxService: StampDutyLandTaxService,
                                        val controllerComponents: MessagesControllerComponents,
@@ -44,24 +45,24 @@ class RemoveAgentController @Inject()(
 
   val form: Form[RemoveAgent] = formProvider()
 
-  def onPageLoad(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
       stampDutyLandTaxService
-        .getAgentDetails(storn) map {
+        .getAgentDetails(request.storn) map {
           case Some(agentDetails) => Ok(view(form, agentDetails))
           case None               =>
-            logger.error(s"[onPageLoad] Failed to retrieve details for agent with storn: $storn")
+            logger.error(s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
             Redirect(JourneyRecoveryController.onPageLoad())
       } recover {
         case ex =>
-          logger.error("[onPageLoad] Unexpected failure", ex)
+          logger.error("[RemoveAgentController][onPageLoad] Unexpected failure", ex)
           Redirect(JourneyRecoveryController.onPageLoad())
       }
   }
 
-  def onSubmit(storn: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
-      stampDutyLandTaxService.getAgentDetails(storn) flatMap {
+      stampDutyLandTaxService.getAgentDetails(request.storn) flatMap {
         case Some(agentDetails) =>
           form.bindFromRequest().fold(
             formWithErrors =>
@@ -70,26 +71,25 @@ class RemoveAgentController @Inject()(
               lazy val agentReferenceNumber =
                 agentDetails.agentReferenceNumber
                   .getOrElse {
-                    val msg = s"agentReferenceNumber missing for storn=$storn userId=${request.userId}"
-                    logger.error(msg)
-                    throw IllegalStateException(msg)
+                    logger.error(s"[RemoveAgentController][onSubmit]: agentReferenceNumber missing for storn=${request.storn} userId=${request.userId}")
+                    throw IllegalStateException("agentReferenceNumber missing")
                   }
               stampDutyLandTaxService
-                .removeAgentDetails(storn, agentReferenceNumber) flatMap {
+                .removeAgentDetails(request.storn, agentReferenceNumber) flatMap {
                   case true =>
-                    logger.info(s"[onSubmit] Successfully removed agent with storn: $storn")
+                    logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
                     Future.successful(Redirect(HomeController.onPageLoad()))
                   case false =>
-                    logger.error(s"[onSubmit] Failed to remove agent with storn: $storn")
+                    logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
                     Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
               }
           )
         case None =>
-          logger.error(s"[onSubmit] Failed to retrieve details for agent with storn: $storn")
+          logger.error(s"[RemoveAgentController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
           Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       } recover {
         case ex =>
-          logger.error("[onSubmit] Unexpected failure", ex)
+          logger.error("[RemoveAgentController][onSubmit] Unexpected failure", ex)
           Redirect(JourneyRecoveryController.onPageLoad())
       }
   }

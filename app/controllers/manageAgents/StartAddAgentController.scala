@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import controllers.routes.JourneyRecoveryController
 import models.NormalMode
 import play.api.Logging
@@ -35,20 +35,21 @@ class StartAddAgentController @Inject()(
                                      identify: IdentifierAction,
                                      getData: DataRetrievalAction,
                                      requireData: DataRequiredAction,
+                                     stornRequiredAction: StornRequiredAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                    )(implicit appConfig: FrontendAppConfig,
                                      executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
-  def onSubmit(storn: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      stampDutyLandTaxService.getAllAgentDetails(storn).map { agents =>
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+      stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agents =>
         if (agents.size >= MAX_AGENTS) {
-          Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(storn, 1))
+          Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
             .flashing("agentsLimitReached" -> "true")
         } else {
-          Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode, storn))
+          Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode))
         }
       } recover {
         case ex =>

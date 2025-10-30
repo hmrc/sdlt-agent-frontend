@@ -17,32 +17,34 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
+import navigation.Navigator
+import pages.manageAgents.StornPage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Results}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import controllers.manageAgents.routes._
+
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
-                                 sessionRepository: SessionRepository
+                                 sessionRepository: SessionRepository,
+                                 navigator: Navigator
                                )(implicit ec: ExecutionContext)
   extends FrontendBaseController
     with I18nSupport {
-
-  // TODO: This Controller provides a route to access the service
-  // TODO: This route must be hit in order to authenticate the user to access other pages
-  // TODO: Essentially the entry point to the service
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
 
     val userAnswers = UserAnswers(id = request.userId)
 
-    sessionRepository.set(userAnswers).map { _ =>
-      Results.Redirect(controllers.routes.HomeController.onPageLoad())
-    }
+    for {
+      updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
+      _              <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(AgentOverviewController.onPageLoad(1))
   }
 }

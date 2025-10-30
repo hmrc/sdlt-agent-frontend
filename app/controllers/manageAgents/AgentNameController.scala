@@ -39,6 +39,7 @@ class AgentNameController@Inject()(
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
                                     formProvider: AgentNameFormProvider,
+                                    stornRequiredAction: StornRequiredAction,
                                     stampDutyLandTaxService: StampDutyLandTaxService,
                                     view: AgentNameView,
                                     navigator: Navigator,
@@ -46,26 +47,26 @@ class AgentNameController@Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, storn: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) { implicit request =>
 
     val preparedForm = request.userAnswers.get(AgentNamePage) match {
       case None        => form
       case Some(value) => form.fill(value)
     }
 
-    Ok(view(preparedForm, mode, storn))
+    Ok(view(preparedForm, mode))
   }
   
 
-  def onSubmit(mode: Mode, storn: String): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
   form
     .bindFromRequest()
     .fold(
-      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, storn))),
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
       value => {
         stampDutyLandTaxService
-          .isDuplicate(storn: String, value)
+          .isDuplicate(request.storn: String, value)
           .flatMap {
             case true =>
               Future.successful(Redirect(controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)))

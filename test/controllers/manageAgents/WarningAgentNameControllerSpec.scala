@@ -36,9 +36,8 @@ import scala.concurrent.Future
 
 class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
 
-  val storn: String = "STN001"
 
-  lazy val AgentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, storn).url
+  lazy val AgentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
   lazy val WarningAgentNameRequestRoute: String = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode).url
 
   val formProvider = new AgentNameFormProvider()

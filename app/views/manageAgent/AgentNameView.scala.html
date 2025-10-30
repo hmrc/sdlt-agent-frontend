@@ -24,11 +24,11 @@
         break: components.SectionBreak
 )
 
-@(form: Form[_], mode: Mode, storn: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("manageAgents.agentName.title"))) {
 
-    @formHelper(action = controllers.manageAgents.routes.AgentNameController.onSubmit(mode, storn)) {
+    @formHelper(action = controllers.manageAgents.routes.AgentNameController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions.*
 import models.NormalMode
-
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,16 +38,15 @@ class HomeController @Inject()(
   // TODO: This is dummy page which we use temporarily to redirect to on successful submission of a form
 
   // TODO: This is dummy page is also used as a temporary landing page - as the landing page has not been implemented yet
-
+  
   // TODO: We can temporarily use this page to show the pages we have implemented
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
 
-      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
-      val agentNameURL = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode, "").url
-      val agentOverviewUrl = controllers.manageAgents.routes.AgentOverviewController.onPageLoad("", 1).url
-
+      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit().url
+      val agentNameURL = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
+      val agentOverviewUrl = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
 
         Future.successful(Ok(Html(
           s"""
