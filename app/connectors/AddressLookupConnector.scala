@@ -85,7 +85,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
         )
       ),
-      "pageHeadingStyle" -> JsString("govuk-heading-s")
+      "pageHeadingStyle" -> JsString("govuk-heading-l")
     )
   }
 
