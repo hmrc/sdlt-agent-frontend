@@ -14,16 +14,19 @@
  * limitations under the License.
  *@
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
-)
+@import utils.EmptyString.emptyString
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@this()
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+@(
+msg: String,
+classes: String = "govuk-heading-l",
+id: Option[String] = None
+)(implicit messages: Messages)
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
-
-    @govukSummaryList(list)
-}
+<h1 @{
+    id.fold(emptyString)(id => s"id=$id")
+    } class="@classes">
+    <span class="govuk-caption-l"> @messages("manageAgents.caption") </span>
+    @messages(msg)
+</h1>

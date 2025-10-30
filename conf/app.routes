@@ -12,8 +12,6 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
-
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
@@ -41,6 +39,7 @@ GET         /manage-agents/check-agent-contact-details   controllers.manageAgent
 POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
+POST        /manage-agents/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
 
 GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad(agentReferenceNumber: String)
 POST        /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit(agentReferenceNumber: String)

@@ -14,33 +14,24 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.manageAgents
 
 import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist.*
-import views.html.CheckYourAnswersView
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
+class SubmitAgentController @Inject()(
                                             identify: IdentifierAction,
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
-                                            stornRequiredAction: StornRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) {
-    implicit request =>
+  // TODO: will need to be removed once we implement the backend submission call
 
-      val list = SummaryListViewModel(
-        rows = Seq.empty
-      )
-
-      Ok(view(list))
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
   }
 }
