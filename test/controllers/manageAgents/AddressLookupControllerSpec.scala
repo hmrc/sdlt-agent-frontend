@@ -126,8 +126,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
       running(app) {
         val request =
-          FakeRequest(POST, addressLookupExtract)
-        //.withFormUrlEncodedBody( ("id", id) )
+          FakeRequest(GET, addressLookupExtract)
 
         val result = route(app, request).value
 
