@@ -46,11 +46,11 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     controllers.manageAgents.routes.AddressLookupController.onSubmit(NormalMode).url
 
   private def setJourneyOptions(): Seq[(String, JsValue)] = {
-    println(s"ContinueUrl: ${continueUrl}")
     Seq(
       "continueUrl" -> JsString(continueUrl),
       "includeHMRCBranding" -> JsBoolean(true),
       "ukMode" -> JsBoolean(true),
+      "disableTranslations" -> JsBoolean(true), // For some reason disable not working as expected
       "selectPageConfig" -> JsObject(
         Seq(
           "proposalListLimit" -> JsNumber(30),
@@ -78,8 +78,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "timeoutAmount" -> JsNumber(sessionTimeout),
           "timeoutUrl" -> JsString(addressLookupTimeoutUrl)
         )
-      )
-//      "pageHeadingStyle" -> JsString("govuk-header")
+      ),
+      "pageHeadingStyle" -> JsString("govuk-heading-xl")
     )
   }
 
@@ -120,7 +120,12 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
       ),
       "editPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.edit.heading"))
+          "heading" ->
+            JsString(
+              messages(
+                s"$langResourcePrefix.edit.heading", agentName.getOrElse("")
+              )
+            )
         )
       )
     )
@@ -138,10 +143,11 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           Seq(
             "en" -> JsObject(
               setLabels(agentName, Lang("en") )
-            ),
-            "cy" -> JsObject(
-              setLabels(agentName, Lang("cy"))
             )
+//            ,
+//            "cy" -> JsObject(
+//              setLabels(agentName, Lang("cy"))
+//            )
           )
         )
       )
