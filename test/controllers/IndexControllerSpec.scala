@@ -34,7 +34,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
   "Index Controller" - {
 
     "onPageLoad" - {
-      s"must redirect to ${HomeController.onPageLoad().url} with the userId added to the session" in {
+      s"must redirect to the Landing page with the userId added to the session" in {
 
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))

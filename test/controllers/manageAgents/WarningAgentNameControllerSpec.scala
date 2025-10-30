@@ -37,15 +37,17 @@ import scala.concurrent.Future
 class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
 
 
-  lazy val AgentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
   lazy val WarningAgentNameRequestRoute: String = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode).url
 
+  val mockSessionRepository: SessionRepository = mock[SessionRepository]
+
   val formProvider = new AgentNameFormProvider()
+  
   val form = formProvider()
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
+  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
 
   "AgentNameController" - {
     "must return OK and the correct view for a GET in NormalMode" in {
@@ -134,6 +136,31 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must save the answer and redirect to the next page when valid data is submitted" in {
+
+      when(mockSessionRepository.set(any[UserAnswers])).thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, WarningAgentNameRequestRoute)
+            .withFormUrlEncodedBody("value" -> "Unique Agent Name")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockSessionRepository, times(1)).set(any[UserAnswers])
       }
     }
   }

@@ -37,7 +37,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
 
       val testData = Json.obj(
         "agentName" -> "John",
-        "addressLookup" -> "123 Road",
+        "agentAddress" -> "123 Road",
         "agentContactDetails" -> Json.obj(
           "contactTelephoneNumber" -> "07123456789",
           "contactEmail" -> "john@example.com"

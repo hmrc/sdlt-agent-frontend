@@ -23,14 +23,13 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.AgentNamePage
+import pages.manageAgents.{AgentNamePage, StornPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
 import services.StampDutyLandTaxService
-import views.html.manageAgent.AgentNameView
+import views.html.manageAgents.AgentNameView
 
 import scala.concurrent.Future
 
@@ -45,7 +44,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  def onwardRoute: Call = controllers.routes.HomeController.onPageLoad()
+  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
   def warningRoute: Call = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
 
   "AgentNameController" - {
@@ -69,23 +68,30 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-//    "must populate the view correctly on a GET when the question has previously been answered" in {
-//
-//    val userAnswers = UserAnswers(userAnswersId).set(AgentNamePage, "Test Agent Name").success.value
-//
-//    val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-//
-//    running(application) {
-//      val request = FakeRequest(GET, AgentNameRequestRoute)
-//
-//      val view = application.injector.instanceOf[AgentNameView]
-//
-//      val result = route(application, request).value
-//
-//      status(result) mustEqual OK
-//      contentAsString(result) mustEqual view(form.fill("Test Agent Name"), NormalMode)(request, messages(application)).toString
-//    }
-//    }
+    "must populate the view correctly on a GET when the question has previously been answered" in {
+
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(AgentNamePage, "Test Agent Name").success.value
+        .set(StornPage, storn).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, AgentNameRequestRoute)
+
+        val view = application.injector.instanceOf[AgentNameView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill("Test Agent Name"), NormalMode)(request, messages(application)).toString
+      }
+    }
 
     "must redirect to the warning page when Agent name already exists" in {
 
@@ -160,6 +166,28 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+    "must redirect to the next page (address) when Agent name does not already exist" in {
 
+      when(service.isDuplicate(any(), any())(any()))
+        .thenReturn(Future.successful(false))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service),
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, AgentNameRequestRoute)
+          .withFormUrlEncodedBody(("value", "Unique Agent Name"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
   }
 }
