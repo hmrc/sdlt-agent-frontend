@@ -44,7 +44,7 @@ class HomeController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>
 
-      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit().url
+      val removeAgentUrl = controllers.manageAgents.routes.RemoveAgentController.onSubmit("").url
       
       val agentOverviewUrl = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
 

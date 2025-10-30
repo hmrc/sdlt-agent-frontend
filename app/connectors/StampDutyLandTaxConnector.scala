@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.AgentDetails
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import play.api.Logging
 import play.api.libs.json.Json
@@ -36,11 +36,11 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
 
   private val base = config.baseUrl("stamp-duty-land-tax")
   
-  private val getAgentDetailsUrl: String => URL = storn =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/storn/$storn"
+  private val getAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get?storn=$storn&agentReferenceNumber=$agentRef"
 
   private val getAllAgentDetailsUrl: String => URL = storn =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents/storn/$storn"
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents?storn=$storn"
 
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
@@ -48,11 +48,11 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
   
-  def getAgentDetails(storn: String)
-                     (implicit hc: HeaderCarrier): Future[Option[AgentDetails]] =
+  def getAgentDetails(storn: String, agentReferenceNumber: String)
+                     (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     http
-      .get(getAgentDetailsUrl(storn))
-      .execute[Option[AgentDetails]]
+      .get(getAgentDetailsUrl(storn, agentReferenceNumber))
+      .execute[Option[AgentDetailsResponse]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAgentDetails]: ${e.getMessage}")
@@ -60,17 +60,17 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
 
   def getAllAgentDetails(storn: String)
-                        (implicit hc: HeaderCarrier): Future[List[AgentDetails]] =
+                        (implicit hc: HeaderCarrier): Future[List[AgentDetailsResponse]] =
     http
       .get(getAllAgentDetailsUrl(storn))
-      .execute[List[AgentDetails]]
+      .execute[List[AgentDetailsResponse]]
       .recover {
         case e: Throwable =>
           logger.error(s"[getAllAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(agentDetails: AgentDetails)
+  def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit hc: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     http
       .post(submitAgentDetailsUrl)
