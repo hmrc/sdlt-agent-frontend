@@ -70,7 +70,7 @@ manageAgents.unauthorised.org.title                 = Sorry, you’re unable to 
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
 
 manageAgents.addressLookup.header.title             = Stamp Taxes Online
-manageAgents.addressLookup.select.heading           = Choose {0} address
-manageAgents.addressLookup.lookup.heading           = Find {0} address
-manageAgents.addressLookup.confirm.heading          = Review and confirm {0} address
+manageAgents.addressLookup.select.heading           = Choose {0}`s address
+manageAgents.addressLookup.lookup.heading           = Find {0}`s address
+manageAgents.addressLookup.confirm.heading          = Review and confirm {0}`s address
 manageAgents.addressLookup.edit.heading             = Enter address

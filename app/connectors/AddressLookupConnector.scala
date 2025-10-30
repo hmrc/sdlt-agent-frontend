@@ -94,7 +94,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.select.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+              s"$langResourcePrefix.select.heading", agentName.getOrElse("")
             )
           )
         )
@@ -103,7 +103,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.lookup.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+              s"$langResourcePrefix.lookup.heading", agentName.getOrElse("")
             )
           )
         )
@@ -112,7 +112,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.confirm.heading", agentName.getOrElse("[agents name]'s") // TODO: remove during PR review
+              s"$langResourcePrefix.confirm.heading", agentName.getOrElse("")
             )
           )
         )
