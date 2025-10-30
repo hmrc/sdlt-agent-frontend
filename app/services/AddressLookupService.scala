@@ -40,7 +40,7 @@ class AddressLookupService @Inject()(
   // Step 1: Init AL journey
   def initJourney(userAnswers: UserAnswers, storn: String)
                  (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
-    Logger("application").debug(s"[AddressLookupService] - Init AddressLookUp journey")
+    Logger("application").info(s"[AddressLookupService][initJourney]")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))
       initJourneyRes <- addressLookUpConnector.initJourney(agentName) // set agentName as empty if nothing found
@@ -48,15 +48,16 @@ class AddressLookupService @Inject()(
   }
 
   // Step 2: extract and save AddressDetails
-  private def saveAddressDetails(userId: String, addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
+  private def saveAddressDetails(userAnswers: UserAnswers, addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
-        val userAnswers = UserAnswers(id = userId)
         userAnswers.set(AgentAddressDetails, addressDetails).toEither match {
           case Right(updatedAnswers) =>
-            Logger("application").debug(s"[AddressLookupService] - Update user session")
-            sessionRepository.set(userAnswers)
-              .map(res => Right(updatedAnswers)) // assume will always succeed
+            Logger("application").debug(s"[AddressLookupService] - Update user session: ${updatedAnswers}")
+            sessionRepository.set(updatedAnswers)
+              .map(res =>
+                Logger("application").debug(s"[AddressLookupService] - UpdateStatus: $res")
+                Right(updatedAnswers)) // assume will always succeed
           case Left(ex) =>
             Future.successful(Left(Error("Failed to update user session")))
         }
@@ -65,12 +66,16 @@ class AddressLookupService @Inject()(
     }
   }
 
-  def getJourneyOutcome(id: String, userId: String)
+  def getJourneyOutcome(id: String, userAnswers: UserAnswers)
                        (implicit hc: HeaderCarrier): Future[Either[Throwable, UserAnswers]] = {
     {
+      Logger("application").info(s"[AddressLookupService][getJourneyOutcome]")
       for {
         addressDetails <- EitherT(addressLookUpConnector.getJourneyOutcome(id))
-        res <- EitherT(saveAddressDetails(userId, addressDetails))
+        res <- EitherT({
+          Logger("application").info(s"[AddressLookupService][getJourneyOutcome] - addressDetails: ${addressDetails}")
+          saveAddressDetails(userAnswers, addressDetails)
+        })
       } yield res
     }.value
   }

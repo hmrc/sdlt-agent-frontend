@@ -46,6 +46,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     controllers.manageAgents.routes.AddressLookupController.onSubmit(NormalMode).url
 
   private def setJourneyOptions(): Seq[(String, JsValue)] = {
+    println(s"ContinueUrl: ${continueUrl}")
     Seq(
       "continueUrl" -> JsString(continueUrl),
       "includeHMRCBranding" -> JsBoolean(true),
@@ -152,7 +153,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                  (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName)
-    Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
+    Logger("application").info(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]

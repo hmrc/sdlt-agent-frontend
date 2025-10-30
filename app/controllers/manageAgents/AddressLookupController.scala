@@ -58,11 +58,12 @@ class AddressLookupController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
+    Logger("application").info(s"[AddressLookupController] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)
       }.toEither))
-      journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userId))
+      journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userAnswers))
     } yield journeyOutcome
   }.value.map {
     case Right(updatedAnswer) =>
