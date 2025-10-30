@@ -16,12 +16,6 @@
 
 package pages.manageAgents
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.Page
 
-case object AgentOverviewPage extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "agentOverview"
-}
+case object AgentOverviewPage extends Page
