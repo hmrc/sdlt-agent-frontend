@@ -54,6 +54,6 @@ class StampDutyLandTaxService @Inject() (
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     getAllAgentDetails(storn).map { res =>
-      res.exists(agent => agent.name == name )
+      res.exists(agent => agent.agentName == name )
     }
 }

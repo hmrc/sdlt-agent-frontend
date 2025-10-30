@@ -224,33 +224,29 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       val (service, connector) = newService()
 
       val payload = List(
-        AgentDetails(
-          storn = "STN001",
-          name = "Acme Property Agents Ltd",
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
           addressLine1 = "High Street",
           addressLine2 = Some("Westminster"),
           addressLine3 = "London",
           addressLine4 = Some("Greater London"),
           postcode = Some("SW1A 2AA"),
-          phoneNumber = "02079460000",
-          emailAddress = "info@acmeagents.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
         ),
-        AgentDetails(
-          storn = "STN001",
-          name = "Harborview Estates",
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Harborview Estates",
           houseNumber = "22A",
           addressLine1 = "Queensway",
           addressLine2 = None,
           addressLine3 = "Birmingham",
           addressLine4 = None,
           postcode = Some("B2 4ND"),
-          phoneNumber = "01214567890",
-          emailAddress = "info@harborviewestates.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("01214567890"),
+          email = "info@harborviewestates.co.uk"
         )
       )
 
@@ -269,19 +265,17 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       val (service, connector) = newService()
 
       val payload = List(
-        AgentDetails(
-          storn = "STN001",
-          name = "Acme Property Agents Ltd",
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
           addressLine1 = "High Street",
           addressLine2 = Some("Westminster"),
           addressLine3 = "London",
           addressLine4 = Some("Greater London"),
           postcode = Some("SW1A 2AA"),
-          phoneNumber = "02079460000",
-          emailAddress = "info@acmeagents.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
         )
       )
 
