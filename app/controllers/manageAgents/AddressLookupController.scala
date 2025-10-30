@@ -58,7 +58,7 @@ class AddressLookupController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
-    Logger("application").info(s"[AddressLookupController] - UA: ${request.userAnswers}")
+    Logger("application").debug(s"[AddressLookupController] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)

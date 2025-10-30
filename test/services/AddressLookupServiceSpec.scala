@@ -107,7 +107,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
         .thenReturn(Future.successful(Right(Some(expectedAddressDetails))))
 
-      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userId).futureValue
+      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
       result mustBe a[Either[Throwable, UserAnswers]]
 
       // align result to the same timeStamp in lastUpdate field
@@ -126,7 +126,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
         .thenReturn(Future.successful( Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)) ) )
 
-      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userId).futureValue
+      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
       result must equal (Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)))
 
       verify(sessionRepository, times(0)).set(any())
@@ -146,7 +146,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
         .thenReturn(Future.successful(Right(Some(expectedAddressDetails))))
 
       assertThrows[RuntimeException] {
-        service.getJourneyOutcome(id, userId).futureValue
+        service.getJourneyOutcome(id, userAnswer).futureValue
       }
 
       verify(sessionRepository, times(1)).set(any())
@@ -154,4 +154,5 @@ class AddressLookupServiceSpec extends AnyWordSpec
     }
 
   }
+
 }
