@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package pages.manageAgents
+package utils
 
-import models.manageAgents.AgentContactDetails
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case object AgentContactDetailsPage extends QuestionPage[AgentContactDetails] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "agentContactDetails"
-  
+object EmptyString {
+  val emptyString = ""
 }

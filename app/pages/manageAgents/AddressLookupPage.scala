@@ -16,14 +16,12 @@
 
 package pages.manageAgents
 
-import models.manageAgents.AgentContactDetails
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object AgentContactDetailsPage extends QuestionPage[AgentContactDetails] {
+case object AddressLookupPage extends QuestionPage[String] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "agentContactDetails"
-  
+  override def toString: String = "addressLookup"
 }
