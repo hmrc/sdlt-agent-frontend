@@ -16,24 +16,38 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import com.google.inject.Inject
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
-
-import javax.inject.Inject
+import viewmodels.govuk.summarylist.*
+import viewmodels.manageAgents.checkAnswers.*
+import views.html.manageAgents.CheckYourAnswersView
 
 class CheckYourAnswersController @Inject()(
-                                            val controllerComponents: MessagesControllerComponents,
+                                            override val messagesApi: MessagesApi,
                                             identify: IdentifierAction,
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
-                                            stornRequiredAction: StornRequiredAction,
-                                            view: IndexView
+                                            val controllerComponents: MessagesControllerComponents,
+                                            view: CheckYourAnswersView
                                           ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) { implicit request =>
-    Ok(view())
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
+
+      val list = SummaryListViewModel(
+        rows = Seq(
+          AgentNameSummary.row(request.userAnswers),
+          AddressSummary.row(request.userAnswers),
+          ContactTelephoneNumberSummary.row(request.userAnswers),
+          ContactEmailSummary.row(request.userAnswers)
+        ).flatten
+      )
+
+      Ok(view(list, postAction))
   }
 }

@@ -17,7 +17,6 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import models.AgentDetails
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar

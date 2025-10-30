@@ -18,7 +18,7 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.AgentDetails
+import models.{AgentDetailsResponse, AgentDetailsRequest}
 import models.responses.SubmitAgentDetailsResponse
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -39,46 +39,43 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   private val storn = "STN001"
 
-  private val agentReferenceNumber = "STN001"
+  private val agentReferenceNumber = "ARN001"
 
   "getAgentDetails" should {
 
-    val agentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/storn/$storn"
+    val agentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/get"
 
     "return AgentDetails when BE returns 200 with valid JSON" in {
       stubFor(
         get(urlPathEqualTo(agentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
+          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
                 """{
-                  |  "storn": "STN001",
-                  |  "name": "Sunrise Realty",
+                  |  "agentReferenceNumber": "ARN001",
+                  |  "agentName": "Sunrise Realty",
                   |  "houseNumber": "8B",
                   |  "addressLine1": "Baker Street",
                   |  "addressLine3": "Manchester",
                   |  "postcode": "M1 2AB",
-                  |  "phoneNumber": "01611234567",
-                  |  "emailAddress": "contact@sunriserealty.co.uk",
-                  |  "agentId": "3454354325",
-                  |  "isAuthorised": 1
+                  |  "phone": "01611234567",
+                  |  "email": "contact@sunriserealty.co.uk"
                   |}""".stripMargin
               )
           )
       )
 
-      val result = connector.getAgentDetails(storn).futureValue
-      result.map(_.storn       ) mustBe Some("STN001")
-      result.map(_.name        ) mustBe Some("Sunrise Realty")
+      val result = connector.getAgentDetails(storn, agentReferenceNumber).futureValue
+      result.map(_.agentName   ) mustBe Some("Sunrise Realty")
       result.map(_.houseNumber ) mustBe Some("8B")
       result.map(_.addressLine1) mustBe Some("Baker Street")
       result.map(_.addressLine3) mustBe Some("Manchester")
       result.flatMap(_.postcode) mustBe Some("M1 2AB")
-      result.map(_.phoneNumber ) mustBe Some("01611234567")
-      result.map(_.emailAddress) mustBe Some("contact@sunriserealty.co.uk")
-      result.map(_.agentId     ) mustBe Some("3454354325")
-      result.map(_.isAuthorised) mustBe Some(1)
+      result.flatMap(_.phone   ) mustBe Some("01611234567")
+      result.map(_.email       ) mustBe Some("contact@sunriserealty.co.uk")
     }
 
     "fail when BE returns 200 with invalid JSON" in {
@@ -92,7 +89,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentDetails(storn).futureValue
+        connector.getAgentDetails(storn, agentReferenceNumber).futureValue
       }
       ex.getMessage.toLowerCase must include("storn")
     }
@@ -108,7 +105,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAgentDetails(storn).futureValue
+        connector.getAgentDetails(storn, agentReferenceNumber).futureValue
       }
       ex.getMessage must include("returned 500")
     }
@@ -116,41 +113,38 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   "getAllAgentDetails" should {
 
-    val allAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents/storn/$storn"
+    val allAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents"
 
     "return a list of AgentDetails when BE returns 200 with valid JSON" in {
       stubFor(
         get(urlPathEqualTo(allAgentDetailsUrl))
+          .withQueryParam("storn", equalTo(storn))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
                 """[
                   |  {
-                  |    "storn": "STN001",
-                  |    "name": "Acme Property Agents Ltd",
+                  |    "agentReferenceNumber": "ARN001",
+                  |    "agentName": "Acme Property Agents Ltd",
                   |    "houseNumber": "42",
                   |    "addressLine1": "High Street",
                   |    "addressLine2": "Westminster",
                   |    "addressLine3": "London",
                   |    "addressLine4": "Greater London",
                   |    "postcode": "SW1A 2AA",
-                  |    "phoneNumber": "02079460000",
-                  |    "emailAddress": "info@acmeagents.co.uk",
-                  |    "agentId": "AGT001",
-                  |    "isAuthorised": 1
+                  |    "phone": "02079460000",
+                  |    "email": "info@acmeagents.co.uk"
                   |  },
                   |  {
-                  |    "storn": "STN001",
-                  |    "name": "Harborview Estates",
+                  |    "agentReferenceNumber": "ARN002",
+                  |    "agentName": "Harborview Estates",
                   |    "houseNumber": "22A",
                   |    "addressLine1": "Queensway",
                   |    "addressLine3": "Birmingham",
                   |    "postcode": "B2 4ND",
-                  |    "phoneNumber": "01214567890",
-                  |    "emailAddress": "info@harborviewestates.co.uk",
-                  |    "agentId": "AGT001",
-                  |    "isAuthorised": 1
+                  |    "phone": "01214567890",
+                  |    "email": "info@harborviewestates.co.uk"
                   |  }
                   |]
                   |""".stripMargin
@@ -159,33 +153,29 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val expected = List(
-        AgentDetails(
-          storn = "STN001",
-          name = "Acme Property Agents Ltd",
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Acme Property Agents Ltd",
           houseNumber = "42",
           addressLine1 = "High Street",
           addressLine2 = Some("Westminster"),
           addressLine3 = "London",
           addressLine4 = Some("Greater London"),
           postcode = Some("SW1A 2AA"),
-          phoneNumber = "02079460000",
-          emailAddress = "info@acmeagents.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
         ),
-        AgentDetails(
-          storn = "STN001",
-          name = "Harborview Estates",
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN002",
+          agentName = "Harborview Estates",
           houseNumber = "22A",
           addressLine1 = "Queensway",
           addressLine2 = None,
           addressLine3 = "Birmingham",
           addressLine4 = None,
           postcode = Some("B2 4ND"),
-          phoneNumber = "01214567890",
-          emailAddress = "info@harborviewestates.co.uk",
-          agentId = "AGT001",
-          isAuthorised = 1
+          phone = Some("01214567890"),
+          email = "info@harborviewestates.co.uk"
         )
       )
 
@@ -231,19 +221,16 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
     val submitAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
-    val agentDetails = AgentDetails(
-      storn = "STN001",
-      name = "Acme Property Agents Ltd",
+    val agentDetails = AgentDetailsRequest(
+      agentName = "Acme Property Agents Ltd",
       houseNumber = "42",
       addressLine1 = "High Street",
       addressLine2 = Some("Westminster"),
       addressLine3 = "London",
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phoneNumber = "02079460000",
-      emailAddress = "info@acmeagents.co.uk",
-      agentId = "AGT001",
-      isAuthorised = 1
+      phone = Some("02079460000"),
+      email = "info@acmeagents.co.uk"
     )
 
     "return SubmitAgentDetailsResponse when BE returns 200 with valid JSON" in {
