@@ -23,7 +23,7 @@ import play.api.data.Form
 class AgentNameFormProvider @Inject() extends Mappings {
 
   private val agentNameRegex = "^[A-Za-z0-9 ~!@%&'()*+,\\-./:=?\\[\\]^_{}};]+$"
-  private val maxAgentNameLength = 254
+  private val maxAgentNameLength = 28
 
   def apply(): Form[String] =
     Form(
