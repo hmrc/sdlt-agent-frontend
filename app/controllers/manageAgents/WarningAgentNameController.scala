@@ -18,9 +18,11 @@ package controllers.manageAgents
 
 import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
+import jakarta.inject.Singleton
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentAddressPage, AgentNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -30,6 +32,7 @@ import views.html.manageAgents.WarningAgentNameView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class WarningAgentNameController@Inject()(
                                     override val messagesApi: MessagesApi,
                                     val controllerComponents: MessagesControllerComponents,
@@ -43,7 +46,7 @@ class WarningAgentNameController@Inject()(
                                     navigator: Navigator
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  lazy val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) { implicit request =>
 
