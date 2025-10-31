@@ -34,6 +34,8 @@ trait AgentDetailsTestUtil {
   
   object AgentNamePageWarningUtils {
     val WarningAgentNameRequestRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
+
+    val onwardRoute: Mode => Call = mode =>  controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
   }
   
   private def agent(i: Int): AgentDetailsResponse =

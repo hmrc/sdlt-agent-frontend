@@ -25,7 +25,6 @@ import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.{AgentNamePage, StornPage}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -36,16 +35,12 @@ import views.html.manageAgents.WarningAgentNameView
 import scala.concurrent.Future
 
 class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
-  
+
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
+  val service: StampDutyLandTaxService         = mock[StampDutyLandTaxService]
 
   val formProvider = new AgentNameFormProvider()
-  
-  val form = formProvider()
-
-  val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
-
-  def onwardRoute: Call = controllers.routes.IndexController.onPageLoad()
+  val form         = formProvider()
 
   "AgentNameController" - {
     "must return OK and the correct view for a GET in NormalMode" in {
@@ -146,7 +141,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(AgentNamePageWarningUtils.onwardRoute(NormalMode))),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
@@ -159,7 +154,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual AgentNamePageWarningUtils.onwardRoute(NormalMode).url
         verify(mockSessionRepository, times(1)).set(any[UserAnswers])
       }
     }
