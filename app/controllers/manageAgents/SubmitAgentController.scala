@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
@@ -30,12 +30,13 @@ class SubmitAgentController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             navigator: Navigator,
+                                            stornRequired: StornRequiredAction,
                                             val controllerComponents: MessagesControllerComponents,
                                           ) extends FrontendBaseController with I18nSupport {
 
   // TODO: will need to be removed once we implement the backend submission call
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) { implicit request =>
     Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
   }
 }

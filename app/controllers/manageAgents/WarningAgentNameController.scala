@@ -37,6 +37,7 @@ class WarningAgentNameController@Inject()(
                                     identify: IdentifierAction,
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
+                                    stornRequired: StornRequiredAction,
                                     formProvider: AgentNameFormProvider,
                                     view: WarningAgentNameView,
                                     navigator: Navigator
@@ -44,7 +45,7 @@ class WarningAgentNameController@Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) { implicit request =>
 
     val preparedForm = request.userAnswers.get(AgentNamePage) match {
       case None        => form
@@ -54,7 +55,7 @@ class WarningAgentNameController@Inject()(
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData andThen stornRequired).async { implicit request =>
 
     form
       .bindFromRequest()
