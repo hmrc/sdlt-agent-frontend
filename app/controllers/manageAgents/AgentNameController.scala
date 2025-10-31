@@ -21,7 +21,8 @@ import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage}
-import javax.inject.Inject
+
+import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -32,6 +33,7 @@ import controllers.manageAgents.routes.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class AgentNameController@Inject()(
                                     override val messagesApi: MessagesApi,
                                     val controllerComponents: MessagesControllerComponents,
