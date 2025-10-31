@@ -155,10 +155,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
             "en" -> JsObject(
               setLabels(agentName, Lang("en") )
             )
-//            ,
-//            "cy" -> JsObject(
-//              setLabels(agentName, Lang("cy"))
-//            )
           )
         )
       )
