@@ -44,7 +44,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
   def agentNameOnwardRoute: Call = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
 
   lazy val postAction: Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit(agentReferenceNumber)
-  
+
   lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(agentReferenceNumber).url
 
   val formProvider = new RemoveAgentFormProvider()

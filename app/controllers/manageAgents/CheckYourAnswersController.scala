@@ -47,7 +47,7 @@ class CheckYourAnswersController @Inject()(
         rows = Seq(
           AgentNameSummary.row(request.userAnswers),
           AddressSummary.row(request.userAnswers),
-          ContactTelephoneNumberSummary.row(request.userAnswers),
+          ContactPhoneNumberSummary.row(request.userAnswers),
           ContactEmailSummary.row(request.userAnswers)
         ).flatten
       )

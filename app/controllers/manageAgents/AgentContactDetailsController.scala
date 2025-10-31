@@ -20,22 +20,62 @@ import controllers.actions.IdentifierAction
 import models.Mode
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
+import controllers.JourneyRecoveryController
+import controllers.actions.*
+import forms.manageAgents.AgentContactDetailsFormProvider
+import models.manageAgents.AgentContactDetails
+
+import javax.inject.Inject
+import navigation.Navigator
+import models.Mode
+import pages.manageAgents.{AgentContactDetailsPage, AgentCheckYourAnswersPage}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+import views.html.manageAgents.AgentContactDetailsView
+
+import scala.concurrent.{ExecutionContext, Future}
+
 
 @Singleton
 class AgentContactDetailsController @Inject()(
-                                               val controllerComponents: MessagesControllerComponents,
+                                               override val messagesApi: MessagesApi,
+                                               sessionRepository: SessionRepository,
+                                               navigator: Navigator,
                                                identify: IdentifierAction,
-                                               view: IndexView
-                                             ) extends FrontendBaseController with I18nSupport {
+                                               getData: DataRetrievalAction,
+                                               requireData: DataRequiredAction,
+                                               formProvider: AgentContactDetailsFormProvider,
+                                               val controllerComponents: MessagesControllerComponents,
+                                               view: AgentContactDetailsView
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+  val form = formProvider()
+
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
+
+      val preparedForm = request.userAnswers.get(AgentContactDetailsPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
+
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
+      )
   }
 }

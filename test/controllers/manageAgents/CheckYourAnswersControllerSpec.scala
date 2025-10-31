@@ -25,7 +25,7 @@ import play.api.test.Helpers.*
 import play.api.libs.json.Json
 import utils.mangeAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
-import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactTelephoneNumberSummary}
+import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
@@ -64,7 +64,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
               Seq(
                 AgentNameSummary.row(ua)(messages(application)).get,
                 AddressSummary.row(ua)(messages(application)).get,
-                ContactTelephoneNumberSummary.row(ua)(messages(application)).get,
+                ContactPhoneNumberSummary.row(ua)(messages(application)).get,
                 ContactEmailSummary.row(ua)(messages(application)).get
               )),
             postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit()

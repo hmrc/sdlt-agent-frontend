@@ -63,6 +63,17 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+manageAgents.agentContactDetails.title = Manage agents – What are the agent’s contact details?
+manageAgents.agentContactDetails.caption = Manage agents
+manageAgents.agentContactDetails.heading = What are the agent's contact details?
+manageAgents.agentContactDetails.question1 = What is the agent's phone number?
+manageAgents.agentContactDetails.question2 = What is the agent's email address?
+manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
+manageAgents.agentContactDetails.error.phoneLength = Your input for 'Agent's telephone number' contains too many characters. Please amend.
+manageAgents.agentContactDetails.error.phoneInvalid = Your entry for 'Agent's telephone number' contains an invalid character. Please amend.
+manageAgents.agentContactDetails.error.emailInvalid = The format for 'Agent's email address' is invalid. Please amend.
+manageAgents.agentContactDetails.error.emailLength = Your input for 'Agent's email address' contains too many characters. Please amend.
+
 manageAgents.caption = Manage Agents
 
 manageAgents.agentName.error.invalid = Your entry for ’Agent’s name’ contains an invalid character. Please amend.
