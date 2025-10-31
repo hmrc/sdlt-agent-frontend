@@ -23,6 +23,7 @@ import models.NormalMode
 import navigation.Navigator
 import play.api.Logging
 import controllers.manageAgents.routes.*
+import jakarta.inject.Singleton
 import pages.manageAgents.{AgentNamePage, AgentOverviewPage}
 
 import javax.inject.Inject
@@ -33,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class StartAddAgentController @Inject()(
                                      val controllerComponents: MessagesControllerComponents,
                                      identify: IdentifierAction,

@@ -36,10 +36,7 @@ import views.html.manageAgents.WarningAgentNameView
 import scala.concurrent.Future
 
 class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
-
-
-  lazy val WarningAgentNameRequestRoute: String = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode).url
-
+  
   val mockSessionRepository: SessionRepository = mock[SessionRepository]
 
   val formProvider = new AgentNameFormProvider()
@@ -60,7 +57,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
           )
           .build()
       running(application) {
-        val request = FakeRequest(GET, WarningAgentNameRequestRoute)
+        val request = FakeRequest(GET, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
 
         val result = route(application, request).value
 
@@ -80,7 +77,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, WarningAgentNameRequestRoute)
+        val request = FakeRequest(GET, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
 
         val view = application.injector.instanceOf[WarningAgentNameView]
 
@@ -98,7 +95,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
 
       running(application) {
         val request =
-          FakeRequest(POST, WarningAgentNameRequestRoute)
+          FakeRequest(POST, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
@@ -117,7 +114,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, WarningAgentNameRequestRoute)
+        val request = FakeRequest(GET, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
 
         val result = route(application, request).value
 
@@ -132,7 +129,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
 
       running(application) {
         val request =
-          FakeRequest(POST, WarningAgentNameRequestRoute)
+          FakeRequest(POST, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
             .withFormUrlEncodedBody(("value", "Test Agent Name"))
 
         val result = route(application, request).value
@@ -156,7 +153,7 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with Age
 
       running(application) {
         val request =
-          FakeRequest(POST, WarningAgentNameRequestRoute)
+          FakeRequest(POST, AgentNamePageWarningUtils.WarningAgentNameRequestRoute(NormalMode).url)
             .withFormUrlEncodedBody("value" -> "Unique Agent Name")
 
         val result = route(application, request).value

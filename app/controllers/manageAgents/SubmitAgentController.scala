@@ -16,15 +16,16 @@
 
 package controllers.manageAgents
 
-import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.NormalMode
 import navigation.Navigator
+import javax.inject.{Inject, Singleton}
 import pages.manageAgents.AgentOverviewPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
+@Singleton
 class SubmitAgentController @Inject()(
                                             identify: IdentifierAction,
                                             getData: DataRetrievalAction,

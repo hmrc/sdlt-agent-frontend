@@ -18,7 +18,6 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 
-import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
@@ -29,14 +28,14 @@ import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
-import jakarta.inject.Singleton
+import javax.inject.{Inject, Singleton}
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
 
 import scala.concurrent.ExecutionContext
 
-//@Singleton
+@Singleton
 class AgentOverviewController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         stampDutyLandTaxService: StampDutyLandTaxService,

@@ -32,6 +32,10 @@ trait AgentDetailsTestUtil {
     val agentNameDuplicateNameRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
   }
   
+  object AgentNamePageWarningUtils {
+    val WarningAgentNameRequestRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
+  }
+  
   private def agent(i: Int): AgentDetailsResponse =
     AgentDetailsResponse(
       agentReferenceNumber = "ARN001",
