@@ -19,8 +19,9 @@ package controllers.manageAgents
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import controllers.routes.JourneyRecoveryController
+import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
-import models.{Mode, UserAnswers}
+import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.AgentContactDetailsPage
 import play.api.Logger
@@ -33,6 +34,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
+@Singleton
 class AddressLookupController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          val addressLookupService: AddressLookupService,
@@ -68,8 +70,9 @@ class AddressLookupController @Inject()(
   }.value.map {
     case Right(updatedAnswer) =>
       Logger("application").info(s"[AddressLookupController] - address extracted and saved")
-      Redirect(JourneyRecoveryController.onPageLoad())
-      //Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
+      Redirect(controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url)
+// TODO: re-enable this when relevant screens will be merged
+//      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
       Redirect(JourneyRecoveryController.onPageLoad())

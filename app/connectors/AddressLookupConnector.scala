@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import jakarta.inject.Singleton
 import models.NormalMode
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
@@ -29,6 +30,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
 
+@Singleton
 class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                                         http: HttpClientV2,
                                         val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {

@@ -59,7 +59,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
 
   // AddressLookup configuration
-  val addressLookupBaseUrl: String = configuration.get[String]("address-lookup.baseUrl")
-  val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup.timeoutUrl")
+  private val addressLookupPort: String = configuration.get[String]("address-lookup-frontend.port")
+  private val addressLookupHost: String = configuration.get[String]("address-lookup-frontend.host")
+  private val addressLookupProtocol: String = configuration.get[String]("address-lookup-frontend.protocol")
+  val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
+  val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
 
 }
