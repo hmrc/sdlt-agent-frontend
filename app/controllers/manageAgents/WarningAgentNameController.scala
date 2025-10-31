@@ -18,40 +18,37 @@ package controllers.manageAgents
 
 import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
+import jakarta.inject.Singleton
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage}
-
-import javax.inject.{Inject, Singleton}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
-import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.manageAgents.AgentNameView
-import controllers.manageAgents.routes.*
-import play.api.data.Form
+import views.html.manageAgents.WarningAgentNameView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AgentNameController@Inject()(
+class WarningAgentNameController@Inject()(
                                     override val messagesApi: MessagesApi,
                                     val controllerComponents: MessagesControllerComponents,
                                     sessionRepository: SessionRepository,
                                     identify: IdentifierAction,
                                     getData: DataRetrievalAction,
                                     requireData: DataRequiredAction,
+                                    stornRequired: StornRequiredAction,
                                     formProvider: AgentNameFormProvider,
-                                    stornRequiredAction: StornRequiredAction,
-                                    stampDutyLandTaxService: StampDutyLandTaxService,
-                                    view: AgentNameView,
+                                    view: WarningAgentNameView,
                                     navigator: Navigator
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   lazy val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) { implicit request =>
 
     val preparedForm = request.userAnswers.get(AgentNamePage) match {
       case None        => form
@@ -61,7 +58,8 @@ class AgentNameController@Inject()(
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData andThen stornRequired).async { implicit request =>
+
     form
       .bindFromRequest()
       .fold(
@@ -69,13 +67,8 @@ class AgentNameController@Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            isDuplicate    <- stampDutyLandTaxService.isDuplicate(request.storn, value)
             _              <- sessionRepository.set(updatedAnswers)
-          } yield if (isDuplicate) {
-            Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
-          } else {
-            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
-          }
+          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
       )
   }
 }

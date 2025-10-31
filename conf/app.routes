@@ -6,8 +6,6 @@ GET         /                                            controllers.IndexContro
 
 GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
-
 GET         /refresh-session                             controllers.KeepAliveController.keepAlive()
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
@@ -18,8 +16,6 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET         /manage-agents/home                          controllers.HomeController.onPageLoad()
-
 GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
 POST        /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit()
 
@@ -27,6 +23,10 @@ GET         /manage-agents/agent-name                    controllers.manageAgent
 POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/check-agent-name              controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/check-agent-name              controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/agent-name-warning            controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/agent-name-warning            controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/check-agent-name-warning      controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-name-warning      controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/find-address                  controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)

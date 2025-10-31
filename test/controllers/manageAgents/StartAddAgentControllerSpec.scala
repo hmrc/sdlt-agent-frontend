@@ -33,7 +33,6 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
   private val service = mock[StampDutyLandTaxService]
 
   private def postUrl: String = routes.StartAddAgentController.onSubmit().url
-  
   "StartAddAgentController.onSubmit" - {
 
     "must redirect to AgentNameController when the number of agents is below the max" in {

@@ -16,7 +16,6 @@
 
 package controllers.manageAgents
 
-import com.google.inject.Inject
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
@@ -28,9 +27,14 @@ import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.RemoveAgentView
 import controllers.routes.*
+import javax.inject.{Inject, Singleton}
+import models.NormalMode
+import navigation.Navigator
+import pages.manageAgents.AgentOverviewPage
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class RemoveAgentController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
@@ -39,10 +43,13 @@ class RemoveAgentController @Inject()(
                                        stornRequiredAction: StornRequiredAction,
                                        formProvider: RemoveAgentFormProvider,
                                        stampDutyLandTaxService: StampDutyLandTaxService,
+                                       navigator: Navigator,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: RemoveAgentView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
+  // TODO: Tidy up logic on this page
+  
   val form: Form[RemoveAgent] = formProvider()
 
   val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
@@ -75,7 +82,7 @@ class RemoveAgentController @Inject()(
                 .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap {
                   case true =>
                     logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
-                    Future.successful(Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)))
+                    Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
                   case false =>
                     logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
                     Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))

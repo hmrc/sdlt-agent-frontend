@@ -17,7 +17,7 @@
 package viewmodels.manageAgents.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.manageAgents.AddressLookupPage
+import pages.manageAgents.AgentAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -27,7 +27,7 @@ import viewmodels.implicits.*
 object AddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(AddressLookupPage).map { answer =>
+    answers.get(AgentAddressPage).map { answer =>
       SummaryListRowViewModel(
         key = "manageAgents.address.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),

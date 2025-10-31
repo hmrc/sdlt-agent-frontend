@@ -22,12 +22,12 @@ import models.responses.SubmitAgentDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
-) {
+)(implicit ec: ExecutionContext) {
 
   // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
   
@@ -50,4 +50,10 @@ class StampDutyLandTaxService @Inject() (
                         (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     stampDutyLandTaxConnector
       .removeAgentDetails(storn, agentReferenceNumber)
+      
+  def isDuplicate(storn: String, name: String)
+                 (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
+    getAllAgentDetails(storn).map { res =>
+      res.exists(agent => agent.agentName == name )
+    }
 }

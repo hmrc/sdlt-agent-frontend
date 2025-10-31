@@ -16,14 +16,28 @@
 
 package utils.mangeAgents
 
-import models.AgentDetailsResponse
+import models.{AgentDetailsResponse, Mode, NormalMode}
+import play.api.mvc.Call
 
 trait AgentDetailsTestUtil {
 
+  lazy val agentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
+  
   val testStorn: String = "STN001"
   
   val MAX_AGENTS = 25
 
+  object AgentNamePageUtils {
+    val agentNameOnwardRoute: Mode => Call = mode => controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
+    val agentNameDuplicateNameRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
+  }
+  
+  object AgentNamePageWarningUtils {
+    val WarningAgentNameRequestRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
+
+    val onwardRoute: Mode => Call = mode =>  controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
+  }
+  
   private def agent(i: Int): AgentDetailsResponse =
     AgentDetailsResponse(
       agentReferenceNumber = "ARN001",
