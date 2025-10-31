@@ -29,12 +29,14 @@ import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
+import jakarta.inject.Singleton
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
 
 import scala.concurrent.ExecutionContext
 
+//@Singleton
 class AgentOverviewController @Inject()(
                                         val controllerComponents: MessagesControllerComponents,
                                         stampDutyLandTaxService: StampDutyLandTaxService,
