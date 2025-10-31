@@ -22,7 +22,11 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.OptionValues
+import play.api.i18n.Messages
 import play.api.libs.json.{JsError, JsString, Json}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import play.api.test.Helpers.stubMessages
 
 class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
@@ -58,6 +62,46 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
         removeAgent =>
 
           Json.toJson(removeAgent) mustEqual JsString(removeAgent.toString)
+      }
+    }
+    "options" - {
+
+      "must build two radio items in order (yes, no) with correct labels, values and ids" in {
+
+        implicit val messages: Messages = stubMessages()
+
+        val radios = RemoveAgent.options
+
+        radios mustEqual Seq(
+          RadioItem(
+            content = Text(messages("site.yes")),
+            value = Some("true"),
+            id = Some("value_0")
+          ),
+          RadioItem(
+            content = Text(messages("site.no")),
+            value = Some("false"),
+            id = Some("value_1")
+          )
+        )
+      }
+
+      "must derive ids from index positions" in {
+
+        implicit val messages: Messages = stubMessages()
+
+        val radios = RemoveAgent.options
+
+        radios.map(_.id) mustEqual Seq(Some("value_0"), Some("value_1"))
+      }
+
+      "must map values to the underlying WithName strings" in {
+
+        implicit val messages: Messages = stubMessages()
+
+        val radios = RemoveAgent.options
+
+        radios.map(_.value) mustEqual Seq(Some(RemoveAgent.Option1.toString), Some(RemoveAgent.Option2.toString))
       }
     }
   }

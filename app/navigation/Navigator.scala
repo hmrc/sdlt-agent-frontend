@@ -17,21 +17,29 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
-import pages._
-import models._
+import pages.*
+import models.*
+import pages.manageAgents.{AgentAddressPage, AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage}
 
 @Singleton
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad()
+    case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
+    case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
+    case AgentAddressPage              => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
+    case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case AgentOverviewPage             => _ => controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
+    case _                             => _ =>                          routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case _ => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
+    case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
+    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

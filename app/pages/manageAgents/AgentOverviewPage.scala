@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.EmptyString.emptyString
+package pages.manageAgents
 
-@this()
+import pages.Page
 
-@(
-    msg: String,
-    classes: String = "govuk-heading-l",
-    id: Option[String] = None
-)(implicit messages: Messages)
-
-<h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
-    <span class="govuk-caption-l"> @messages("manageAgents.caption") </span>
-    @messages(msg)
-</h1>
+case object AgentOverviewPage extends Page

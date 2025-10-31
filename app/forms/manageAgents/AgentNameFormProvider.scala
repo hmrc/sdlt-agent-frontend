@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.EmptyString.emptyString
+package forms.manageAgents
 
-@this()
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
 
-@(
-    msg: String,
-    classes: String = "govuk-heading-l",
-    id: Option[String] = None
-)(implicit messages: Messages)
+class AgentNameFormProvider @Inject() extends Mappings {
 
-<h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
-    <span class="govuk-caption-l"> @messages("manageAgents.caption") </span>
-    @messages(msg)
-</h1>
+  private val agentNameRegex = "^[A-Za-z0-9 ~!@%&'()*+,\\-./:=?\\[\\]^_{}};]+$"
+  private val maxAgentNameLength = 28
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("manageAgents.agentName.error.required")
+        .verifying(regexp(agentNameRegex, "manageAgents.agentName.error.invalid"))
+        .verifying(maxLength(maxAgentNameLength, "manageAgents.agentName.error.length"))
+    )
+}

@@ -14,17 +14,8 @@
  * limitations under the License.
  *@
 
-@import utils.EmptyString.emptyString
-
 @this()
 
-@(
-    msg: String,
-    classes: String = "govuk-heading-l",
-    id: Option[String] = None
-)(implicit messages: Messages)
+@()
 
-<h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
-    <span class="govuk-caption-l"> @messages("manageAgents.caption") </span>
-    @messages(msg)
-</h1>
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">

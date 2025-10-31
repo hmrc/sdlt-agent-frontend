@@ -20,7 +20,11 @@ import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import controllers.routes.JourneyRecoveryController
 import models.NormalMode
+import navigation.Navigator
 import play.api.Logging
+import controllers.manageAgents.routes.*
+import jakarta.inject.Singleton
+import pages.manageAgents.{AgentNamePage, AgentOverviewPage}
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
@@ -30,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class StartAddAgentController @Inject()(
                                      val controllerComponents: MessagesControllerComponents,
                                      identify: IdentifierAction,
@@ -37,23 +42,24 @@ class StartAddAgentController @Inject()(
                                      requireData: DataRequiredAction,
                                      stornRequiredAction: StornRequiredAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
+                                     navigator: Navigator
                                    )(implicit appConfig: FrontendAppConfig,
                                      executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
-  def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-      stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agents =>
-        if (agents.size >= MAX_AGENTS) {
-          Redirect(controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1))
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+    stampDutyLandTaxService
+      .getAllAgentDetails(request.storn)
+      .map {
+        case agents if agents.size >= MAX_AGENTS =>
+          Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
             .flashing("agentsLimitReached" -> "true")
-        } else {
-          Redirect(controllers.manageAgents.routes.AgentNameController.onPageLoad(mode = NormalMode))
-        }
+        case _ =>
+          Redirect(navigator.nextPage(AgentNamePage, NormalMode, request.userAnswers))
       } recover {
         case ex =>
-          logger.error("[onPageLoad] Unexpected failure", ex)
+          logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
           Redirect(JourneyRecoveryController.onPageLoad())
       }
     }

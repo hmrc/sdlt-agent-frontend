@@ -25,12 +25,14 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
 
   private def newService(): (StampDutyLandTaxService, StampDutyLandTaxConnector) = {
     val connector = mock(classOf[StampDutyLandTaxConnector])
@@ -214,6 +216,78 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       }
 
       ex.getMessage must include("boom")
+    }
+  }
+
+  "isDuplicate" should {
+    "return true when the agent name already exists and there is a duplicate" in {
+      val (service, connector) = newService()
+
+      val payload = List(
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Acme Property Agents Ltd",
+          houseNumber = "42",
+          addressLine1 = "High Street",
+          addressLine2 = Some("Westminster"),
+          addressLine3 = "London",
+          addressLine4 = Some("Greater London"),
+          postcode = Some("SW1A 2AA"),
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
+        ),
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Harborview Estates",
+          houseNumber = "22A",
+          addressLine1 = "Queensway",
+          addressLine2 = None,
+          addressLine3 = "Birmingham",
+          addressLine4 = None,
+          postcode = Some("B2 4ND"),
+          phone = Some("01214567890"),
+          email = "info@harborviewestates.co.uk"
+        )
+      )
+
+      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.isDuplicate(sorn, "Harborview Estates").futureValue
+
+      result mustBe true
+
+      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+    "return false when the agent name does not exist" in {
+      val (service, connector) = newService()
+
+      val payload = List(
+        AgentDetailsResponse(
+          agentReferenceNumber = "ARN001",
+          agentName = "Acme Property Agents Ltd",
+          houseNumber = "42",
+          addressLine1 = "High Street",
+          addressLine2 = Some("Westminster"),
+          addressLine3 = "London",
+          addressLine4 = Some("Greater London"),
+          postcode = Some("SW1A 2AA"),
+          phone = Some("02079460000"),
+          email = "info@acmeagents.co.uk"
+        )
+      )
+
+      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result = service.isDuplicate(sorn, "Nonexistent Agent").futureValue
+
+      result mustBe false
+
+      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
     }
   }
 }
