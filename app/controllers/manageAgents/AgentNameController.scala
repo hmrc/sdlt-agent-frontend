@@ -30,6 +30,7 @@ import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentNameView
 import controllers.manageAgents.routes.*
+import play.api.data.Form
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -48,7 +49,7 @@ class AgentNameController@Inject()(
                                     navigator: Navigator
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
+  lazy val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) { implicit request =>
 
@@ -68,7 +69,7 @@ class AgentNameController@Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            isDuplicate    <- stampDutyLandTaxService.isDuplicate(request.storn: String, value)
+            isDuplicate    <- stampDutyLandTaxService.isDuplicate(request.storn, value)
             _              <- sessionRepository.set(updatedAnswers)
           } yield if (isDuplicate) {
             Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
