@@ -54,4 +54,13 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  val sessionTimeOut: Long = configuration.get[Long]("session.timeoutSeconds")
+  
+  // AddressLookup configuration
+  private val addressLookupPort: String = configuration.get[String]("address-lookup-frontend.port")
+  private val addressLookupHost: String = configuration.get[String]("address-lookup-frontend.host")
+  private val addressLookupProtocol: String = configuration.get[String]("address-lookup-frontend.protocol")
+  val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
+  val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
 }
