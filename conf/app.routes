@@ -35,8 +35,8 @@ POST        /manage-agents/check-address-lookup          controllers.manageAgent
 
 GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad()
 POST        /manage-agents/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
