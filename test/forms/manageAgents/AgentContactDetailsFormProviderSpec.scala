@@ -17,8 +17,7 @@
 package forms.manageAgents
 
 import forms.behaviours.StringFieldBehaviours
-import forms.mappings.manageAgents.AgentContactDetailsFormProvider
-import play.api.data.{Form, FormError}
+import play.api.data.FormError
 
 class AgentContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
@@ -28,19 +27,21 @@ class AgentContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "phone"
     val lengthKey = "manageAgents.agentContactDetails.error.phoneLength"
+    val invalidKey = "manageAgents.agentContactDetails.error.phoneInvalid"
     val maxLength = 14
 
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
-
-    behave like fieldWithMaxLength(
+    behave like lengthValidation(
       form,
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+    )
+
+    behave like invalidField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, invalidKey),
+      "test"
     )
     
   }
@@ -52,7 +53,7 @@ class AgentContactDetailsFormProviderSpec extends StringFieldBehaviours {
     val invalidKey = "manageAgents.agentContactDetails.error.emailInvalid"
     val maxLength = 36
 
-    behave like emailLengthValidation(
+    behave like lengthValidation(
       form,
       fieldName,
       maxLength = maxLength,

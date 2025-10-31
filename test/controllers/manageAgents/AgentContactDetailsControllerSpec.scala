@@ -17,9 +17,8 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import controllers.routes
-import forms.mappings.manageAgents.AgentContactDetailsFormProvider
-import models.{CheckMode, NormalMode, UserAnswers}
+import forms.manageAgents.AgentContactDetailsFormProvider
+import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -30,20 +29,18 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import views.html.manageAgents.AgentContactDetailsView
-import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 
 import scala.concurrent.Future
 
 class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
 
-  def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/check-your-answers")
+  def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-your-answers")
 
   val formProvider = new AgentContactDetailsFormProvider()
   val form = formProvider()
-  val storn: String = "STN001"
 
-  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode, storn).url
+  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
 
 
   "AgentContactDetails Controller" - {
@@ -59,7 +56,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, storn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -105,21 +102,48 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, storn)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must redirect to Check your answers for a POST if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
+    "must redirect to Check your answers for a POST if no data is found on AgentContactDetails page" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(POST, AgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("phone", ""))
           .withFormUrlEncodedBody(("email", ""))
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+        val request = FakeRequest(POST, AgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("phone", ""))
+          .withFormUrlEncodedBody(("email", ""))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }

@@ -16,11 +16,12 @@
 
 package models.manageAgents
 
-import play.api.libs.json.*
+import play.api.libs.json.{Json, OFormat}
 
-case class AgentContactDetails(contactTelephoneNumber: String, contactEmail: String)
+case class AgentContactDetails(
+                                phone: Option[String], email: Option[String]
+                              )
 
 object AgentContactDetails {
-
-  implicit val format: OFormat[AgentContactDetails] = Json.format
+  implicit val format: OFormat[AgentContactDetails] = Json.format[AgentContactDetails]
 }

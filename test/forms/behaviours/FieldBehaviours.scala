@@ -65,7 +65,7 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     }
   }
 
-  def emailLengthValidation(form: Form[_],
+  def lengthValidation(form: Form[_],
                             fieldName: String,
                             maxLength: Int,
                             lengthError: FormError): Unit = {

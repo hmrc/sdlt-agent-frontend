@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package forms.mappings.manageAgents
+package forms.manageAgents
 
-import forms.constraints.{OptionalEmailFormat, OptionalMaxLength}
+import forms.constraints.{OptionalEmailFormat, OptionalMaxLength, OptionalPhoneFormat}
+import models.manageAgents.AgentContactDetails
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, text}
 import play.api.data.validation.Constraint
 
 class AgentContactDetailsFormProvider {
 
-  private val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-  
-  def apply(): Form[(Option[String], Option[String])] = {
+  def apply(): Form[AgentContactDetails] = {
     Form(
       mapping(
         "phone" -> optional(text)
-          .verifying(OptionalMaxLength(14, "manageAgents.agentContactDetails.error.phoneLength")),
+          .verifying(OptionalMaxLength(14, "manageAgents.agentContactDetails.error.phoneLength"))
+          .verifying(OptionalPhoneFormat("manageAgents.agentContactDetails.error.phoneInvalid")),
         "email" -> optional(text)
           .verifying(OptionalMaxLength(36, "manageAgents.agentContactDetails.error.emailLength"))
           .verifying(OptionalEmailFormat("manageAgents.agentContactDetails.error.emailInvalid"))
-      )(Tuple2.apply)(Tuple2.unapply)
+      )(AgentContactDetails.apply)(contactDetails => Some((contactDetails.phone, contactDetails.email)))
     )
   }
 }

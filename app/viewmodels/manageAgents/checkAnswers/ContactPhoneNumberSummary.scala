@@ -24,13 +24,13 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ContactTelephoneNumberSummary {
+object ContactPhoneNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentContactDetailsPage).map { answer =>
       SummaryListRowViewModel(
         key = s"manageAgents.contactTelephoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer.contactTelephoneNumber).toString),
+        value = ValueViewModel(HtmlFormat.escape(answer.phone.getOrElse("")).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",

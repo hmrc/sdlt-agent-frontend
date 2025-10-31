@@ -16,25 +16,20 @@
 
 package views
 
-import forms.mappings.manageAgents.AgentContactDetailsFormProvider
-import models.CheckMode
-import org.apache.pekko.actor.setup.Setup
+import forms.manageAgents.AgentContactDetailsFormProvider
+import models.NormalMode
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Request
 import play.api.test.FakeRequest
-import play.twirl.api.HtmlFormat
-import viewmodels.govuk.all.{InputViewModel, LabelViewModel}
-import views.html.helper.form
 import views.html.manageAgents.AgentContactDetailsView
 
 class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val storn: String = "STN001"
-  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode, storn).url
+  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
 
   trait Setup {
     val formProvider = new AgentContactDetailsFormProvider()
@@ -47,7 +42,7 @@ class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOn
 
   "AgentContactDetailsView" should {
     "render the page with title and heading" in new Setup {
-      val html = view(form, CheckMode, storn)
+      val html = view(form, NormalMode)
       val doc = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("span.govuk-caption-xl").text() mustBe messages("manageAgents.agentContactDetails.caption")
@@ -61,7 +56,7 @@ class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOn
       .withError("email", "manageAgents.agentContactDetails.error.emailLength")
       .withError("email", "manageAgents.agentContactDetails.error.emailInvalid")
 
-    val html = view(errorForm, CheckMode, storn)
+    val html = view(errorForm, NormalMode)
     val doc = org.jsoup.Jsoup.parse(html.toString())
     val errorSummaryText = doc.select(".govuk-error-summary").text()
 

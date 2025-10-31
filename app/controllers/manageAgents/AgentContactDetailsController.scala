@@ -22,14 +22,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import controllers.JourneyRecoveryController
 import controllers.actions.*
-import forms.mappings.manageAgents.AgentContactDetailsFormProvider
+import forms.manageAgents.AgentContactDetailsFormProvider
+import models.manageAgents.AgentContactDetails
 
 import javax.inject.Inject
 import navigation.Navigator
-import models.{Mode, UserAnswers}
-import pages.manageAgents.AgentContactDetailsPage
+import models.Mode
+import pages.manageAgents.{AgentContactDetailsPage, AgentCheckYourAnswersPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -51,44 +51,31 @@ class AgentContactDetailsController @Inject()(
                                                view: AgentContactDetailsView
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-    val form = formProvider()
+  val form = formProvider()
 
-  // TODO Change back to (identify andThen getData andThen requireData) after main merge
-    def onPageLoad(mode: Mode, storn: String): Action[AnyContent] = Action {
-      implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+    implicit request =>
 
-        val userAnswersOpt: Option[UserAnswers] = request.session.get("userAnswers").map { jsonStr =>
-          Json.parse(jsonStr).as[UserAnswers]
-        }
+      val preparedForm = request.userAnswers.get(AgentContactDetailsPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
 
-        val preparedForm = userAnswersOpt.flatMap(_.get(AgentContactDetailsPage)) match {
-          case None => form
-          case Some(value) => form.fill((Some(""), Some("")))
-        }
+      Ok(view(preparedForm, mode))
+  }
 
-        Ok(view(preparedForm, mode, storn))
-    }
-
-  // TODO Change back to (identify andThen getData andThen requireData) after main merge
-    def onSubmit(mode: Mode, storn: String): Action[AnyContent] = Action.async { implicit request =>
-      val userAnswersOpt = request.session.get("userAnswers").map(Json.parse(_).as[UserAnswers])
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode, storn))),
+          Future.successful(BadRequest(view(formWithErrors, mode))),
 
         value =>
-          userAnswersOpt match {
-            case Some(userAnswers) =>
-              val updatedAnswers = userAnswers.set(AgentContactDetailsPage, true).get
-              for {
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswers, storn))
-
-            case None =>
-              Future.successful(Redirect(controllers.routes.CheckYourAnswersController.onPageLoad()))
-          }
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
       )
-    }
-
+  }
 }
