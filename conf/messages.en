@@ -63,7 +63,7 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-manageAgents.agentContactDetails.title = Test
+manageAgents.agentContactDetails.title = Manage agents – What are the agent’s contact details?
 manageAgents.agentContactDetails.caption = Manage agents
 manageAgents.agentContactDetails.heading = What are the agent's contact details?
 manageAgents.agentContactDetails.question1 = What is the agent's phone number?
