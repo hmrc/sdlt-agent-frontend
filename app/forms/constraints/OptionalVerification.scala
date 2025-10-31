@@ -35,12 +35,3 @@ object OptionalEmailFormat {
       case _ => Valid
     }
 }
-
-object OptionalPhoneFormat {
-  def apply(errorKey: String): Constraint[Option[String]] =
-    Constraint("constraints.phone") {
-      case Some(value) if !value.matches("""^\d+$""") =>
-        Invalid(ValidationError(errorKey))
-      case _ => Valid
-    }
-}

@@ -27,21 +27,19 @@ class AgentContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
     val fieldName = "phone"
     val lengthKey = "manageAgents.agentContactDetails.error.phoneLength"
-    val invalidKey = "manageAgents.agentContactDetails.error.phoneInvalid"
     val maxLength = 14
 
-    behave like lengthValidation(
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      stringsWithMaxLength(maxLength)
+    )
+
+    behave like fieldWithMaxLength(
       form,
       fieldName,
       maxLength = maxLength,
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
-    )
-
-    behave like invalidField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, invalidKey),
-      "test"
     )
     
   }
