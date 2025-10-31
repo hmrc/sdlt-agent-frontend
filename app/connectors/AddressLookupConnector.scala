@@ -50,7 +50,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
       "continueUrl" -> JsString(continueUrl),
 
       "ukMode" -> JsBoolean(true),
-      "disableTranslations" -> JsBoolean(true), // For some reason disable not working as expected
+      // TODO: we expect Welsh translation to be disabled / not working as expected
+      "disableTranslations" -> JsBoolean(true),
 
       "showPhaseBanner" -> JsBoolean(true),
       "alphaPhase" -> JsBoolean(true),
