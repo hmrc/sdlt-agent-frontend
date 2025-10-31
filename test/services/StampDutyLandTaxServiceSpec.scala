@@ -220,7 +220,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   }
 
   "isDuplicate" should {
-    "return true when the agent name already exists" in {
+    "return true when the agent name already exists and there is a duplicate" in {
       val (service, connector) = newService()
 
       val payload = List(

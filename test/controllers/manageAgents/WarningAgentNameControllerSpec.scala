@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.manageAgent
+package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.AgentNameFormProvider
@@ -23,18 +23,19 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.AgentNamePage
+import pages.manageAgents.{AgentNamePage, StornPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
+import utils.mangeAgents.AgentDetailsTestUtil
 import views.html.manageAgents.WarningAgentNameView
 
 import scala.concurrent.Future
 
-class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
+class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
 
   lazy val WarningAgentNameRequestRoute: String = controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode).url
@@ -72,7 +73,9 @@ class WarningAgentNameControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(AgentNamePage, "Test Agent Name").success.value
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(StornPage, testStorn).success.value
+        .set(AgentNamePage, "Test Agent Name").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 

@@ -41,7 +41,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
 
   private val agentReferenceNumber: String = "ARN001"
 
-  def onwardRoute: Call = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
+  def agentNameOnwardRoute: Call = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
 
   lazy val postAction: Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit(agentReferenceNumber)
   
@@ -176,7 +176,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(new FakeNavigator(agentNameOnwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
             bind[StampDutyLandTaxService].toInstance(service)
           )

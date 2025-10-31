@@ -19,14 +19,16 @@ package controllers.manageAgents
 import base.SpecBase
 import controllers.routes
 import models.UserAnswers
+import pages.manageAgents.StornPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import play.api.libs.json.Json
+import utils.mangeAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactTelephoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
+class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
 
   private def checkYourAnswersUrl =
     controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad().url
@@ -44,7 +46,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
         )
       )
 
-      val ua = UserAnswers("id", testData)
+      val ua = UserAnswers("id", testData).set(StornPage, testStorn).success.value
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
