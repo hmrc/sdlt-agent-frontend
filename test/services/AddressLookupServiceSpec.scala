@@ -47,7 +47,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
   implicit val ex: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   trait Fixture {
-    val sorn: String = "SN001"
+    val storn: String = "SN001"
     val id: String = "idToExtractAddress"
     val userId: String = "userId"
     val userAnswer = UserAnswers(userId)
@@ -72,7 +72,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
       when(connector.initJourney(any())(any[HeaderCarrier], any[Messages]))
         .thenReturn(Future.successful(Right(expectedPayload)))
 
-      val result: AddressLookupResponse = service.initJourney(userAnswer, sorn).futureValue
+      val result: AddressLookupResponse = service.initJourney(userAnswer, storn).futureValue
       result mustBe Right(expectedPayload)
 
       verify(connector, times(1)).initJourney(any())(any[HeaderCarrier], any[Messages])
@@ -84,7 +84,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
       when(connector.initJourney(any)(any[HeaderCarrier], any[Messages]))
         .thenReturn(Future.successful(Left(expectedError)))
 
-      val result: AddressLookupResponse = service.initJourney(userAnswer, sorn).futureValue
+      val result: AddressLookupResponse = service.initJourney(userAnswer, storn).futureValue
       result mustBe Left(expectedError)
 
       verify(connector, times(1)).initJourney(any())(any[HeaderCarrier], any[Messages])
