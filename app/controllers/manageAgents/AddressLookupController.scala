@@ -16,26 +16,67 @@
 
 package controllers.manageAgents
 
-import controllers.actions.IdentifierAction
-import models.Mode
-import javax.inject.{Inject, Singleton}
+import cats.data.EitherT
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.routes.JourneyRecoveryController
+import jakarta.inject.Singleton
+import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
+import models.{Mode, NormalMode, UserAnswers}
+import navigation.Navigator
+import pages.manageAgents.AgentContactDetailsPage
+import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class AddressLookupController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
+                                         val addressLookupService: AddressLookupService,
                                          identify: IdentifierAction,
-                                         view: IndexView
-                                       ) extends FrontendBaseController with I18nSupport {
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         stornRequiredAction: StornRequiredAction,
+                                         navigator: Navigator
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+    addressLookupService.initJourney(request.userAnswers, request.storn).map {
+      case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
+        Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
+        Redirect(addressLookupLocation)
+      case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
+        Logger("application").error("[AddressLookupController] - Failed::Location not provided")
+        Redirect(JourneyRecoveryController.onPageLoad())
+      case Left(ex) =>
+        Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
+        Redirect(JourneyRecoveryController.onPageLoad())
+    }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
+    Logger("application").debug(s"[AddressLookupController] - UA: ${request.userAnswers}")
+    for {
+      id <- EitherT(Future.successful(Try {
+        request.queryString.get("id").get(0)
+      }.toEither))
+      journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userAnswers))
+    } yield journeyOutcome
+  }.value.map {
+    case Right(updatedAnswer) =>
+      Logger("application").info(s"[AddressLookupController] - address extracted and saved")
+      Redirect(controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url)
+// TODO: re-enable this when relevant screens will be merged
+//      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
+    case Left(ex) =>
+      Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
+      Redirect(JourneyRecoveryController.onPageLoad())
+    }
   }
+
 }
