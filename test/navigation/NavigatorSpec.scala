@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import pages.manageAgents.{AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
 
 class NavigatorSpec extends SpecBase {
 

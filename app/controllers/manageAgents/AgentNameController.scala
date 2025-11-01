@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressDetails, AgentNameDuplicateWarningPage, AgentNamePage}
 
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -74,7 +74,7 @@ class AgentNameController@Inject()(
           } yield if (isDuplicate) {
             Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
           } else {
-            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
+            Redirect(navigator.nextPage(AgentAddressDetails, mode, updatedAnswers))
           }
       )
   }
