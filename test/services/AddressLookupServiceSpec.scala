@@ -17,7 +17,7 @@
 package services
 
 import connectors.AddressLookupConnector
-import models.{Mode, NormalMode, UserAnswers}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
@@ -53,7 +53,6 @@ class AddressLookupServiceSpec extends AnyWordSpec
     val id: String = "idToExtractAddress"
     val userId: String = "userId"
     val userAnswer = UserAnswers(userId)
-    val mode: Mode = NormalMode
 
     val connector: AddressLookupConnector = mock(classOf[AddressLookupConnector])
     val sessionRepository: SessionRepository = mock(classOf[SessionRepository])
@@ -70,27 +69,28 @@ class AddressLookupServiceSpec extends AnyWordSpec
   "Init AddressLookup Journey" should {
 
     "return new Location on success" in new Fixture {
-      val expectedPayload = JourneyInitSuccessResponse(Some("locationA"))
+      Seq(NormalMode, CheckMode).foreach { mode =>
+        val expectedPayload = JourneyInitSuccessResponse(Some("locationA"))
+        when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
+          .thenReturn(Future.successful(Right(expectedPayload)))
 
-      when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
-        .thenReturn(Future.successful(Right(expectedPayload)))
-
-      val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
-      result mustBe Right(expectedPayload)
-
-      verify(connector, times(1)).initJourney(any(), any())(any[HeaderCarrier], any[Messages])
+        val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
+        result mustBe Right(expectedPayload)
+        verify(connector, times(1)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
+      }
     }
 
     "return failure response on error" in new Fixture {
-      val expectedError = JourneyInitFailureResponse(INTERNAL_SERVER_ERROR)
+      Seq(NormalMode, CheckMode).foreach { mode =>
+        val expectedError = JourneyInitFailureResponse(INTERNAL_SERVER_ERROR)
 
-      when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
-        .thenReturn(Future.successful(Left(expectedError)))
+        when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
+          .thenReturn(Future.successful(Left(expectedError)))
 
-      val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
-      result mustBe Left(expectedError)
-
-      verify(connector, times(1)).initJourney(any(), any())(any[HeaderCarrier], any[Messages])
+        val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
+        result mustBe Left(expectedError)
+        verify(connector, times(2)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
+      }
     }
 
   }
@@ -127,10 +127,10 @@ class AddressLookupServiceSpec extends AnyWordSpec
         .get
 
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
-        .thenReturn(Future.successful( Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)) ) )
+        .thenReturn(Future.successful(Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))))
 
       val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
-      result must equal (Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)))
+      result must equal(Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)))
 
       verify(sessionRepository, times(0)).set(any())
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
