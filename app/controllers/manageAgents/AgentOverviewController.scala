@@ -58,9 +58,10 @@ class AgentOverviewController @Inject()(
         case agentDetailsList =>
 
           generateAgentSummary(paginationIndex, agentDetailsList)
-            .fold(
+            .fold {
+              logger.error("[AgentOverviewController][onPageLoad] Failed to generate summary list of agents")
               Ok(view(None, None, None, postAction))
-            ) { summary =>
+            } { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
               val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
