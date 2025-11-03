@@ -16,14 +16,26 @@
 
 package controllers.manageAgents
 
+import controllers.JourneyRecoveryController
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import models.UserAnswers
+import models.manageAgents.AgentContactDetails
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import play.api.Logging
+
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.StampDutyLandTaxService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist.*
 import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class CheckYourAnswersController @Inject()(
@@ -32,26 +44,48 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
+                                            sessionRepository: SessionRepository,
+                                            stampDutyLandTaxService: StampDutyLandTaxService,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
-                                          ) extends FrontendBaseController with I18nSupport {
+                                          )(implicit executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) {
+  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
       // TODO: This is a dummy postAction call -> must be replaced with an actual call to the BE
-
       val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
 
-      val list = SummaryListViewModel(
+      def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
-          AgentNameSummary.row(request.userAnswers),
-          AddressSummary.row(request.userAnswers),
-          ContactPhoneNumberSummary.row(request.userAnswers),
-          ContactEmailSummary.row(request.userAnswers)
+          AgentNameSummary.row(userAnswers),
+          AddressSummary.row(userAnswers),
+          ContactPhoneNumberSummary.row(userAnswers),
+          ContactEmailSummary.row(userAnswers)
         ).flatten
       )
 
-      Ok(view(list, postAction))
+      agentReferenceNumber match {
+        case None =>
+          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+        case Some(arn) =>
+          stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
+            case Some(agentDetails) =>
+              println(s"\nGOT: $agentDetails\n")
+              for {
+                updatedAgentName     <- Future.fromTry(request.userAnswers.set(AgentNamePage, agentDetails.agentName))
+                _                    <- Future.fromTry(request.userAnswers.remove(AgentNameDuplicateWarningPage))
+                updatedAddressLines  = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3, agentDetails.addressLine4.getOrElse(""))
+                updatedAddress       <- Future.fromTry(request.userAnswers.set(AgentAddressPage, JourneyResultAddressModel("", Address(updatedAddressLines, agentDetails.postcode))))
+                updateContactDetails <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, Some(agentDetails.email))))
+                _                    <- sessionRepository.set(updateContactDetails)
+              } yield {
+                Ok(view(getSummaryListRows(request.userAnswers), postAction))
+              }
+            case None =>
+              logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
+      }
   }
 }
