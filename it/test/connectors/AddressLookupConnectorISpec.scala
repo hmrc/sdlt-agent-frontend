@@ -20,6 +20,7 @@ package connectors
 import config.FrontendAppConfig
 import itutil.ApplicationWithWiremock
 import mocks.MockHttpV2
+import models.{CheckMode, NormalMode}
 import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
@@ -64,29 +65,31 @@ class AddressLookupConnectorISpec extends AnyWordSpec
 
   "Initiate Address Lookup Journey" should {
     "return location details on success" in {
-      setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
-        Right(JourneyInitSuccessResponse(Some("Some location")))
-      )
-      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
-      result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
+      Seq(NormalMode, CheckMode).foreach{ mode =>
+        setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+          Right(JourneyInitSuccessResponse(Some("Some location")))
+        )
+        val result = TestAddressLookupConnector.initJourney(agentName, mode).futureValue
+        result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
+      }
     }
-    "return failure when attempt init Journey" in {
-      setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
-        Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
-      )
-      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
-      result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
+    "return failure when attempt on error" in {
+      Seq(NormalMode, CheckMode).foreach { mode =>
+        setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+          Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
+        )
+        val result = TestAddressLookupConnector.initJourney(agentName, mode).futureValue
+        result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
+      }
     }
   }
 
   "Extract Address Details upon Journey completion" should {
     "return address details on success" in {
-
       val expectedJourneyResultAddressModel =
         JourneyResultAddressModel(auditRef = "auditRef",
           address = Address(lines = Seq.empty, postcode = Some("Z9 3WW"))
         )
-
       setupMockHttpGet(TestAddressLookupConnector.addressLookupOutcomeUrl(id))(
         Right(Some(expectedJourneyResultAddressModel))
       )

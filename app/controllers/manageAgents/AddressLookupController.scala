@@ -21,9 +21,9 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import controllers.routes.JourneyRecoveryController
 import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
-import models.{Mode, NormalMode, UserAnswers}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.AgentContactDetailsPage
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -46,7 +46,7 @@ class AddressLookupController @Inject()(
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    addressLookupService.initJourney(request.userAnswers, request.storn).map {
+    addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
         Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)
@@ -68,11 +68,12 @@ class AddressLookupController @Inject()(
       journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userAnswers))
     } yield journeyOutcome
   }.value.map {
-    case Right(updatedAnswer) =>
+    case Right(updatedAnswer) if mode == NormalMode =>
       Logger("application").info(s"[AddressLookupController] - address extracted and saved")
-      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
-// TODO: re-enable this when relevant screens will be merged
-//      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
+      Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, updatedAnswer))
+    case Right(updatedAnswer) if mode == CheckMode =>
+      Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
+      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
       Redirect(JourneyRecoveryController.onPageLoad())
