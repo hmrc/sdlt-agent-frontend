@@ -94,6 +94,10 @@ class CheckYourAnswersController @Inject()(
             case None =>
               logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          } recover {
+            case ex =>
+              logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
+              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
       }
   }
