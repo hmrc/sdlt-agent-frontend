@@ -29,7 +29,7 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
-    case AgentAddressPage              => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
+    case AgentAddressPage           => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
     case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
     case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
     case AgentOverviewPage             => _ => controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)

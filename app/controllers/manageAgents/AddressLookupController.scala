@@ -70,7 +70,7 @@ class AddressLookupController @Inject()(
   }.value.map {
     case Right(updatedAnswer) =>
       Logger("application").info(s"[AddressLookupController] - address extracted and saved")
-      Redirect(controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url)
+      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
 // TODO: re-enable this when relevant screens will be merged
 //      Redirect(navigator.nextPage(AgentContactDetailsPage, mode, updatedAnswer))
     case Left(ex) =>

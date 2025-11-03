@@ -16,10 +16,11 @@
 
 package pages.manageAgents
 
+import models.responses.addresslookup.JourneyResultAddressModel
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object AgentAddressPage extends QuestionPage[String] {
+case object AgentAddressPage extends QuestionPage[JourneyResultAddressModel] {
 
   override def path: JsPath = JsPath \ toString
 

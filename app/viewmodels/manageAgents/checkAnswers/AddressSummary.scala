@@ -20,6 +20,7 @@ import models.{CheckMode, UserAnswers}
 import pages.manageAgents.AgentAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,9 +29,22 @@ object AddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentAddressPage).map { answer =>
+
+      val organisation   = answer.address.lines.lift(0)
+      val addressLine1   = answer.address.lines.lift(1)
+      val addressLine2   = answer.address.lines.lift(2)
+      val townOrCity     = answer.address.lines.lift(3)
+      val postcode       = answer.address.postcode
+
+      val formattedLines =
+        Seq(organisation, addressLine1, addressLine2, townOrCity, postcode)
+          .flatten
+          .map(HtmlFormat.escape)
+          .mkString("<br>")
+
       SummaryListRowViewModel(
         key = "manageAgents.address.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(HtmlContent(HtmlFormat.raw(formattedLines))),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
@@ -43,5 +57,3 @@ object AddressSummary {
     }
   }
 }
-
-

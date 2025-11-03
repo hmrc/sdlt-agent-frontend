@@ -28,7 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.scalatest.EitherValues
-import pages.manageAgents.AgentAddressDetails
+import pages.manageAgents.AgentAddressPage
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.i18n.Messages
 import repositories.SessionRepository
@@ -97,7 +97,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
     "return UserAnswer on success" in new Fixture {
 
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressDetails, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails).toOption
         .get
         .copy(lastUpdated = instant)
 
@@ -120,7 +120,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
 
     "return AddressLookupConnector error" in new Fixture {
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressDetails, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails).toOption
         .get
 
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
@@ -136,7 +136,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
     "return SessionRepository error" in new Fixture {
 
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressDetails, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails).toOption
         .get
 
       when(sessionRepository.set(any()))

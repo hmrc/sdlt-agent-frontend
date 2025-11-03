@@ -23,7 +23,7 @@ import jakarta.inject.Inject
 import models.UserAnswers
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.{JourneyInitResponse, JourneyResultAddressModel}
-import pages.manageAgents.{AgentAddressDetails, AgentNamePage, StornPage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage, StornPage}
 import uk.gov.hmrc.http.HeaderCarrier
 import repositories.SessionRepository
 import play.api.Logger
@@ -51,7 +51,7 @@ class AddressLookupService @Inject()(
   private def saveAddressDetails(userAnswers: UserAnswers, addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
-        userAnswers.set(AgentAddressDetails, addressDetails).toEither match {
+        userAnswers.set(AgentAddressPage, addressDetails).toEither match {
           case Right(updatedAnswers) =>
             Logger("application").debug(s"[AddressLookupService] - Update user session: ${updatedAnswers}")
             sessionRepository.set(updatedAnswers)
