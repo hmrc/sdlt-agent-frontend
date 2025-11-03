@@ -17,7 +17,6 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
@@ -28,8 +27,11 @@ import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
-import javax.inject.{Inject, Singleton}
+import models.NormalMode
+import navigation.Navigator
+import pages.manageAgents.AgentOverviewPage
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -40,6 +42,7 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         stornRequiredAction: StornRequiredAction,
+                                        navigator: Navigator,
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
@@ -56,7 +59,7 @@ class AgentOverviewController @Inject()(
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold {
               logger.error("[AgentOverviewController][onPageLoad] Failed to generate summary list of agents")
-              Ok(view(None, None, None, postAction))
+              Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
             } { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
