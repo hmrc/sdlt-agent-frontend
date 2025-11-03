@@ -16,7 +16,6 @@
 
 package controllers.manageAgents
 
-import controllers.JourneyRecoveryController
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.UserAnswers
 import models.manageAgents.AgentContactDetails
@@ -29,8 +28,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.manageAgents.UserAnswersHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
@@ -49,7 +48,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           )(implicit executionContext: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with Logging {
+  extends FrontendBaseController with I18nSupport with Logging with UserAnswersHelper {
 
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
@@ -73,15 +72,7 @@ class CheckYourAnswersController @Inject()(
           stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
             case Some(agentDetails) =>
 
-              val updatedUserAnswers = for {
-                  userAnswersOne   <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
-                  userAnswersTwo   <- userAnswersOne.set(AgentNamePage, agentDetails.agentName)
-                  addressLines      = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3, agentDetails.addressLine4.getOrElse(""))
-                  userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
-                  userAnswersFour  <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, Some(agentDetails.email)))
-                } yield userAnswersFour
-
-              updatedUserAnswers
+              updateUserAnswers(agentDetails)
                 .fold ({ error =>
                   logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
