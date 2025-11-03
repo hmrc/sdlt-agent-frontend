@@ -44,27 +44,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
     "must return OK and the correct view for a GET" in {
 
-      val testData = Json.obj(
-        "agentName" -> "John",
-        "agentAddress" -> "123 Road",
-        "agentContactDetails" -> Json.obj(
-          "contactTelephoneNumber" -> "07123456789",
-          "contactEmail" -> "john@example.com"
-        ),
-        "agentAddress" -> Json.obj(
-          "auditRef" -> "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
-          "address" -> Json.obj(
-            "lines" -> Json.arr(
-              "10 Downing Street",
-              "South Kensington",
-              "London",
-              "SW7 5JT"
-            )
-          )
-        )
-      )
-
-      val ua = UserAnswers("id", testData).set(StornPage, testStorn).success.value
+      val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
 
       val application = applicationBuilder(userAnswers = Some(ua)).build()
 
