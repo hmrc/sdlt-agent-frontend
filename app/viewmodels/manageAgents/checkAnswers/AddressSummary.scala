@@ -30,15 +30,10 @@ object AddressSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentAddressPage).map { answer =>
 
-      val organisation   = answer.address.lines.lift(0)
-      val addressLine1   = answer.address.lines.lift(1)
-      val addressLine2   = answer.address.lines.lift(2)
-      val townOrCity     = answer.address.lines.lift(3)
-      val postcode       = answer.address.postcode
+      val postcode = answer.address.postcode.toSeq
 
-      val formattedLines =
-        Seq(organisation, addressLine1, addressLine2, townOrCity, postcode)
-          .flatten
+        val formattedLines = (answer.address.lines ++ postcode)
+          .filter(_.nonEmpty)
           .map(HtmlFormat.escape)
           .mkString("<br>")
 
