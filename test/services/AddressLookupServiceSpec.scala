@@ -89,7 +89,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
 
         val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
         result mustBe Left(expectedError)
-        verify(connector, times(2)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
+        verify(connector, times(1)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
       }
     }
 
