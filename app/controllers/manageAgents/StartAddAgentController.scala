@@ -58,12 +58,12 @@ class StartAddAgentController @Inject()(
             .flashing("agentsLimitReached" -> "true"))
         case _ =>
 
-          val userAnswers = UserAnswers(id = request.userId)
+          val emptiedUserAnswers = UserAnswers(id = request.userId)
 
           for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
+            updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, userAnswers))
+          } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers))
       } recover {
         case ex =>
           logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
