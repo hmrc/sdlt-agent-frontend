@@ -20,6 +20,7 @@ package connectors
 import config.FrontendAppConfig
 import itutil.ApplicationWithWiremock
 import mocks.MockHttpV2
+import models.NormalMode
 import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
@@ -67,14 +68,14 @@ class AddressLookupConnectorISpec extends AnyWordSpec
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Right(JourneyInitSuccessResponse(Some("Some location")))
       )
-      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
+      val result = TestAddressLookupConnector.initJourney(agentName, NormalMode).futureValue
       result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
     }
     "return failure when attempt init Journey" in {
       setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
         Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
       )
-      val result = TestAddressLookupConnector.initJourney(agentName).futureValue
+      val result = TestAddressLookupConnector.initJourney(agentName, NormalMode).futureValue
       result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
     }
   }
