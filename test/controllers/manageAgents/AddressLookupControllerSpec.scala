@@ -121,7 +121,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
   "AddressLookupController get AL journey result" - {
 
-    "return AddressDetails on success" in new Fixture {
+    "return AddressDetails on success: NormalMode" in new Fixture {
       when(service.getJourneyOutcome(any(), any())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Right(userAnswers)))
 
@@ -133,6 +133,23 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/manage-agents/agent-contact-details"
+
+        verify(service, times(1)).getJourneyOutcome(any(), any())(any[HeaderCarrier])
+      }
+    }
+
+    "return AddressDetails on success: CheckMode" in new Fixture {
+      when(service.getJourneyOutcome(any(), any())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(userAnswers)))
+
+      running(app) {
+        val request =
+          FakeRequest(GET, addressLookupExtract(CheckMode))
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/manage-agents/check-your-answers"
 
         verify(service, times(1)).getJourneyOutcome(any(), any())(any[HeaderCarrier])
       }
