@@ -33,7 +33,6 @@ import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
 
-import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
