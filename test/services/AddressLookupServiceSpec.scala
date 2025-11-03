@@ -21,13 +21,12 @@ import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
-import org.apache.pekko.actor.FSM.Normal
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
 import org.scalatest.EitherValues
 import pages.manageAgents.AgentAddressPage
 import play.api.http.Status.INTERNAL_SERVER_ERROR
@@ -38,6 +37,8 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.test.Helpers.stubMessages
+import org.scalactic.TripleEquals.*
+
 
 class AddressLookupServiceSpec extends AnyWordSpec
   with ScalaFutures
@@ -132,7 +133,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
       val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
       result must equal(Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)))
 
-      verify(sessionRepository, times(0)).set(any())
+      verify(sessionRepository, times(0)).set(eqTo(updatedAnswers))
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
     }
 
@@ -141,8 +142,9 @@ class AddressLookupServiceSpec extends AnyWordSpec
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
         .set(AgentAddressPage, expectedAddressDetails).toOption
         .get
+        .copy(lastUpdated = instant)
 
-      when(sessionRepository.set(any()))
+      when(sessionRepository.set(eqTo(updatedAnswers)))
         .thenThrow(new RuntimeException("Failed connect to MongoDb | Or save user session"))
 
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
@@ -152,8 +154,12 @@ class AddressLookupServiceSpec extends AnyWordSpec
         service.getJourneyOutcome(id, userAnswer).futureValue
       }
 
-      verify(sessionRepository, times(1)).set(any())
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
+
+      // User custom equality / override last updated
+      verify(sessionRepository, times(1)).set( argThat(captureUserAnswer =>
+        captureUserAnswer.copy(lastUpdated = instant) === updatedAnswers
+      ) )
     }
 
   }
