@@ -31,7 +31,7 @@ import views.html.manageAgents.CheckYourAnswersView
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil {
 
   private def checkYourAnswersUrl =
-    controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad().url
+    controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None).url
 
   "Check Your Answers Controller" - {
 

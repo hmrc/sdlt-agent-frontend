@@ -87,7 +87,7 @@ class CheckYourAnswersController @Inject()(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(request.userAnswers), postAction))
+                    Ok(view(getSummaryListRows(userAnswers), postAction))
                   }
                 })
 
