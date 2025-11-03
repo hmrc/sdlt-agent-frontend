@@ -20,7 +20,7 @@ import cats.data.EitherT
 import com.google.inject.Singleton
 import connectors.AddressLookupConnector
 import jakarta.inject.Inject
-import models.UserAnswers
+import models.{Mode, UserAnswers}
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.{JourneyInitResponse, JourneyResultAddressModel}
 import pages.manageAgents.{AgentAddressPage, AgentNamePage, StornPage}
@@ -38,12 +38,12 @@ class AddressLookupService @Inject()(
                                     )(implicit ec: ExecutionContext) {
 
   // Step 1: Init AL journey
-  def initJourney(userAnswers: UserAnswers, storn: String)
+  def initJourney(userAnswers: UserAnswers, storn: String, mode: Mode)
                  (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     Logger("application").info(s"[AddressLookupService][initJourney]")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))
-      initJourneyRes <- addressLookUpConnector.initJourney(agentName) // set agentName as empty if nothing found
+      initJourneyRes <- addressLookUpConnector.initJourney(agentName, mode) // set agentName as empty if nothing found
     } yield initJourneyRes
   }
 

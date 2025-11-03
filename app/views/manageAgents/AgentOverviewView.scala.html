@@ -40,7 +40,8 @@
 )
 
 @layout(
-    pageTitle = titleNoForm(messages("manageAgents.agentOverview.title"))
+    pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
+    showBackLink = false
 ) {
 
     @request.flash.get("agentsLimitReached").map { _ =>
