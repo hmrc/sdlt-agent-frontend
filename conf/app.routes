@@ -32,7 +32,7 @@ GET         /manage-agents/find-address                  controllers.manageAgent
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
 
 GET         /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/check-address-lookup          controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/save-address-lookup           controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)

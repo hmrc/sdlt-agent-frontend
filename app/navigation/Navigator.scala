@@ -39,7 +39,9 @@ class Navigator @Inject()() {
   private val checkRouteMap: Page => UserAnswers => Call = {
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
-    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case _                             => _ =>                          routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

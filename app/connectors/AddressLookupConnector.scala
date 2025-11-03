@@ -18,7 +18,7 @@ package connectors
 
 import config.FrontendAppConfig
 import jakarta.inject.Singleton
-import models.NormalMode
+import models.{Mode, NormalMode}
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
 import play.api.i18n.{Lang, Messages, MessagesApi}
@@ -44,12 +44,12 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
   private val langResourcePrefix : String = "manageAgents.addressLookup"
 
-  private val continueUrl = appConfig.loginContinueUrl +
-    controllers.manageAgents.routes.AddressLookupController.onSubmit(NormalMode).url
+  private val continueUrl = (mode: Mode) => appConfig.host +
+    controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
-  private def setJourneyOptions(): Seq[(String, JsValue)] = {
+  private def setJourneyOptions(mode: Mode): Seq[(String, JsValue)] = {
     Seq(
-      "continueUrl" -> JsString(continueUrl),
+      "continueUrl" -> JsString(continueUrl(mode)),
 
       "ukMode" -> JsBoolean(true),
       // TODO: we expect Welsh translation to be disabled / not working as expected
@@ -145,13 +145,13 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     )
   }
 
-  private def buildConfig(agentName: Option[String])
+  private def buildConfig(agentName: Option[String], mode: Mode)
       (implicit messages: Messages): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
         "options" -> JsObject(
-          setJourneyOptions()
+          setJourneyOptions(mode)
         ),
         "labels" -> JsObject(
           Seq(
@@ -165,10 +165,10 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   // Step 1: Journey start/init
-  def initJourney(agentName: Option[String])
+  def initJourney(agentName: Option[String], mode: Mode)
                  (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
-    val payload: JsValue = buildConfig(agentName)
+    val payload: JsValue = buildConfig(agentName, mode: Mode)
     Logger("application").info(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
