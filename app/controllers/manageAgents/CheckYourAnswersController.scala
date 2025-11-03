@@ -48,7 +48,8 @@ class CheckYourAnswersController @Inject()(
                                             stampDutyLandTaxService: StampDutyLandTaxService,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
-                                          )(implicit executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                          )(implicit executionContext: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
@@ -71,17 +72,25 @@ class CheckYourAnswersController @Inject()(
         case Some(arn) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
             case Some(agentDetails) =>
-              println(s"\nGOT: $agentDetails\n")
-              for {
-                updatedAgentName     <- Future.fromTry(request.userAnswers.set(AgentNamePage, agentDetails.agentName))
-                _                    <- Future.fromTry(request.userAnswers.remove(AgentNameDuplicateWarningPage))
-                updatedAddressLines  = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3, agentDetails.addressLine4.getOrElse(""))
-                updatedAddress       <- Future.fromTry(request.userAnswers.set(AgentAddressPage, JourneyResultAddressModel("", Address(updatedAddressLines, agentDetails.postcode))))
-                updateContactDetails <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, Some(agentDetails.email))))
-                _                    <- sessionRepository.set(updateContactDetails)
-              } yield {
-                Ok(view(getSummaryListRows(request.userAnswers), postAction))
-              }
+
+              val updatedUserAnswers = for {
+                  userAnswersOne   <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
+                  userAnswersTwo   <- userAnswersOne.set(AgentNamePage, agentDetails.agentName)
+                  addressLines      = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3, agentDetails.addressLine4.getOrElse(""))
+                  userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
+                  userAnswersFour  <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, Some(agentDetails.email)))
+                } yield userAnswersFour
+
+              updatedUserAnswers
+                .fold ({ error =>
+                  logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                }, { userAnswers =>
+                  sessionRepository.set(userAnswers).map { _ =>
+                    Ok(view(getSummaryListRows(request.userAnswers), postAction))
+                  }
+                })
+
             case None =>
               logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
