@@ -169,7 +169,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                  (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
-    Logger("application").info(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
+    Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]
