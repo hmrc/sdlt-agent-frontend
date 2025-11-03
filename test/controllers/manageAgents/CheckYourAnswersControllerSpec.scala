@@ -44,7 +44,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           "contactTelephoneNumber" -> "07123456789",
           "contactEmail" -> "john@example.com"
         ),
-        "AgentAddressDetails" -> Json.obj(
+        "agentAddress" -> Json.obj(
           "auditRef" -> "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
           "address" -> Json.obj(
             "lines" -> Json.arr(
