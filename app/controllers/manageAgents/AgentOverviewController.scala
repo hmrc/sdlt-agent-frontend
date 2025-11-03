@@ -29,9 +29,6 @@ import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
 import javax.inject.{Inject, Singleton}
-import models.NormalMode
-import navigation.Navigator
-import pages.manageAgents.AgentOverviewPage
 
 import scala.concurrent.ExecutionContext
 
@@ -43,7 +40,6 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         stornRequiredAction: StornRequiredAction,
-                                        navigator: Navigator,
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
