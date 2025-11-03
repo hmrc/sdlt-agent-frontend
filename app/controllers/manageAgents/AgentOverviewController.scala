@@ -59,7 +59,7 @@ class AgentOverviewController @Inject()(
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
-              Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+              Ok(view(None, None, None, postAction))
             ) { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
