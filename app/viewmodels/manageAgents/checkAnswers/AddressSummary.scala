@@ -17,7 +17,7 @@
 package viewmodels.manageAgents.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.manageAgents.AgentAddressDetails
+import pages.manageAgents.AgentAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
@@ -28,7 +28,7 @@ import viewmodels.implicits.*
 object AddressSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(AgentAddressDetails).map { answer =>
+    answers.get(AgentAddressPage).map { answer =>
 
       val organisation   = answer.address.lines.lift(0)
       val addressLine1   = answer.address.lines.lift(1)

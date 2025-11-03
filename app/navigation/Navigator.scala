@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressDetails, AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage}
+import pages.manageAgents.{AgentAddressPage, AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage}
 
 @Singleton
 class Navigator @Inject()() {
@@ -29,7 +29,7 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
-    case AgentAddressDetails           => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
+    case AgentAddressPage           => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
     case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
     case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
     case AgentOverviewPage             => _ => controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)

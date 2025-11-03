@@ -20,9 +20,9 @@ import models.responses.addresslookup.JourneyResultAddressModel
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object AgentAddressDetails extends QuestionPage[JourneyResultAddressModel] {
+case object AgentAddressPage extends QuestionPage[JourneyResultAddressModel] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "AgentAddressDetails"
+  override def toString: String = "agentAddress"
 }

@@ -21,7 +21,7 @@ import forms.manageAgents.AgentNameFormProvider
 import jakarta.inject.Singleton
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressDetails, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -68,7 +68,7 @@ class WarningAgentNameController@Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentAddressDetails, mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
       )
   }
 }

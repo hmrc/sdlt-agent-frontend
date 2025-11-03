@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressDetails, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -47,7 +47,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from AgentAddressPage to AddressLookupController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(AgentAddressDetails, NormalMode, UserAnswers("id")) mustBe
+        navigator.nextPage(AgentAddressPage, NormalMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
       }
 
