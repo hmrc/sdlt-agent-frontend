@@ -17,6 +17,7 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import services.StampDutyLandTaxService
@@ -27,6 +28,7 @@ import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*
+import javax.inject.{Inject, Singleton}
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
@@ -57,10 +59,9 @@ class AgentOverviewController @Inject()(
         case agentDetailsList =>
 
           generateAgentSummary(paginationIndex, agentDetailsList)
-            .fold {
-              logger.error("[AgentOverviewController][onPageLoad] Failed to generate summary list of agents")
+            .fold(
               Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-            } { summary =>
+            ) { summary =>
 
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
               val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
