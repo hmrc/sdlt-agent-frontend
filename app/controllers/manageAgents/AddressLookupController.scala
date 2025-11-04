@@ -70,7 +70,7 @@ class AddressLookupController @Inject()(
   }.value.map {
     case Right(updatedAnswer) if mode == NormalMode =>
       Logger("application").info(s"[AddressLookupController] - address extracted and saved")
-      Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, updatedAnswer))
+      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
       Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
