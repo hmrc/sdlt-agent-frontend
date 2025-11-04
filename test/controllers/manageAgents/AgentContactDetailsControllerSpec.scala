@@ -18,7 +18,7 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
-import models.NormalMode
+import models.{AgentDetailsResponse, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -28,6 +28,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import views.html.manageAgents.AgentContactDetailsView
 
 import scala.concurrent.Future
@@ -39,8 +40,11 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new AgentContactDetailsFormProvider()
   val form = formProvider()
+  val postAction = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit
+  val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
+  val agentDetails = new AgentDetailsResponse
 
-  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
+  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode, "").url
 
 
   "AgentContactDetails Controller" - {
@@ -56,7 +60,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, postAction(NormalMode, ""), agentDetails)(request, messages(application)).toString
       }
     }
 
@@ -102,7 +106,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, postAction(NormalMode, ""), agentDetails)(request, messages(application)).toString
       }
     }
 

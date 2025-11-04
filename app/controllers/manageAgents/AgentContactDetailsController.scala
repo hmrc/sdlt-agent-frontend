@@ -18,20 +18,24 @@ package controllers.manageAgents
 
 import controllers.actions.IdentifierAction
 import models.Mode
+
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import controllers.JourneyRecoveryController
 import controllers.actions.*
+import controllers.routes.JourneyRecoveryController
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.manageAgents.AgentContactDetails
 
 import javax.inject.Inject
 import navigation.Navigator
 import models.Mode
-import pages.manageAgents.{AgentContactDetailsPage, AgentCheckYourAnswersPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentContactDetailsView
 
@@ -46,36 +50,58 @@ class AgentContactDetailsController @Inject()(
                                                identify: IdentifierAction,
                                                getData: DataRetrievalAction,
                                                requireData: DataRequiredAction,
+                                               stornRequiredAction: StornRequiredAction,
                                                formProvider: AgentContactDetailsFormProvider,
+                                               stampDutyLandTaxService: StampDutyLandTaxService,
                                                val controllerComponents: MessagesControllerComponents,
                                                view: AgentContactDetailsView
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  val postAction = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit
+
+  def onPageLoad(mode: Mode, agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(AgentContactDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+      stampDutyLandTaxService
+        .getAgentDetails(request.storn, agentReferenceNumber) map {
+        case Some(agentDetails) =>
+          val preparedForm = request.userAnswers.get(AgentContactDetailsPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+          logger.error(s"session=${request.session.data}")
+          Ok(view(preparedForm, mode, postAction(mode, agentReferenceNumber), agentDetails))
+        case None               =>
+          logger.error(s"[AgentContactDetailsController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      } recover {
+        case ex =>
+          logger.error("[AgentContactDetailsController][onPageLoad] Unexpected failure", ex)
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
-
-      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
+      stampDutyLandTaxService
+        .getAgentDetails(request.storn, agentReferenceNumber) flatMap {
+        case Some(agentDetails) =>
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, postAction(mode, agentReferenceNumber), agentDetails))),
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
-      )
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
+            )
+        case None =>
+          logger.error(s"[AgentContactDetailsController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
+          logger.error(s"session=${request.session.data}")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          }
   }
 }

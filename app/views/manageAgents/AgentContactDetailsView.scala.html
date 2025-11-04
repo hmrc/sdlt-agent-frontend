@@ -24,11 +24,12 @@
         govukButton: GovukButton
     )
 
-    @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+    @(form: Form[_], mode: Mode, postAction: Call,
+            agentDetails: AgentDetailsResponse)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = title(form, messages("manageAgents.agentContactDetails.title"))) {
 
-    @formHelper(action = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(mode, ""), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -36,7 +37,7 @@
 
 
         <span class="govuk-caption-xl">@messages("manageAgents.agentContactDetails.caption")</span>
-        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading", agentDetails.agentName)</h1>
 
         @govukInput(
             InputViewModel(

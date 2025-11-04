@@ -53,7 +53,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(NormalMode)" in {
         navigator.nextPage(AgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+          controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode, "")
       }
     }
 
