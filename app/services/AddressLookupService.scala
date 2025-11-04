@@ -53,7 +53,6 @@ class AddressLookupService @Inject()(
       case Some(addressDetails) =>
         userAnswers.set(AgentAddressPage, addressDetails).toEither match {
           case Right(updatedAnswers) =>
-            Logger("application").debug(s"[AddressLookupService] - Update user session: ${updatedAnswers}")
             sessionRepository.set(updatedAnswers)
               .map(res =>
                 Logger("application").debug(s"[AddressLookupService] - UpdateStatus: $res")

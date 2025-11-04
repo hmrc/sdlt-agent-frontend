@@ -162,6 +162,29 @@ class AddressLookupServiceSpec extends AnyWordSpec
       ) )
     }
 
+    "failed to save AddressDetails as None extracted" in new Fixture {
+
+      when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(None)))
+
+      val _ = service.getJourneyOutcome(id, userAnswer).futureValue
+
+      verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
+    }
+
+    // TODO: required trait for UserAnswer class to abstract away methods/-> mock UserAnswer
+    "failed to set UserAnswer while attempt to save" in new Fixture {
+
+      val updatedAnswersMaybe: Option[UserAnswers] = None
+
+      when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(updatedAnswersMaybe)))
+
+      val _ = service.getJourneyOutcome(id, UserAnswers("")).futureValue
+
+      verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
+    }
+
   }
 
 }
