@@ -20,6 +20,7 @@ import models.{CheckMode, UserAnswers}
 import pages.manageAgents.AgentNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -30,7 +31,7 @@ object AgentNameSummary {
     answers.get(AgentNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "manageAgents.agentName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        value = ValueViewModel(Text(answer)),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
