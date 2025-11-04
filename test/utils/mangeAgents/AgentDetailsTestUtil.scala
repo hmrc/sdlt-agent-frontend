@@ -23,8 +23,6 @@ trait AgentDetailsTestUtil {
 
   lazy val agentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
   
-  val testStorn: String = "STN001"
-  
   val MAX_AGENTS = 25
 
   object AgentNamePageUtils {

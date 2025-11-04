@@ -96,7 +96,7 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
       summary.rows.head.value.content.asHtml.body must include ("Address 1")
       summary.rows.head.actions.get.items.size mustBe 2
       val hrefs = summary.rows.head.actions.get.items.map(_.href)
-      hrefs.exists(_.contains(routes.CheckYourAnswersController.onPageLoad().url.stripPrefix("/"))) mustBe true
+      hrefs.exists(_.contains(routes.CheckYourAnswersController.onPageLoad(Some(testAgentReferenceNumber)).url.stripPrefix("/"))) mustBe true
       hrefs.exists(_.contains(routes.RemoveAgentController.onPageLoad(testAgentReferenceNumber).url.stripPrefix("/"))) mustBe true
     }
     "return a SummaryList with 2 rows on page 3 when there are 22 items" in {

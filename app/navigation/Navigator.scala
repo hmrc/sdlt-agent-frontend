@@ -29,9 +29,9 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
-    case AgentAddressPage           => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
+    case AgentAddressPage              => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
     case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
-    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
     case AgentOverviewPage             => _ => controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
     case _                             => _ =>                          routes.IndexController.onPageLoad()
   }
@@ -40,8 +40,8 @@ class Navigator @Inject()() {
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
     case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
-    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
-    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad()
+    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
+    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

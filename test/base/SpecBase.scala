@@ -22,11 +22,12 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import pages.manageAgents.StornPage
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.test.FakeRequest
 
 trait SpecBase
@@ -37,6 +38,10 @@ trait SpecBase
     with ScalaFutures
     with IntegrationPatience {
 
+  val testArn = "ARN001"
+
+  val testStorn = "STN001"
+  
   val userAnswersId: String = "id"
 
   val stornData = Json.obj(
@@ -44,6 +49,32 @@ trait SpecBase
   )
   
   def emptyUserAnswers : UserAnswers = UserAnswers(userAnswersId, stornData)
+
+  val emptyUserAnswersWithStorn: UserAnswers = emptyUserAnswers.set(StornPage, testStorn).success.value
+
+  val testUserAnswers: JsObject = Json.obj(
+    "agentName" -> "John",
+    "agentAddress" -> "123 Road",
+    "agentContactDetails" -> Json.obj(
+      "contactTelephoneNumber" -> "07123456789",
+      "contactEmail" -> "john@example.com"
+    ),
+    "agentAddress" -> Json.obj(
+      "auditRef" -> "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
+      "address" -> Json.obj(
+        "lines" -> Json.arr(
+          "10 Downing Street",
+          "South Kensington",
+          "London",
+          "SW7 5JT"
+        )
+      )
+    )
+  )
+
+
+  val populatedUserAnswers: UserAnswers =
+    emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswers)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 

@@ -73,7 +73,7 @@ trait PaginationHelper {
             actions = Seq(
               ActionItemViewModel(
                 Text(messages("site.change")),
-                CheckYourAnswersController.onPageLoad().url
+                CheckYourAnswersController.onPageLoad(agentReferenceNumber = Some(agentDetails.agentReferenceNumber)).url
               )
                 .withVisuallyHiddenText(agentDetails.agentName),
               ActionItemViewModel(
