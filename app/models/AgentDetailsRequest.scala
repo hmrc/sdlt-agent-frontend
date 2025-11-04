@@ -20,14 +20,14 @@ import play.api.libs.json.{Json, OFormat}
 
 case class AgentDetailsRequest(
                                 agentName    : String,
-                                houseNumber  : String,
-                                addressLine1 : String,
+                                houseNumber  : String,          // TODO: this field should be removed - it's meant to be part of addressLine1
+                                addressLine1 : String,          // TODO: Confirm which address fields are optional
                                 addressLine2 : Option[String],
                                 addressLine3 : String,
                                 addressLine4 : Option[String],
                                 postcode     : Option[String],
                                 phone        : Option[String],
-                                email        : String
+                                email        : String           // TODO: Confirmed this email field should be optional
 ) {
 
   def getFirstLineOfAddress: String =
