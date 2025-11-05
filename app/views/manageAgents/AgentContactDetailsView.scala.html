@@ -15,14 +15,17 @@
  *@
 
 @import viewmodels.InputWidth._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukInput: GovukInput,
-        govukButton: GovukButton
-    )
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading
+
+)
 
     @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
@@ -34,9 +37,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-
-        <span class="govuk-caption-xl">@messages("manageAgents.agentContactDetails.caption")</span>
-        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading")</h1>
+        @hmrcPageHeading(PageHeading(
+            text           = messages("manageAgents.agentContactDetails.heading"),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-xl"),
+            section        = Some(messages("manageAgents.agentDetails.caption"))
+        ))
 
         @govukInput(
             InputViewModel(
