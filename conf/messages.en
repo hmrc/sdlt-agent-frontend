@@ -46,7 +46,7 @@ manageAgents.contactTelephoneNumber.change.hidden =
 manageAgents.contactEmail.checkYourAnswersLabel = Contact email
 manageAgents.contactEmail.change.hidden = 
 
-manageAgents.checkYourAnswers.title = Manage agents – Check your answers – Stamp Taxes Online – GOV.UK
+manageAgents.checkYourAnswers.title = Check your answers – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.checkYourAnswers.heading = Check your answers
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
@@ -63,8 +63,7 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
-manageAgents.agentContactDetails.title = Manage agents – What are the agent’s contact details? – Stamp Taxes Online – GOV.UK
-manageAgents.agentContactDetails.caption = Manage agents
+manageAgents.agentContactDetails.title = Agent’s contact details – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.agentContactDetails.heading = What are the agent’s contact details?
 manageAgents.agentContactDetails.question1 = What is the agent’s phone number?
 manageAgents.agentContactDetails.question2 = What is the agent’s email address?
@@ -81,18 +80,18 @@ manageAgents.agentName.error.length = Your input for Agent’s name contains too
 manageAgents.agentName.error.required = Please complete Agent’s name.
 manageAgents.agentName.warning = You cannot add this branch name as it already exists. Please check the details entered in the Maintain agent’s details list
 
-manageAgents.agentName.title = Manage agents – What is the agent’s name? – Stamp Taxes Online – GOV.UK
+manageAgents.agentName.title = What is the agent’s name? – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.agentName.heading = What is the agent’s name?
-manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
+manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds
 manageAgents.agentName.button = Continue
-manageAgents.removeAgent.title   = Manage agents – Delete agent – Stamp Taxes Online – GOV.UK
+manageAgents.removeAgent.title   = Are you sure you want to remove this agent? – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
 
 manageAgents.agentOverview.noAgents.info.text       = Any agents added can be linked to a purchaser within ‘About the purchaser’.
-manageAgents.agentOverview.nonZeroAgents.info.text  = The agents below can be linked to a purchaser within ‘About the purchaser’.
+manageAgents.agentOverview.nonZeroAgents.info.text  = You can link an agent to a purchaser within ‘About the purchaser’.
 manageAgents.agentOverview.noAgents.text            = You have no agents listed.
 manageAgents.agentOverview.remove.visuallyHidden    = Change {0}
-manageAgents.agentOverview.title                    = Manage agents – Agent details – Stamp Taxes Online – GOV.UK
+manageAgents.agentOverview.title                    = Agent overview – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.agentDetails.heading                   = Agent Overview
 manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
@@ -101,7 +100,7 @@ manageAgents.agentDetails.limitReached              = Currently you cannot add a
 manageAgents.unauthorised.org.title                 = Sorry, you’re unable to use this service
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
 
-manageAgents.addressLookup.header.title             = Manage agents – Enter the agent’s address – Stamp Taxes Online – GOV.UK
+manageAgents.addressLookup.header.title             = Find the agent’s address – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.addressLookup.select.heading           = Choose {0}’s address
 manageAgents.addressLookup.lookup.heading           = Find {0}’s address
 manageAgents.addressLookup.confirm.heading          = Review and confirm {0}’s address
