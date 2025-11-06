@@ -19,19 +19,28 @@ package forms.constraints
 import play.api.data.validation._
 
 object OptionalMaxLength {
-  def apply(max: Int, errorKey: String): Constraint[Option[String]] =
+  def apply(max: Int, errorKey: String, name: String): Constraint[Option[String]] =
     Constraint("constraints.maxLength") {
       case Some(value) if value.length > max =>
-        Invalid(ValidationError(errorKey, max))
+        Invalid(ValidationError(errorKey, max, name))
       case _ => Valid
     }
 }
 
 object OptionalEmailFormat {
-  def apply(errorKey: String): Constraint[Option[String]] =
+  def apply(errorKey: String, name: String): Constraint[Option[String]] =
     Constraint("constraints.email") {
       case Some(value) if !value.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$") =>
-        Invalid(ValidationError(errorKey))
+        Invalid(ValidationError(errorKey, name))
+      case _ => Valid
+    }
+}
+
+object OptionalPhoneFormat {
+  def apply(errorKey: String, name: String): Constraint[Option[String]] =
+    Constraint("constraints.phone") {
+      case Some(value) if !value.matches("[A-Za-z0-9 \\~\\!\\@\\%\\&\\'\\(\\)\\*\\+,\\-\\.\\/\\:\\=\\?\\[\\]\\^\\_\\{\\}\\;]*") =>
+        Invalid(ValidationError(errorKey, name))
       case _ => Valid
     }
 }
