@@ -74,7 +74,7 @@ manageAgents.agentContactDetails.error.phoneInvalid = Your entry for Agent’s t
 manageAgents.agentContactDetails.error.emailInvalid = The format for Agent’s email address is invalid. Please amend.
 manageAgents.agentContactDetails.error.emailLength = Your input for Agent’s email address contains too many characters. Please amend.
 
-manageAgents.caption = Manage Agents
+manageAgents.caption = Agent Details
 
 manageAgents.agentName.error.invalid = Your entry for Agent’s name contains an invalid character. Please amend.
 manageAgents.agentName.error.length = Your input for Agent’s name contains too many characters. Please amend.
@@ -83,7 +83,6 @@ manageAgents.agentName.warning = You cannot add this branch name as it already e
 
 manageAgents.agentName.title = Manage agents – What is the agent’s name? – Stamp Taxes Online – GOV.UK
 manageAgents.agentName.heading = What is the agent’s name?
-manageAgents.agentName.manageAgentsHeader = Manage agents
 manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds.
 manageAgents.agentName.button = Continue
 manageAgents.removeAgent.title   = Manage agents – Delete agent – Stamp Taxes Online – GOV.UK
@@ -94,8 +93,7 @@ manageAgents.agentOverview.nonZeroAgents.info.text  = The agents below can be li
 manageAgents.agentOverview.noAgents.text            = You have no agents listed.
 manageAgents.agentOverview.remove.visuallyHidden    = Change {0}
 manageAgents.agentOverview.title                    = Manage agents – Agent details – Stamp Taxes Online – GOV.UK
-manageAgents.agentDetails.heading                   = Agent details
-manageAgents.agentDetails.caption                   = Manage agents
+manageAgents.agentDetails.heading                   = Agent Overview
 manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
 manageAgents.agentDetails.limitReached              = Currently you cannot add any more agents as the limit of 25 agents has been reached. If you wish to add another agent you will have to delete one of your existing agents.

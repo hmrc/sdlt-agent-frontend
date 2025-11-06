@@ -45,8 +45,8 @@ class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOn
       val html = view(form, NormalMode)
       val doc = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("span.govuk-caption-xl").text() mustBe messages("manageAgents.agentContactDetails.caption")
-      doc.select("h1").text() mustBe messages("manageAgents.agentContactDetails.heading")
+      doc.select("govuk-caption-xl").text() mustBe messages("manageAgents.caption")
+      doc.select("govuk-heading-l").text() mustBe messages("manageAgents.agentContactDetails.heading")
     }
   }
 
