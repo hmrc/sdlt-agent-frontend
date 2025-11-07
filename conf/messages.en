@@ -87,6 +87,7 @@ manageAgents.agentName.tip = Include the branch name if there are multiple offic
 manageAgents.agentName.button = Continue
 manageAgents.removeAgent.title   = Are you sure you want to remove this agent? – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
+manageAgents.removeAgent.error.required = Confirm that you want to remove [Agent Name]
 
 manageAgents.agentOverview.noAgents.info.text       = Any agents added can be linked to a purchaser within ‘About the purchaser’.
 manageAgents.agentOverview.nonZeroAgents.info.text  = You can link an agent to a purchaser within ‘About the purchaser’.

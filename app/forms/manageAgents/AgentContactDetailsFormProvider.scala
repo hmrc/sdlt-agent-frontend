@@ -28,7 +28,8 @@ import javax.inject.Inject
 class AgentContactDetailsFormProvider @Inject() extends Mappings{
 
   private val phoneRegex = "^[A-Za-z0-9&'@/.\\-? ]+$"
-  private val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+  private val emailInvalidFormatRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+  private val emailInvalidRegex = "^[A-Za-z0-9&'@\\/.\\-? ]+$"
   private val maxAgentPhoneLength = 14
   private val maxAgentEmailLength = 36
 
@@ -40,7 +41,8 @@ class AgentContactDetailsFormProvider @Inject() extends Mappings{
           .verifying(regexp(phoneRegex, "manageAgents.agentContactDetails.error.phoneInvalid")),
         "email" -> text("manageAgents.agentContactDetails.error.emailRequired")
           .verifying(maxLength(maxAgentEmailLength, "manageAgents.agentContactDetails.error.emailLength"))
-          .verifying(regexp(emailRegex,"manageAgents.agentContactDetails.error.emailInvalidFormat"))
+          .verifying(regexp(emailInvalidFormatRegex,"manageAgents.agentContactDetails.error.emailInvalidFormat"))
+          .verifying(regexp(emailInvalidRegex,"manageAgents.agentContactDetails.error.emailInvalid")),
       )(AgentContactDetails.apply)(contactDetails => Some((contactDetails.phone, contactDetails.email)))
     )
 }
