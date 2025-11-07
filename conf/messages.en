@@ -97,7 +97,7 @@ manageAgents.agentOverview.title                    = Agent overview – Agent d
 manageAgents.agentDetails.heading                   = Agent Overview
 manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
-manageAgents.agentDetails.limitReached              = Currently you cannot add any more agents as the limit of 25 agents has been reached. If you wish to add another agent you will have to delete one of your existing agents.
+manageAgents.agentDetails.limitReached              = You have reached the limit of 25 agents. To add a new agent, you must delete one
 
 manageAgents.unauthorised.org.title                 = Sorry, you’re unable to use this service
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
