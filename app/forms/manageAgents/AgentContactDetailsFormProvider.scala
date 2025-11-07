@@ -19,20 +19,28 @@ package forms.manageAgents
 import forms.constraints.{OptionalEmailFormat, OptionalMaxLength}
 import models.manageAgents.AgentContactDetails
 import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text}
+import forms.mappings.Mappings
+import play.api.data.Forms.mapping
 import play.api.data.validation.Constraint
 
-class AgentContactDetailsFormProvider {
+import javax.inject.Inject
 
-  def apply(): Form[AgentContactDetails] = {
+class AgentContactDetailsFormProvider @Inject() extends Mappings{
+
+  private val phoneRegex = "^[A-Za-z0-9&'@/.\\-? ]+$"
+  private val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+  private val maxAgentPhoneLength = 14
+  private val maxAgentEmailLength = 36
+
+  def apply(): Form[AgentContactDetails] =
     Form(
       mapping(
-        "phone" -> optional(text)
-          .verifying(OptionalMaxLength(14, "manageAgents.agentContactDetails.error.phoneLength")),
-        "email" -> optional(text)
-          .verifying(OptionalMaxLength(36, "manageAgents.agentContactDetails.error.emailLength"))
-          .verifying(OptionalEmailFormat("manageAgents.agentContactDetails.error.emailInvalid"))
+        "phone" -> text("manageAgents.agentContactDetails.error.phoneRequired")
+          .verifying(maxLength(maxAgentPhoneLength, "manageAgents.agentContactDetails.error.phoneLength"))
+          .verifying(regexp(phoneRegex, "manageAgents.agentContactDetails.error.phoneInvalid")),
+        "email" -> text("manageAgents.agentContactDetails.error.emailRequired")
+          .verifying(maxLength(maxAgentEmailLength, "manageAgents.agentContactDetails.error.emailLength"))
+          .verifying(regexp(emailRegex,"manageAgents.agentContactDetails.error.emailInvalidFormat"))
       )(AgentContactDetails.apply)(contactDetails => Some((contactDetails.phone, contactDetails.email)))
     )
-  }
 }

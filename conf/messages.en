@@ -68,16 +68,17 @@ manageAgents.agentContactDetails.heading = What are the agent’s contact detail
 manageAgents.agentContactDetails.question1 = What is the agent’s phone number?
 manageAgents.agentContactDetails.question2 = What is the agent’s email address?
 manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
-manageAgents.agentContactDetails.error.phoneLength = Your input for Agent’s telephone number contains too many characters. Please amend.
-manageAgents.agentContactDetails.error.phoneInvalid = Your entry for Agent’s telephone number contains an invalid character. Please amend.
-manageAgents.agentContactDetails.error.emailInvalid = The format for Agent’s email address is invalid. Please amend.
-manageAgents.agentContactDetails.error.emailLength = Your input for Agent’s email address contains too many characters. Please amend.
+manageAgents.agentContactDetails.error.phoneRequired = Enter [Agent Name]’s phone number
+manageAgents.agentContactDetails.error.phoneLength = [Agent Name]’s phone number must be 14 characters or less
+manageAgents.agentContactDetails.error.phoneInvalid = [Agent Name]’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
+manageAgents.agentContactDetails.error.emailRequired = Enter [Agent Name]’s email address
+manageAgents.agentContactDetails.error.emailInvalid = Enter [Agent Name]’s email address in the correct format, like name@example.com
+manageAgents.agentContactDetails.error.emailInvalidFormat = Enter [Agent Name]’s email address in the correct format, like name@example.com
+manageAgents.agentContactDetails.error.emailLength = [Agent Name]’s email address must be 36 characters or less
 
-manageAgents.caption = Agent Details
-
-manageAgents.agentName.error.invalid = Your entry for Agent’s name contains an invalid character. Please amend.
-manageAgents.agentName.error.length = Your input for Agent’s name contains too many characters. Please amend.
-manageAgents.agentName.error.required = Please complete Agent’s name.
+manageAgents.agentName.error.invalid = The agent’s name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
+manageAgents.agentName.error.length = The agent’s name must be 28 characters or less
+manageAgents.agentName.error.required = Enter the agent’s name
 manageAgents.agentName.warning = You cannot add this branch name as it already exists. Please check the details entered in the Maintain agent’s details list
 
 manageAgents.agentName.title = What is the agent’s name? – Agent details – Stamp Taxes Online – GOV.UK
