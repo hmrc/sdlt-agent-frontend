@@ -64,17 +64,17 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details – Stamp Taxes Online – GOV.UK
-manageAgents.agentContactDetails.heading = What are the agent’s contact details?
-manageAgents.agentContactDetails.question1 = What is the agent’s phone number?
-manageAgents.agentContactDetails.question2 = What is the agent’s email address?
+manageAgents.agentContactDetails.heading = What are {0}’s contact details?
+manageAgents.agentContactDetails.question1 = What is {0}’s phone number?
+manageAgents.agentContactDetails.question2 = What is {0}’s email address?
 manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
-manageAgents.agentContactDetails.error.phoneRequired = Enter [Agent Name]’s phone number
-manageAgents.agentContactDetails.error.phoneLength = [Agent Name]’s phone number must be 14 characters or less
-manageAgents.agentContactDetails.error.phoneInvalid = [Agent Name]’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
-manageAgents.agentContactDetails.error.emailRequired = Enter [Agent Name]’s email address
-manageAgents.agentContactDetails.error.emailInvalid = Enter [Agent Name]’s email address in the correct format, like name@example.com
-manageAgents.agentContactDetails.error.emailInvalidFormat = Enter [Agent Name]’s email address in the correct format, like name@example.com
-manageAgents.agentContactDetails.error.emailLength = [Agent Name]’s email address must be 36 characters or less
+manageAgents.agentContactDetails.error.phoneRequired = Enter {0}’s phone number
+manageAgents.agentContactDetails.error.phoneLength = {0}’s phone number must be 14 characters or less
+manageAgents.agentContactDetails.error.phoneInvalid = {0}’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
+manageAgents.agentContactDetails.error.emailRequired = Enter {0}’s email address
+manageAgents.agentContactDetails.error.emailInvalid = Enter {0}’s email address in the correct format, like name@example.com
+manageAgents.agentContactDetails.error.emailInvalidFormat = Enter {0}’s email address in the correct format, like name@example.com
+manageAgents.agentContactDetails.error.emailLength = {0}’s email address must be 36 characters or less
 
 manageAgents.agentName.error.invalid = The agent’s name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
 manageAgents.agentName.error.length = The agent’s name must be 28 characters or less
@@ -87,7 +87,7 @@ manageAgents.agentName.tip = Include the branch name if there are multiple offic
 manageAgents.agentName.button = Continue
 manageAgents.removeAgent.title   = Are you sure you want to remove this agent? – Agent details – Stamp Taxes Online – GOV.UK
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
-manageAgents.removeAgent.error.required = Confirm that you want to remove [Agent Name]
+manageAgents.removeAgent.error.required = Confirm that you want to remove {0}
 
 manageAgents.agentOverview.noAgents.info.text       = Any agents added can be linked to a purchaser within ‘About the purchaser’.
 manageAgents.agentOverview.nonZeroAgents.info.text  = You can link an agent to a purchaser within ‘About the purchaser’.

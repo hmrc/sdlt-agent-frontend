@@ -27,19 +27,19 @@
 
 )
 
-    @(form: Form[_], mode: Mode, postAction: Call,
-            agentDetails: AgentDetailsResponse)(implicit request: Request[_], messages: Messages)
+    @(form: Form[_], mode: Mode,
+            agentName: String)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = title(form, messages("manageAgents.agentContactDetails.title"))) {
 
-    @formHelper(action = postAction, Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.agentContactDetails.heading", agentDetails.agentName),
+            text           = messages("manageAgents.agentContactDetails.heading", agentName),
             headingClasses = Some("govuk-heading-l"),
             captionClasses = Some("govuk-caption-xl"),
             section        = Some(messages("manageAgents.caption"))
@@ -48,7 +48,7 @@
         @govukInput(
             InputViewModel(
                 field = form("phone"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentDetails.agentName))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentName))
         )
     .withWidth(Full)
         )
@@ -56,7 +56,7 @@
         @govukInput(
             InputViewModel(
                 field = form("email"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentDetails.agentName))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentName))
 
         )
     .withWidth(Full)
