@@ -24,11 +24,12 @@
         govukButton: GovukButton
     )
 
-    @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+    @(form: Form[_], mode: Mode, postAction: Call,
+            agentDetails: AgentDetailsResponse)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = title(form, messages("manageAgents.agentContactDetails.title"))) {
 
-    @formHelper(action = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = postAction, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -36,12 +37,12 @@
 
 
         <span class="govuk-caption-xl">@messages("manageAgents.agentContactDetails.caption")</span>
-        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading", agentDetails.agentName)</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("phone"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1"))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentDetails.agentName))
         )
     .withWidth(Full)
         )
@@ -49,7 +50,7 @@
         @govukInput(
             InputViewModel(
                 field = form("email"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2"))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentDetails.agentName))
 
         )
     .withWidth(Full)

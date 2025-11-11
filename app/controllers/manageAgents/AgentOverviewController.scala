@@ -43,7 +43,7 @@ class AgentOverviewController @Inject()(
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         stornRequiredAction: StornRequiredAction,
-                                        navigator: Navigator,
+                                                navigator: Navigator,
                                         view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 

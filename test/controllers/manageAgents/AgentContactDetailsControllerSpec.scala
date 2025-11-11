@@ -28,25 +28,38 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import views.html.manageAgents.AgentContactDetailsView
+import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
+class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
 
   def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-your-answers")
 
+  private val agentReferenceNumber: String = "ARN001"
   val formProvider = new AgentContactDetailsFormProvider()
-  val form = formProvider()
+  val form = formProvider(testAgentDetails)
+  val postAction: Call = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(NormalMode, agentReferenceNumber)
+  val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
+  lazy val AgentContactDetailsRoute: String = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode, agentReferenceNumber).url
 
 
   "AgentContactDetails Controller" - {
 
     "must return OK and the correct view for a GET request" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request = FakeRequest(GET, AgentContactDetailsRoute)
@@ -56,7 +69,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, postAction, testAgentDetails)(request, messages(application)).toString
       }
     }
 
@@ -69,10 +82,14 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
+            bind[StampDutyLandTaxService].toInstance(service),
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
           )
           .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request =
@@ -88,7 +105,13 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[StampDutyLandTaxService].toInstance(service)
+        ).build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request =
@@ -102,11 +125,11 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, postAction, testAgentDetails)(request, messages(application)).toString
       }
     }
 
-    "must redirect to Check your answers for a POST if no data is found on AgentContactDetails page" in {
+    "must navigate to Check your answers for a POST if no data is found on AgentContactDetails page" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -132,13 +155,129 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
+
+      running(application) {
+        val request = FakeRequest(GET, AgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
-      val application = applicationBuilder(userAnswers = None).build()
+      val application =
+        applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
         val request = FakeRequest(POST, AgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("phone", ""))
-          .withFormUrlEncodedBody(("email", ""))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a GET when agent details are not found" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(GET, AgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a POST when agent details are not found" in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(POST, AgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a GET when StampDutyLandTaxService fails unexpectedly " in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("Error")))
+
+      running(application) {
+        val request = FakeRequest(GET, AgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the Journey Recovery page for a POST when StampDutyLandTaxService fails unexpectedly " in {
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("Error")))
+
+      running(application) {
+        val request = FakeRequest(POST, AgentContactDetailsRoute)
 
         val result = route(application, request).value
 

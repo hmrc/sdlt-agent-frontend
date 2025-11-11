@@ -34,7 +34,7 @@ object ContactEmailSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode, "").url
           )
             .withVisuallyHiddenText(messages(s"manageAgents.contactEmail.change.hidden"))
             .withAttribute("id" -> "change-agent-contact-details")

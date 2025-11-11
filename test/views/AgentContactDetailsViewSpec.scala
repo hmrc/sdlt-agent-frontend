@@ -18,51 +18,66 @@ package views
 
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import services.StampDutyLandTaxService
 import views.html.manageAgents.AgentContactDetailsView
+import utils.mangeAgents.AgentDetailsTestUtil
 
-class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+import scala.concurrent.Future
 
-  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
+class AgentContactDetailsViewSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with AgentDetailsTestUtil {
+
+  lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode, "").url
 
   trait Setup {
+    private val agentReferenceNumber: String = "ARN001"
     val formProvider = new AgentContactDetailsFormProvider()
-    val form: Form[?] = formProvider()
+    val form: Form[?] = formProvider(testAgentDetails)
+    val postAction = controllers.manageAgents.routes.AgentContactDetailsController.onSubmit(NormalMode, agentReferenceNumber)
+    val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
     implicit val request: Request[?] = FakeRequest()
     implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
 
     val view: AgentContactDetailsView = app.injector.instanceOf[AgentContactDetailsView]
+
+
+    when(service.getAgentDetails(any(), any())(any()))
+      .thenReturn(Future.successful(Some(testAgentDetails)))
   }
 
   "AgentContactDetailsView" should {
     "render the page with title and heading" in new Setup {
-      val html = view(form, NormalMode)
+      val html = view(form, NormalMode, postAction, testAgentDetails)
       val doc = org.jsoup.Jsoup.parse(html.toString())
 
-      doc.select("span.govuk-caption-xl").text() mustBe messages("manageAgents.agentContactDetails.caption")
-      doc.select("h1").text() mustBe messages("manageAgents.agentContactDetails.heading")
+      doc.select("span.govuk-caption-xl").text() mustBe messages("manageAgents.agentContactDetails.caption", testAgentDetails.agentName)
+      doc.select("h1").text() mustBe messages("manageAgents.agentContactDetails.heading", testAgentDetails.agentName)
     }
   }
 
   "display error messages when form has errors" in new Setup {
     val errorForm = form
-      .withError("phone", "manageAgents.agentContactDetails.error.phoneLength")
-      .withError("email", "manageAgents.agentContactDetails.error.emailLength")
-      .withError("email", "manageAgents.agentContactDetails.error.emailInvalid")
+      .withError("phone", "manageAgents.agentContactDetails.error.phoneLength", testAgentDetails.agentName)
+      .withError("email", "manageAgents.agentContactDetails.error.emailLength", testAgentDetails.agentName)
+      .withError("email", "manageAgents.agentContactDetails.error.emailInvalid", testAgentDetails.agentName)
 
-    val html = view(errorForm, NormalMode)
+    val html = view(errorForm, NormalMode, postAction, testAgentDetails)
     val doc = org.jsoup.Jsoup.parse(html.toString())
     val errorSummaryText = doc.select(".govuk-error-summary").text()
 
-    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.phoneLength"))
-    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.emailLength"))
-    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.emailInvalid"))
+    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.phoneLength", testAgentDetails.agentName))
+    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.emailLength", testAgentDetails.agentName))
+    errorSummaryText must include(messages("manageAgents.agentContactDetails.error.emailInvalid", testAgentDetails.agentName))
   }
 }
 

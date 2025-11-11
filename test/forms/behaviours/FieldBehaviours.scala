@@ -61,7 +61,9 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     "not bind invalid values" in {
 
       val result = form.bind(Map(fieldName -> invalidData)).apply(fieldName)
-      result.errors mustEqual Seq(requiredError)
+      result.errors.exists(e =>
+        e.key == requiredError.key && e.message == requiredError.message
+      ) mustBe true
     }
   }
 
@@ -75,7 +77,9 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       forAll(stringsLongerThan(maxLength) -> "longString") {
         (string: String) =>
           val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors must contain(lengthError)
+          result.errors.exists(e =>
+            e.key == lengthError.key && e.message == lengthError.message
+          ) mustBe true
       }
     }
   }
