@@ -35,7 +35,7 @@ index.title = sdlt-agent-frontend
 index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
-manageAgents.caption = Manage agents
+manageAgents.caption = Agent Details
 
 manageAgents.agentName.checkYourAnswersLabel = Agent name
 manageAgents.agentName.change.hidden = 
