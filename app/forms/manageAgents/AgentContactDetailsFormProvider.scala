@@ -20,6 +20,7 @@ import forms.constraints.{OptionalEmailFormat, OptionalMaxLength}
 import models.manageAgents.AgentContactDetails
 import play.api.data.Form
 import forms.mappings.Mappings
+import models.AgentDetailsResponse
 import play.api.data.Forms.mapping
 import play.api.data.validation.Constraint
 
@@ -33,7 +34,7 @@ class AgentContactDetailsFormProvider @Inject() extends Mappings{
   private val maxAgentPhoneLength = 14
   private val maxAgentEmailLength = 36
 
-  def apply(): Form[AgentContactDetails] =
+  def apply(agentDetailsResponse: AgentDetailsResponse): Form[AgentContactDetails] =
     Form(
       mapping(
         "phone" -> text("manageAgents.agentContactDetails.error.phoneRequired")
