@@ -26,9 +26,10 @@ import play.api.i18n.Messages
 
 import javax.inject.Inject
 
-class AgentContactDetailsFormProvider @Inject() () extends Mappings {
+class AgentContactDetailsFormProvider @Inject() extends Mappings {
 
-  private val phoneRegex = "^[A-Za-z0-9&'@/.\\-? ]+$"
+  private val phoneInvalidRegex = "^[0-9+\\-\\s()]+$"
+  private val phoneInvalidFormatRegex = "^(?:\\+44\\s?\\d{4}|\\(?0\\d{3,4}\\)?)\\s?\\d{3}\\s?\\d{3,4}$"
   private val emailInvalidFormatRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
   private val emailInvalidRegex = "^[A-Za-z0-9&'@\\/.\\-? ]+$"
   private val maxAgentPhoneLength = 14
@@ -40,7 +41,8 @@ class AgentContactDetailsFormProvider @Inject() () extends Mappings {
       mapping(
         "phone" -> text("manageAgents.agentContactDetails.error.phoneRequired", Seq(agentName))
           .verifying(maxLength(maxAgentPhoneLength, messages("manageAgents.agentContactDetails.error.phoneLength", agentName)))
-          .verifying(regexp(phoneRegex, messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName))),
+          .verifying(regexp(phoneInvalidRegex, messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)))
+          .verifying(regexp(phoneInvalidFormatRegex, "manageAgents.agentContactDetails.error.phoneInvalidFormat")),
 
         "email" -> text("manageAgents.agentContactDetails.error.emailRequired", Seq(agentName))
           .verifying(maxLength(maxAgentEmailLength, messages("manageAgents.agentContactDetails.error.emailLength", agentName)))

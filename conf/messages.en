@@ -71,8 +71,9 @@ manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
 manageAgents.agentContactDetails.error.phoneRequired = Enter {0}’s phone number
 manageAgents.agentContactDetails.error.phoneLength = {0}’s phone number must be 14 characters or less
 manageAgents.agentContactDetails.error.phoneInvalid = {0}’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
+manageAgents.agentContactDetails.error.phoneInvalidFormat = Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192 
 manageAgents.agentContactDetails.error.emailRequired = Enter {0}’s email address
-manageAgents.agentContactDetails.error.emailInvalid = Enter {0}’s email address in the correct format, like name@example.com
+manageAgents.agentContactDetails.error.emailInvalid = {0}’s email address must only include letters a to z without accents, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
 manageAgents.agentContactDetails.error.emailInvalidFormat = Enter {0}’s email address in the correct format, like name@example.com
 manageAgents.agentContactDetails.error.emailLength = {0}’s email address must be 36 characters or less
 

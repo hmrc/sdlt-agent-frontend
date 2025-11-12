@@ -21,7 +21,7 @@ import play.api.data.FormError
 
 class AgentContactDetailsFormProviderSpec extends StringFieldBehaviours {
 
-  val form = new AgentContactDetailsFormProvider()()
+  val form = new AgentContactDetailsFormProvider
 
   ".phone" - {
 

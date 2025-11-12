@@ -23,6 +23,8 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.i18n
+import play.api.i18n.I18nSupport
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -32,7 +34,7 @@ import views.html.manageAgents.AgentContactDetailsView
 
 import scala.concurrent.Future
 
-class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
+class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport{
 
 
   def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
