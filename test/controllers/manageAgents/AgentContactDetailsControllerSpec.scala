@@ -38,7 +38,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
 
   val formProvider = new AgentContactDetailsFormProvider()
-  val form = formProvider()
+  val form = formProvider("AgentName")
 
   lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
 

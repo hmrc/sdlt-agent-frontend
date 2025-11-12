@@ -50,16 +50,19 @@ class RemoveAgentController @Inject()(
 
   // TODO: Tidy up logic on this page
   
-  val form: Form[RemoveAgent] = formProvider()
+  
 
   val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
 
   def onPageLoad(agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
-      
+
       stampDutyLandTaxService
         .getAgentDetails(request.storn, agentReferenceNumber) map {
-          case Some(agentDetails) => Ok(view(form, postAction(agentReferenceNumber), agentDetails))
+          case Some(agentDetails) => {
+            val form: Form[RemoveAgent] = formProvider(agentDetails)
+            Ok(view(form, postAction(agentReferenceNumber), agentDetails))
+          }
           case None               =>
             logger.error(s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
             Redirect(JourneyRecoveryController.onPageLoad())
@@ -74,6 +77,7 @@ class RemoveAgentController @Inject()(
     implicit request =>
       stampDutyLandTaxService.getAgentDetails(request.storn, agentReferenceNumber) flatMap {
         case Some(agentDetails) =>
+          val form: Form[RemoveAgent] = formProvider(agentDetails)
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
