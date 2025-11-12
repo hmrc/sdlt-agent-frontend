@@ -28,26 +28,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
 )(implicit ec: ExecutionContext) {
-
-  // TODO: TO BE REMOVED - DO NOT USE
-  @deprecated
-  def getAgentDetailsLegacy(storn: String, agentReferenceNumber: String)
-                           (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
-    stampDutyLandTaxConnector
-      .getAgentDetails(storn, agentReferenceNumber)
-
+  
   def getAgentDetails(storn: String, agentReferenceNumber: String)
                      (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents.find(_.agentReferenceNumber == agentReferenceNumber))
-
-  // TODO: TO BE REMOVED - DO NOT USE
-  @deprecated
-  def getAllAgentDetailsLegacy(storn: String)
-                              (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
-    stampDutyLandTaxConnector
-      .getAllAgentDetailsLegacy(storn)
 
   def getAllAgentDetails(storn: String)
                         (implicit headerCarrier: HeaderCarrier): Future[Seq[AgentDetailsResponse]] =
@@ -70,4 +56,18 @@ class StampDutyLandTaxService @Inject() (
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents.exists(_.agentName == name))
+
+  // TODO: TO BE REMOVED - DO NOT USE
+  @deprecated
+  def getAgentDetailsLegacy(storn: String, agentReferenceNumber: String)
+                           (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
+    stampDutyLandTaxConnector
+      .getAgentDetails(storn, agentReferenceNumber)
+
+  // TODO: TO BE REMOVED - DO NOT USE
+  @deprecated
+  def getAllAgentDetailsLegacy(storn: String)
+                              (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
+    stampDutyLandTaxConnector
+      .getAllAgentDetailsLegacy(storn)
 }
