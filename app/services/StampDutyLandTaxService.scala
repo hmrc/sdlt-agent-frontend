@@ -19,7 +19,6 @@ package services
 import connectors.StampDutyLandTaxConnector
 import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -30,13 +29,20 @@ class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
 )(implicit ec: ExecutionContext) {
 
-  // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
-  
-  def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
+  // TODO: TO BE REMOVED - DO NOT USE
+  @deprecated
+  def getAgentDetailsLegacy(storn: String, agentReferenceNumber: String)
+                           (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAgentDetails(storn, agentReferenceNumber)
 
+  def getAgentDetails(storn: String, agentReferenceNumber: String)
+                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
+    stampDutyLandTaxConnector
+      .getSdltOrganisation(storn)
+      .map(_.agents.find(_.agentReferenceNumber == agentReferenceNumber))
+
+  // TODO: TO BE REMOVED - DO NOT USE
   @deprecated
   def getAllAgentDetailsLegacy(storn: String)
                               (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
@@ -61,7 +67,7 @@ class StampDutyLandTaxService @Inject() (
       
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
-    getAllAgentDetailsLegacy(storn).map { res =>
-      res.exists(agent => agent.agentName == name )
-    }
+    stampDutyLandTaxConnector
+      .getSdltOrganisation(storn)
+      .map(_.agents.exists(_.agentName == name))
 }

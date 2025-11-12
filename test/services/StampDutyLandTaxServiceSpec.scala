@@ -65,7 +65,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       when(connector.getAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
-      val result = service.getAgentDetails(sorn, agentReferenceNumber).futureValue
+      val result = service.getAgentDetailsLegacy(sorn, agentReferenceNumber).futureValue
       result mustBe payload
 
       verify(connector).getAgentDetails(eqTo(sorn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
@@ -80,7 +80,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
-        service.getAgentDetails(sorn, agentReferenceNumber).futureValue
+        service.getAgentDetailsLegacy(sorn, agentReferenceNumber).futureValue
       }
 
       ex.getMessage must include("boom")

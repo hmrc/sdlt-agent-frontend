@@ -96,7 +96,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(application) {
@@ -106,7 +106,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(service, times(1)).getAgentDetails(any(), any())(any())
+        verify(service, times(1)).getAgentDetailsLegacy(any(), any())(any())
       }
     }
 
@@ -118,7 +118,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {
@@ -151,7 +151,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentResponse)))
 
       running(application) {
@@ -186,7 +186,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         status(result) mustEqual OK
 
-        verify(service, times(0)).getAgentDetails(any(), any())(any())
+        verify(service, times(0)).getAgentDetailsLegacy(any(), any())(any())
 
         body must include("John")
       }

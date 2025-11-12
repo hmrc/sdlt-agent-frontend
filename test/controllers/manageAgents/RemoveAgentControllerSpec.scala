@@ -64,7 +64,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
@@ -88,7 +88,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(application) {
@@ -110,7 +110,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {
@@ -132,7 +132,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(application) {
@@ -154,7 +154,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {
@@ -182,7 +182,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       when(service.removeAgentDetails(any(), any())(any()))
@@ -209,7 +209,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
@@ -237,7 +237,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           )
           .build()
 
-      when(service.getAgentDetails(any(), any())(any()))
+      when(service.getAgentDetailsLegacy(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       running(application) {
@@ -259,7 +259,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           FakeRequest(POST, removeAgentRequestRoute)
             .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
 
-        when(service.getAgentDetails(any(), any())(any()))
+        when(service.getAgentDetailsLegacy(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentDetails)))
 
         val result = route(application, request).value
@@ -283,7 +283,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
           FakeRequest(POST, removeAgentRequestRoute)
             .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
 
-        when(service.getAgentDetails(any(), any())(any()))
+        when(service.getAgentDetailsLegacy(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentDetails)))
 
         when(service.removeAgentDetails(any(), any())(any()))

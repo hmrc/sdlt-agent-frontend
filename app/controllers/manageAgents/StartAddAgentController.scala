@@ -51,7 +51,7 @@ class StartAddAgentController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     stampDutyLandTaxService
-      .getAllAgentDetailsLegacy(request.storn)
+      .getAllAgentDetails(request.storn)
       .flatMap {
         case agents if agents.size >= MAX_AGENTS =>
           Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
