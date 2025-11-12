@@ -23,8 +23,6 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, Pagina
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, FluentKey, FluentValue, KeyViewModel, SummaryListRowViewModel, SummaryListViewModel, ValueViewModel}
 import controllers.manageAgents.routes.*
-import models.requests.DataRequest
-import org.apache.pekko.actor.typed.delivery.internal.ProducerControllerImpl.Request
 
 trait PaginationHelper {
 
@@ -46,7 +44,7 @@ trait PaginationHelper {
     }
   }
 
-  def getNumberOfPages[A](itemList: List[A]): Int =
+  def getNumberOfPages[A](itemList: Seq[A]): Int =
     itemList
       .grouped(ROWS_ON_PAGE)
       .size

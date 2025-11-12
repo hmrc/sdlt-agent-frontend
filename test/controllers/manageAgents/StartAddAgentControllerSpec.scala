@@ -41,7 +41,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(getAgentList(MAX_AGENTS - 1)))
 
       running(application) {
@@ -60,7 +60,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(getAgentList(MAX_AGENTS)))
 
       running(application) {
@@ -94,7 +94,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {

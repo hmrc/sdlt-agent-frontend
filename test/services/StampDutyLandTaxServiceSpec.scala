@@ -151,24 +151,24 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         )
       )
 
-      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
-      val result = service.getAllAgentDetails(sorn).futureValue
+      val result = service.getAllAgentDetailsLegacy(sorn).futureValue
       result mustBe payload
 
-      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verify(connector).getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
     "propagate failures from the connector" in {
 
       val (service, connector) = newService()
 
-      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
-        service.getAllAgentDetails(sorn).futureValue
+        service.getAllAgentDetailsLegacy(sorn).futureValue
       }
 
       ex.getMessage must include("boom")
@@ -250,14 +250,14 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         )
       )
 
-      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
       val result = service.isDuplicate(sorn, "Harborview Estates").futureValue
 
       result mustBe true
 
-      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verify(connector).getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
 
@@ -279,14 +279,14 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         )
       )
 
-      when(connector.getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier]))
+      when(connector.getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
       val result = service.isDuplicate(sorn, "Nonexistent Agent").futureValue
 
       result mustBe false
 
-      verify(connector).getAllAgentDetails(eqTo(sorn))(any[HeaderCarrier])
+      verify(connector).getAllAgentDetailsLegacy(eqTo(sorn))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
   }

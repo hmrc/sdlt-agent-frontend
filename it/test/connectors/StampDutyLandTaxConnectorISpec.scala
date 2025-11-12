@@ -179,7 +179,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
         )
       )
 
-      val result = connector.getAllAgentDetails(storn).futureValue
+      val result = connector.getAllAgentDetailsLegacy(storn).futureValue
 
       result mustBe expected
     }
@@ -195,7 +195,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAllAgentDetails(storn).futureValue
+        connector.getAllAgentDetailsLegacy(storn).futureValue
       }
       ex.getMessage.toLowerCase must include("storn")
     }
@@ -211,7 +211,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.getAllAgentDetails(storn).futureValue
+        connector.getAllAgentDetailsLegacy(storn).futureValue
       }
       ex.getMessage must include("returned 500")
     }

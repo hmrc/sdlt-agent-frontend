@@ -49,7 +49,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(Nil))
 
       running(application) {
@@ -75,7 +75,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(agents22))
 
       running(application) {
@@ -103,7 +103,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(agents22))
 
       running(application) {
@@ -121,7 +121,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.successful(agents22))
 
       running(application) {
@@ -139,7 +139,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
-      when(service.getAllAgentDetails(any())(any()))
+      when(service.getAllAgentDetailsLegacy(any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {

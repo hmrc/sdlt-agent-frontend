@@ -17,8 +17,9 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsResponse, AgentDetailsRequest}
+import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
+import models.responses.organisation.SdltOrganisation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -35,11 +36,18 @@ class StampDutyLandTaxService @Inject() (
                      (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAgentDetails(storn, agentReferenceNumber)
-    
-  def getAllAgentDetails(storn: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
+
+  @deprecated
+  def getAllAgentDetailsLegacy(storn: String)
+                              (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
-      .getAllAgentDetails(storn)
+      .getAllAgentDetailsLegacy(storn)
+
+  def getAllAgentDetails(storn: String)
+                        (implicit headerCarrier: HeaderCarrier): Future[Seq[AgentDetailsResponse]] =
+    stampDutyLandTaxConnector
+      .getSdltOrganisation(storn)
+      .map(_.agents)
     
   def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
@@ -53,7 +61,7 @@ class StampDutyLandTaxService @Inject() (
       
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
-    getAllAgentDetails(storn).map { res =>
+    getAllAgentDetailsLegacy(storn).map { res =>
       res.exists(agent => agent.agentName == name )
     }
 }
