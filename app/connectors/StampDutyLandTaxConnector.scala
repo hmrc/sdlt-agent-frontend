@@ -44,7 +44,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents?storn=$storn"
 
   private val getSdltOrganisationUrl: String => URL = storn =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents?storn=$storn"
+    url"$base/stamp-duty-land-tax/manage-agents/get-sdlt-organisation?storn=$storn"
 
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
