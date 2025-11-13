@@ -17,12 +17,10 @@
 package forms.manageAgents
 
 import forms.behaviours.{OptionFieldBehaviours, StringFieldBehaviours}
-import models.AgentDetailsResponse
 import models.manageAgents.RemoveAgent
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.test.FakeRequest
 import utils.mangeAgents.AgentDetailsTestUtil
 
 class RemoveAgentFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {

@@ -18,7 +18,7 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.AgentNamePage
 import models.NormalMode
 import models.manageAgents.AgentContactDetails
 import navigation.{FakeNavigator, Navigator}
@@ -48,7 +48,6 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with 
   lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
 
   private val agentName = "null"
-  private val validData = AgentContactDetails("07700900982", "test@gov.uk")
   private val form = formProvider(agentName)(messages)
 
   "AgentContactDetails Controller" - {

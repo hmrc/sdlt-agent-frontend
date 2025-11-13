@@ -74,7 +74,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       result.map(_.addressLine1) mustBe Some("Baker Street")
       result.map(_.addressLine3) mustBe Some("Manchester")
       result.flatMap(_.postcode) mustBe Some("M1 2AB")
-      result.flatMap(_.phone   ) mustBe Some("01611234567")
+      result.map(_.phone   ) mustBe Some("01611234567")
       result.map(_.email       ) mustBe Some("contact@sunriserealty.co.uk")
     }
 
@@ -162,7 +162,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           addressLine3 = "London",
           addressLine4 = Some("Greater London"),
           postcode = Some("SW1A 2AA"),
-          phone = Some("02079460000"),
+          phone = "02079460000",
           email = "info@acmeagents.co.uk"
         ),
         AgentDetailsResponse(
@@ -174,7 +174,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           addressLine3 = "Birmingham",
           addressLine4 = None,
           postcode = Some("B2 4ND"),
-          phone = Some("01214567890"),
+          phone = "01214567890",
           email = "info@harborviewestates.co.uk"
         )
       )
@@ -229,7 +229,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       addressLine3 = "London",
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = Some("02079460000"),
+      phone = "02079460000",
       email = "info@acmeagents.co.uk"
     )
 
