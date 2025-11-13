@@ -18,7 +18,7 @@ package connectors
 
 import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisation
+import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -55,10 +55,10 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
 
   def getSdltOrganisation(storn: String)
-                         (implicit hc: HeaderCarrier): Future[SdltOrganisation] =
+                         (implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =
     http
       .get(getSdltOrganisationUrl(storn))
-      .execute[SdltOrganisation]
+      .execute[SdltOrganisationResponse]
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}")

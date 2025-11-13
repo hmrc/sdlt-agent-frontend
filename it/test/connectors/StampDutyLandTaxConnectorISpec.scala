@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get,
 import itutil.ApplicationWithWiremock
 import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisation
+import models.responses.organisation.SdltOrganisationResponse
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -90,7 +90,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
       
       val expected =
-        SdltOrganisation(
+        SdltOrganisationResponse(
           storn = "STN001",
           version = 1,
           isReturnUser = "Y",

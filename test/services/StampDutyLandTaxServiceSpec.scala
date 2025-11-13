@@ -19,7 +19,7 @@ package services
 import connectors.StampDutyLandTaxConnector
 import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisation
+import models.responses.organisation.SdltOrganisationResponse
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -45,8 +45,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   
   val agentReferenceNumber = "ARN001"
 
-  val payload: SdltOrganisation =
-    SdltOrganisation(
+  val payload: SdltOrganisationResponse =
+    SdltOrganisationResponse(
       storn = "STN001",
       version = 1,
       isReturnUser = "Y",
