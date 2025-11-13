@@ -17,15 +17,12 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.UserAnswers
-import models.manageAgents.AgentContactDetails
-import models.responses.addresslookup.{Address, JourneyResultAddressModel}
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import models.{AgentDetailsRequest, NormalMode, UserAnswers}
+import navigation.Navigator
+import pages.manageAgents.*
 import play.api.Logging
-
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,6 +31,7 @@ import viewmodels.govuk.summarylist.*
 import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -43,6 +41,7 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
+                                            navigator: Navigator,
                                             sessionRepository: SessionRepository,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
                                             val controllerComponents: MessagesControllerComponents,
@@ -53,8 +52,7 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
-      // TODO: This is a dummy postAction call -> must be replaced with an actual call to the BE
-      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
+      val callUrl: String = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
 
       def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
@@ -67,23 +65,23 @@ class CheckYourAnswersController @Inject()(
 
       agentReferenceNumber match {
         case None =>
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), callUrl)))
         case Some(arn) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
             case Some(agentDetails) =>
 
               updateUserAnswers(agentDetails)
-                .fold ({ error =>
+                .fold({ error =>
                   logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(userAnswers), postAction))
+                    Ok(view(getSummaryListRows(userAnswers), callUrl))
                   }
                 })
 
             case None =>
-              logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
+              logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retrieve details for agent with agentReferenceNumber: $arn")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           } recover {
             case ex =>
@@ -92,4 +90,32 @@ class CheckYourAnswersController @Inject()(
           }
       }
   }
+
+  def onSubmit(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
+    implicit request =>
+      agentReferenceNumber match {
+        case None =>
+          print(s"Payload structure:${request.userAnswers.data}")
+          request.userAnswers.data.asOpt[AgentDetailsRequest] match {
+            case None =>
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(agentDetails) =>
+              stampDutyLandTaxService.submitAgentDetails(agentDetails) map {
+                _ => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+              } recover {
+                case ex =>
+                  logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+          }
+        case Some(arn) =>
+          logger.warn("[CheckYourAnswersController][onSubmit] Duplicate submission attempt detected; blocking progression")
+          //TODO: Need to add a real backend call to update a pre-existing agent
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+
+
+  }
 }
+

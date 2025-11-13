@@ -179,14 +179,14 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
     val payload = AgentDetailsRequest(
       agentName = "Acme Property Agents Ltd",
-      houseNumber = "42",
-      addressLine1 = "High Street",
+      houseNumber = Some("42"),
+      addressLine1 = Some("High Street"),
       addressLine2 = Some("Westminster"),
-      addressLine3 = "London",
+      addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
       phone = Some("02079460000"),
-      email = "info@acmeagents.co.uk"
+      email = Some("info@acmeagents.co.uk")
     )
 
     "delegate to connector with the given AgentDetails and return the success json" in {

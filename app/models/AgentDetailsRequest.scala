@@ -16,24 +16,41 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 case class AgentDetailsRequest(
-                                agentName    : String,
-                                houseNumber  : String,          // TODO: this field should be removed - it's meant to be part of addressLine1
-                                addressLine1 : String,          // TODO: Confirm which address fields are optional
-                                addressLine2 : Option[String],
-                                addressLine3 : String,
-                                addressLine4 : Option[String],
-                                postcode     : Option[String],
-                                phone        : Option[String],
-                                email        : String           // TODO: Confirmed this email field should be optional
-) {
+                                agentName: String,
+                                houseNumber: Option[String],
+                                addressLine1: Option[String],
+                                addressLine2: Option[String],
+                                addressLine3: Option[String],
+                                addressLine4: Option[String],
+                                postcode: Option[String],
+                                phone: Option[String],
+                                email: Option[String]
+                              ) {
 
   def getFirstLineOfAddress: String =
     s"$houseNumber $addressLine1"
+
 }
 
 object AgentDetailsRequest {
-  implicit val format: OFormat[AgentDetailsRequest] = Json.format[AgentDetailsRequest]
+
+  implicit val reads: Reads[AgentDetailsRequest] = (
+    (__ \"agentName").read[String] and
+      Reads.pure(None: Option[String]) and
+      (__ \"agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
+      (__ \"agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(1)) and
+      (__ \"agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(2)) and
+      (__ \"agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(3)) and
+      (__ \"agentAddress" \ "address" \ "postcode").readNullable[String] and
+      (__ \"agentContactDetails" \ "phone").readNullable[String] and
+      (__ \"agentContactDetails" \ "email").readNullable[String]
+    )(AgentDetailsRequest.apply _)
+  
+  implicit val writes: OWrites[AgentDetailsRequest] = Json.writes[AgentDetailsRequest]
+
+
 }

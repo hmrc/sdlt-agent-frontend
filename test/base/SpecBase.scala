@@ -71,10 +71,49 @@ trait SpecBase
       )
     )
   )
+  val testUserAnswers1: JsObject = Json.obj(
+    "agentName" -> "John",
+    "agentAddress" -> "123 Road",
+    "agentContactDetails" -> Json.obj(
+      "contactTelephoneNumber" -> "07123456789",
+      "contactEmail" -> "john@example.com"
+    ),
+    "agentAddress" -> Json.obj(
+      "auditRef" -> "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
+      "address" -> Json.obj(
+        "lines" -> Json.arr(
+          "10 Downing Street",
+          "South Kensington",
+          "London",
+          "SW7 5JT"
+        )
+      )
+    )
+  )
+  val testUserAnswersWithoutAgentName: JsObject = Json.obj(
+    "agentAddress" -> "123 Road",
+    "agentContactDetails" -> Json.obj(
+      "contactTelephoneNumber" -> "07123456789",
+      "contactEmail" -> "john@example.com"
+    ),
+    "agentAddress" -> Json.obj(
+      "auditRef" -> "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
+      "address" -> Json.obj(
+        "lines" -> Json.arr(
+          "10 Downing Street",
+          "South Kensington",
+          "London",
+          "SW7 5JT"
+        )
+      )
+    )
+  )
 
 
   val populatedUserAnswers: UserAnswers =
     emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswers)
+  val populatedUserAnswersWithoutAgentName: UserAnswers =
+    emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswersWithoutAgentName)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 

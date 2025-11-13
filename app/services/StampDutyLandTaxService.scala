@@ -17,30 +17,31 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsResponse, AgentDetailsRequest}
+import models.{AgentDetailsRequest, AgentDetailsResponse, UserAnswers}
 import models.responses.SubmitAgentDetailsResponse
+import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class StampDutyLandTaxService @Inject() (
-  stampDutyLandTaxConnector: StampDutyLandTaxConnector
-)(implicit ec: ExecutionContext) {
+class StampDutyLandTaxService @Inject()(
+                                         stampDutyLandTaxConnector: StampDutyLandTaxConnector
+                                       )(implicit ec: ExecutionContext) extends Logging {
 
   // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
-  
+
   def getAgentDetails(storn: String, agentReferenceNumber: String)
                      (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAgentDetails(storn, agentReferenceNumber)
-    
+
   def getAllAgentDetails(storn: String)
                         (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
       .getAllAgentDetails(storn)
-    
+
   def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     stampDutyLandTaxConnector
@@ -50,10 +51,12 @@ class StampDutyLandTaxService @Inject() (
                         (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     stampDutyLandTaxConnector
       .removeAgentDetails(storn, agentReferenceNumber)
-      
+
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     getAllAgentDetails(storn).map { res =>
-      res.exists(agent => agent.agentName == name )
+      res.exists(agent => agent.agentName == name)
     }
+
+
 }
