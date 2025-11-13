@@ -21,7 +21,6 @@ import controllers.routes
 import models.responses.SubmitAgentDetailsResponse
 import models.{AgentDetailsRequest, AgentDetailsResponse, NormalMode, UserAnswers}
 import navigation.Navigator
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -72,7 +71,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
                     ContactPhoneNumberSummary.row(ua)(messages(application)).get,
                     ContactEmailSummary.row(ua)(messages(application)).get
                   )),
-                controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None).url
+                controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
               )(request, messages(application)).toString
           }
         }

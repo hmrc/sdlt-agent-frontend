@@ -22,7 +22,7 @@ import navigation.Navigator
 import pages.manageAgents.*
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -52,8 +52,7 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
-      val callUrl: String = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
-
+      val postAction: Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
       def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
           AgentNameSummary.row(userAnswers),
@@ -65,7 +64,7 @@ class CheckYourAnswersController @Inject()(
 
       agentReferenceNumber match {
         case None =>
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), callUrl)))
+          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
         case Some(arn) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
             case Some(agentDetails) =>
@@ -76,7 +75,7 @@ class CheckYourAnswersController @Inject()(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(userAnswers), callUrl))
+                    Ok(view(getSummaryListRows(userAnswers), postAction))
                   }
                 })
 
@@ -101,6 +100,7 @@ class CheckYourAnswersController @Inject()(
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(agentDetails) =>
+              print(s"Agent Details Structure $agentDetails")
               stampDutyLandTaxService.submitAgentDetails(agentDetails) map {
                 _ => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
               } recover {
