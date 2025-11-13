@@ -37,14 +37,6 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
 
   private val base = config.baseUrl("stamp-duty-land-tax")
 
-//  // TODO: TO BE REMOVED - DO NOT USE
-//  private val getAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
-//    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get?storn=$storn&agentReferenceNumber=$agentRef"
-//
-//  // TODO: TO BE REMOVED - DO NOT USE
-//  private val getAllAgentDetailLegacyUrl: String => URL = storn =>
-//    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents?storn=$storn"
-
   private val getSdltOrganisationUrl: String => URL = storn =>
     url"$base/stamp-duty-land-tax/manage-agents/get-sdlt-organisation?storn=$storn"
 
@@ -87,30 +79,4 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           logger.error(s"[StampDutyLandTaxConnector][removeAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
-
-//  // TODO: TO BE REMOVED - DO NOT USE
-//  @deprecated
-//  def getAgentDetailsLegacy(storn: String, agentReferenceNumber: String)
-//                           (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
-//    http
-//      .get(getAgentDetailsUrl(storn, agentReferenceNumber))
-//      .execute[Option[AgentDetailsResponse]]
-//      .recover {
-//        case e: Throwable =>
-//          logger.error(s"[StampDutyLandTaxConnector][getAgentDetails]: ${e.getMessage}")
-//          throw new RuntimeException(e.getMessage)
-//      }
-//
-//  // TODO: TO BE REMOVED - DO NOT USE
-//  @deprecated
-//  def getAllAgentDetailsLegacy(storn: String)
-//                              (implicit hc: HeaderCarrier): Future[List[AgentDetailsResponse]] =
-//    http
-//      .get(getAllAgentDetailLegacyUrl(storn))
-//      .execute[List[AgentDetailsResponse]]
-//      .recover {
-//        case e: Throwable =>
-//          logger.error(s"[StampDutyLandTaxConnector][getAllAgentDetailsLegacy]: ${e.getMessage}")
-//          throw new RuntimeException(e.getMessage)
-//      }
 }
