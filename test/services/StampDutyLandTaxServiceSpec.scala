@@ -70,7 +70,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           addressLine3 = None,
           addressLine4 = None,
           postcode = Some("NW1 6XE"),
-          phone = 02077644567,
+          phone = "02077644567",
           email = "contact@andersonlegal.com",
           agentReferenceNumber = "ARN002"
         )

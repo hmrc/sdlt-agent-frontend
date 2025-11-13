@@ -58,10 +58,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
   val testAgentResponse = AgentDetailsResponse(
     agentReferenceNumber = agentReferenceNumber,
     agentName = "Harborview Estates",
-    houseNumber = "42",
     addressLine1 = "Queensway",
     addressLine2 = None,
-    addressLine3 = "Birmingham",
+    addressLine3 = Some("Birmingham"),
     addressLine4 = None,
     postcode = Some("B2 4ND"),
     phone = "01214567890",
