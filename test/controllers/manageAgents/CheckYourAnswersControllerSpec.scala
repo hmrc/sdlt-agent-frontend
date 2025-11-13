@@ -61,11 +61,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           view(
             list = SummaryListViewModel(
               Seq(
-                AgentNameSummary.row(ua)(messages(application)).get,
-                AddressSummary.row(ua)(messages(application)).get,
-                ContactPhoneNumberSummary.row(ua)(messages(application)).get,
-                ContactEmailSummary.row(ua)(messages(application)).get
-              )),
+                AgentNameSummary.row(ua)(messages(application)),
+                AddressSummary.row(ua)(messages(application)),
+                ContactPhoneNumberSummary.row(ua)(messages(application)),
+                ContactEmailSummary.row(ua)(messages(application))
+              ).flatten
+            ),
             postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
           )(request, messages(application)).toString
       }
