@@ -66,7 +66,7 @@ class UserAnswersHelperSpec
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.auditRef mustBe "" // helper hardcodes empty auditRef
       addr.address mustBe Address(
-        lines    = Seq("Queensway", "", "Birmingham", ""),
+        lines    = Seq("42 Queensway", "", "Birmingham", ""),
         postcode = Some("B2 4ND")
       )
 
@@ -97,7 +97,7 @@ class UserAnswersHelperSpec
 
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.address mustBe Address(
-        lines    = Seq("Baker Street", "Marylebone", "London", "Greater London"),
+        lines    = Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
         postcode = Some("NW1 6XE")
       )
 

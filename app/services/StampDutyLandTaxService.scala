@@ -56,11 +56,4 @@ class StampDutyLandTaxService @Inject() (
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents.exists(_.agentName == name))
-
-  // TODO: TO BE REMOVED - DO NOT USE
-  @deprecated
-  def getAllAgentDetailsLegacy(storn: String)
-                              (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
-    stampDutyLandTaxConnector
-      .getAllAgentDetailsLegacy(storn)
 }
