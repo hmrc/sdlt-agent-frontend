@@ -138,10 +138,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       val testAgentResponse = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Harborview Estates",
-        houseNumber = "42",
-        addressLine1 = "Queensway",
+        addressLine1 = "42 Queensway",
         addressLine2 = None,
-        addressLine3 = "Birmingham",
+        addressLine3 = Some("Birmingham"),
         addressLine4 = None,
         postcode = Some("B2 4ND"),
         phone = "01214567890",

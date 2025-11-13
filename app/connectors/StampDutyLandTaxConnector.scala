@@ -16,8 +16,9 @@
 
 package connectors
 
-import models.{AgentDetailsResponse, AgentDetailsRequest}
+import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
+import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -35,38 +36,24 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
                                          (implicit ec: ExecutionContext) extends Logging {
 
   private val base = config.baseUrl("stamp-duty-land-tax")
-  
-  private val getAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get?storn=$storn&agentReferenceNumber=$agentRef"
 
-  private val getAllAgentDetailsUrl: String => URL = storn =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/get-all-agents?storn=$storn"
+  private val getSdltOrganisationUrl: String => URL = storn =>
+    url"$base/stamp-duty-land-tax/manage-agents/get-sdlt-organisation?storn=$storn"
 
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
-  
-  def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
-    http
-      .get(getAgentDetailsUrl(storn, agentReferenceNumber))
-      .execute[Option[AgentDetailsResponse]]
-      .recover {
-        case e: Throwable =>
-          logger.error(s"[getAgentDetails]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
-      }
 
-  def getAllAgentDetails(storn: String)
-                        (implicit hc: HeaderCarrier): Future[List[AgentDetailsResponse]] =
+  def getSdltOrganisation(storn: String)
+                         (implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =
     http
-      .get(getAllAgentDetailsUrl(storn))
-      .execute[List[AgentDetailsResponse]]
+      .get(getSdltOrganisationUrl(storn))
+      .execute[SdltOrganisationResponse]
       .recover {
         case e: Throwable =>
-          logger.error(s"[getAllAgentDetails]: ${e.getMessage}")
+          logger.error(s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
@@ -78,7 +65,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .execute[SubmitAgentDetailsResponse]
       .recover {
         case e: Throwable =>
-          logger.error(s"[submitAgentDetails]: ${e.getMessage}")
+          logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
@@ -89,7 +76,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .execute[Boolean]
       .recover {
         case e: Throwable =>
-          logger.error(s"[removeAgentDetails]: ${e.getMessage}")
+          logger.error(s"[StampDutyLandTaxConnector][removeAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 }

@@ -28,7 +28,7 @@ trait UserAnswersHelper {
     for {
       userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
       userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.agentName)
-      addressLines = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3, agentDetails.addressLine4.getOrElse(""))
+      addressLines = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3.getOrElse(""), agentDetails.addressLine4.getOrElse(""))
       userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
       userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
     } yield userAnswersFour

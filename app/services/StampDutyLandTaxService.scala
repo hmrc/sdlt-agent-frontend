@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsResponse, AgentDetailsRequest}
+import models.{AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,18 +28,18 @@ import scala.concurrent.{ExecutionContext, Future}
 class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
 )(implicit ec: ExecutionContext) {
-
-  // TODO: Modify these methods so that we try to retrieve from the session before attempting a BE call
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
                      (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
-      .getAgentDetails(storn, agentReferenceNumber)
-    
+      .getSdltOrganisation(storn)
+      .map(_.agents.find(_.agentReferenceNumber == agentReferenceNumber))
+
   def getAllAgentDetails(storn: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[List[AgentDetailsResponse]] =
+                        (implicit headerCarrier: HeaderCarrier): Future[Seq[AgentDetailsResponse]] =
     stampDutyLandTaxConnector
-      .getAllAgentDetails(storn)
+      .getSdltOrganisation(storn)
+      .map(_.agents)
     
   def submitAgentDetails(agentDetails: AgentDetailsRequest)
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
@@ -53,7 +53,7 @@ class StampDutyLandTaxService @Inject() (
       
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
-    getAllAgentDetails(storn).map { res =>
-      res.exists(agent => agent.agentName == name )
-    }
+    stampDutyLandTaxConnector
+      .getSdltOrganisation(storn)
+      .map(_.agents.exists(_.agentName == name))
 }

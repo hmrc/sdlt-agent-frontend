@@ -48,10 +48,9 @@ class UserAnswersHelperSpec
       val be = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Harborview Estates",
-        houseNumber = "42",
-        addressLine1 = "Queensway",
+        addressLine1 = "42 Queensway",
         addressLine2 = None,
-        addressLine3 = "Birmingham",
+        addressLine3 = Some("Birmingham"),
         addressLine4 = None,
         postcode = Some("B2 4ND"),
         phone = "01214567890",
@@ -67,7 +66,7 @@ class UserAnswersHelperSpec
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.auditRef mustBe "" // helper hardcodes empty auditRef
       addr.address mustBe Address(
-        lines    = Seq("Queensway", "", "Birmingham", ""),
+        lines    = Seq("42 Queensway", "", "Birmingham", ""),
         postcode = Some("B2 4ND")
       )
 
@@ -81,10 +80,9 @@ class UserAnswersHelperSpec
       val be = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Sunrise Realty",
-        houseNumber = "8B",
-        addressLine1 = "Baker Street",
+        addressLine1 = "8B Baker Street",
         addressLine2 = Some("Marylebone"),
-        addressLine3 = "London",
+        addressLine3 = Some("London"),
         addressLine4 = Some("Greater London"),
         postcode = Some("NW1 6XE"),
         phone = "02071234567",
@@ -99,7 +97,7 @@ class UserAnswersHelperSpec
 
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.address mustBe Address(
-        lines    = Seq("Baker Street", "Marylebone", "London", "Greater London"),
+        lines    = Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
         postcode = Some("NW1 6XE")
       )
 

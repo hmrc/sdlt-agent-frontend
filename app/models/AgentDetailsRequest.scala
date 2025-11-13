@@ -19,20 +19,15 @@ package models
 import play.api.libs.json.{Json, OFormat}
 
 case class AgentDetailsRequest(
-                                agentName    : String,
-                                houseNumber  : String,          // TODO: this field should be removed - it's meant to be part of addressLine1
-                                addressLine1 : String,          // TODO: Confirm which address fields are optional
-                                addressLine2 : Option[String],
-                                addressLine3 : String,
-                                addressLine4 : Option[String],
-                                postcode     : Option[String],
-                                phone        : String,
-                                email        : String           // TODO: Confirmed this email field should be optional
-) {
-
-  def getFirstLineOfAddress: String =
-    s"$houseNumber $addressLine1"
-}
+                                agentName            : String,
+                                addressLine1         : String,
+                                addressLine2         : Option[String],
+                                addressLine3         : Option[String],
+                                addressLine4         : Option[String],
+                                postcode             : Option[String],
+                                phone                : String,
+                                email                : String
+)
 
 object AgentDetailsRequest {
   implicit val format: OFormat[AgentDetailsRequest] = Json.format[AgentDetailsRequest]
