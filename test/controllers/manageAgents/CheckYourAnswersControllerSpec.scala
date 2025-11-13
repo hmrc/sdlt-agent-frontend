@@ -16,24 +16,22 @@
 
 package controllers.manageAgents
 
-import base.SpecBase
 import controllers.routes
-import models.responses.SubmitAgentDetailsResponse
-import models.{AgentDetailsRequest, AgentDetailsResponse, NormalMode, UserAnswers}
-import navigation.Navigator
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{times, verify, when}
-import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.{AgentOverviewPage, StornPage}
-import play.api.inject.bind
-import play.api.libs.json.JsObject
-import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, *}
+import models.{AgentDetailsResponse, UserAnswers}
+import pages.manageAgents.StornPage
+import play.api.libs.json.Json
 import services.StampDutyLandTaxService
 import utils.mangeAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
+import base.SpecBase
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 
 import scala.concurrent.Future
 
@@ -41,267 +39,156 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   private lazy val checkYourAnswersUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(agentReferenceNumber).url
-  private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
-    controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
 
-  "Check Your Answers Controller " - {
-    "onPageLoad()" - {
-      "with no ARN population" - {
-        "must return OK and the correct view for a GET" in {
+  "Check Your Answers Controller (with no ARN population)" - {
 
-          val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+    "must return OK and the correct view for a GET" in {
 
-          val application = applicationBuilder(userAnswers = Some(ua)).build()
+      val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
 
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(None))
+      val application = applicationBuilder(userAnswers = Some(ua)).build()
 
-            val result = route(application, request).value
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(None))
 
-            val view = application.injector.instanceOf[CheckYourAnswersView]
+        val result = route(application, request).value
 
-            status(result) mustEqual OK
+        val view = application.injector.instanceOf[CheckYourAnswersView]
 
-            contentAsString(result) mustEqual
-              view(
-                list = SummaryListViewModel(
-                  Seq(
-                    AgentNameSummary.row(ua)(messages(application)).get,
-                    AddressSummary.row(ua)(messages(application)).get,
-                    ContactPhoneNumberSummary.row(ua)(messages(application)).get,
-                    ContactEmailSummary.row(ua)(messages(application)).get
-                  )),
-                controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
-              )(request, messages(application)).toString
-          }
-        }
+        status(result) mustEqual OK
 
-        "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-          val application = applicationBuilder(userAnswers = None).build()
-
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(None))
-
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-          }
-        }
-      }
-      "with ARN population" - {
-        "must call BE and redirect to Journey Recovery when agent is not found (None returned)" in {
-
-          val service = mock[StampDutyLandTaxService]
-
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          when(service.getAgentDetails(any(), any())(any()))
-            .thenReturn(Future.successful(None))
-
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-            verify(service, times(1)).getAgentDetails(any(), any())(any())
-          }
-        }
-
-        "must redirect to Journey Recovery when BE call fails unexpectedly" in {
-
-          val service = mock[StampDutyLandTaxService]
-
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          when(service.getAgentDetails(any(), any())(any()))
-            .thenReturn(Future.failed(new RuntimeException("boom")))
-
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-          }
-        }
-
-        "must return OK and render from freshly populated UA when BE returns details" in {
-
-          val service = mock[StampDutyLandTaxService]
-
-          val testAgentResponse = AgentDetailsResponse(
-            agentReferenceNumber = testArn,
-            agentName = "Harborview Estates",
-            houseNumber = "42",
-            addressLine1 = "Queensway",
-            addressLine2 = None,
-            addressLine3 = "Birmingham",
-            addressLine4 = None,
-            postcode = Some("B2 4ND"),
-            phone = Some("01214567890"),
-            email = "info@harborviewestates.co.uk"
-          )
-
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          when(service.getAgentDetails(any(), any())(any()))
-            .thenReturn(Future.successful(Some(testAgentResponse)))
-
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
-            val result = route(application, request).value
-            val body = contentAsString(result)
-
-            status(result) mustEqual OK
-
-            body must include("Harborview Estates")
-            body must include("Queensway")
-            body must include("Birmingham")
-            body must include("B2 4ND")
-            body must include("01214567890")
-            body must include("info@harborviewestates.co.uk")
-            body must include(s"""action="${controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some(testArn)).url}"""")
-          }
-        }
-
-        "must return OK (no BE call) when ARN not provided (None) and render from existing UA" in {
-
-          val service = mock[StampDutyLandTaxService]
-
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          running(application) {
-            val request = FakeRequest(GET, checkYourAnswersUrl(None))
-            val result = route(application, request).value
-            val body = contentAsString(result)
-
-            status(result) mustEqual OK
-
-            verify(service, times(0)).getAgentDetails(any(), any())(any())
-
-            body must include("John")
-          }
-        }
+        contentAsString(result) mustEqual
+          view(
+            list = SummaryListViewModel(
+              Seq(
+                AgentNameSummary.row(ua)(messages(application)).get,
+                AddressSummary.row(ua)(messages(application)).get,
+                ContactPhoneNumberSummary.row(ua)(messages(application)).get,
+                ContactEmailSummary.row(ua)(messages(application)).get
+              )),
+            postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
+          )(request, messages(application)).toString
       }
     }
-    "onSubmit()" - {
-      "with no ARN population" - {
-        "must redirect to Journey Recovery Controller when agentName is missing from userAnswers " in {
 
-          val service = mock[StampDutyLandTaxService]
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithoutAgentName))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 
-          when(service.submitAgentDetails(any())(any()))
-            .thenReturn(Future.successful(None))
+      val application = applicationBuilder(userAnswers = None).build()
 
-          running(application) {
-            val request = FakeRequest(POST, submitAnswerUrl(None))
-            val result = route(application, request).value
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(None))
 
-            status(result) mustEqual SEE_OTHER
+        val result = route(application, request).value
 
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-            verify(service, times(0)).submitAgentDetails(any())(any())
-
-
-          }
-        }
-        //TODO NEEDS TO BE REMOVED AFTER ALL TESTING HAS BEEN DONE
-        "must deserialize to AgentDetailsRequest" in {
-          val jsObject: JsObject = populatedUserAnswers.data
-
-          val parsed = jsObject.asOpt[AgentDetailsRequest]
-
-          println(s"parsed value ${jsObject.asOpt[AgentDetailsRequest]}")
-
-          parsed mustBe defined
-          print(s"Parsed value : $parsed")
-        }
-        "must redirect to next page after submitting agentDetails to StampDutyLandTaxService.submitAgentDetails in BE" in {
-          val navigator = new Navigator
-          val service = mock[StampDutyLandTaxService]
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          when(service.submitAgentDetails(any())(any()))
-            .thenReturn(Future.successful(SubmitAgentDetailsResponse("OK")))
-
-          running(application) {
-            val request = FakeRequest(POST, submitAnswerUrl(None))
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-
-            redirectLocation(result).value mustEqual navigator.nextPage(AgentOverviewPage, NormalMode, populatedUserAnswers).url
-
-            verify(service, times(1)).submitAgentDetails(any())(any())
-
-          }
-        }
-        "must throw and exception after getting error response from StampDutyLandTaxService.submitAgentDetails" in {
-          val service = mock[StampDutyLandTaxService]
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
-
-          when(service.submitAgentDetails(any())(any()))
-            .thenReturn(Future.failed(new RuntimeException("An unexpected error occurred")))
-
-          running(application) {
-            val request = FakeRequest(POST, submitAnswerUrl(None))
-            val result = route(application, request).value
-
-            status(result) mustEqual SEE_OTHER
-
-            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-
-            verify(service, times(1)).submitAgentDetails(any())(any())
-
-          }
-
-        }
-        "with ARN population" - {
-          "must redirect to Journey Recovery controller when ARN is not found " in {
-            val service = mock[StampDutyLandTaxService]
-
-            val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
-              .overrides(bind[StampDutyLandTaxService].toInstance(service))
-              .build()
-
-            running(application) {
-              val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
-              val result = route(application, request).value
-
-              status(result) mustEqual SEE_OTHER
-
-              redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-            }
-          }
-
-        }
-
-
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
+    }
+  }
 
+  "Check Your Answers Controller (with ARN population)" - {
 
+    "must call BE and redirect to Journey Recovery when agent is not found (None returned)" in {
+
+      val service = mock[StampDutyLandTaxService]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        .overrides(bind[StampDutyLandTaxService].toInstance(service))
+        .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+        verify(service, times(1)).getAgentDetails(any(), any())(any())
+      }
+    }
+
+    "must redirect to Journey Recovery when BE call fails unexpectedly" in {
+
+      val service = mock[StampDutyLandTaxService]
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        .overrides(bind[StampDutyLandTaxService].toInstance(service))
+        .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return OK and render from freshly populated UA when BE returns details" in {
+
+      val service = mock[StampDutyLandTaxService]
+
+      val testAgentResponse = AgentDetailsResponse(
+        agentReferenceNumber = testArn,
+        agentName = "Harborview Estates",
+        addressLine1 = "42 Queensway",
+        addressLine2 = None,
+        addressLine3 = Some("Birmingham"),
+        addressLine4 = None,
+        postcode = Some("B2 4ND"),
+        phone = Some("01214567890"),
+        email = Some("info@harborviewestates.co.uk")
+      )
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        .overrides(bind[StampDutyLandTaxService].toInstance(service))
+        .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentResponse)))
+
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+        val result = route(application, request).value
+        val body = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        body must include("Harborview Estates")
+        body must include("Queensway")
+        body must include("Birmingham")
+        body must include("B2 4ND")
+        body must include("01214567890")
+        body must include("info@harborviewestates.co.uk")
+        body must include(s"""action="${controllers.manageAgents.routes.SubmitAgentController.onSubmit().url}"""")
+      }
+    }
+
+    "must return OK (no BE call) when ARN not provided (None) and render from existing UA" in {
+
+      val service = mock[StampDutyLandTaxService]
+
+      val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
+        .overrides(bind[StampDutyLandTaxService].toInstance(service))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, checkYourAnswersUrl(None))
+        val result = route(application, request).value
+        val body = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        verify(service, times(0)).getAgentDetails(any(), any())(any())
+
+        body must include("John")
+      }
     }
   }
 }
-

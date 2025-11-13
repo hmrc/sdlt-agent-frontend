@@ -20,16 +20,15 @@ import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 
 case class AgentDetailsRequest(
-                                agentName: String,
-                                addressLine1: String,
-                                addressLine2: Option[String],
-                                addressLine3: Option[String],
-                                addressLine4: Option[String],
-                                postcode: Option[String],
-                                phone: Option[String],
-                                email: Option[String]
-                              )
-
+                                agentName            : String,
+                                addressLine1         : String,
+                                addressLine2         : Option[String],
+                                addressLine3         : Option[String],
+                                addressLine4         : Option[String],
+                                postcode             : Option[String],
+                                phone                : Option[String],
+                                email                : Option[String]
+)
 
 object AgentDetailsRequest {
 
