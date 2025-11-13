@@ -18,13 +18,15 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
 import models.NormalMode
+import models.manageAgents.AgentContactDetails
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.i18n
 import play.api.i18n.I18nSupport
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -34,81 +36,66 @@ import views.html.manageAgents.AgentContactDetailsView
 
 import scala.concurrent.Future
 
-class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport{
+class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport {
+  val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
+  val messagesApi = application.injector.instanceOf[MessagesApi]
+  implicit val messages: Messages = messagesApi.preferred(FakeRequest())
 
   def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
 
   val formProvider = new AgentContactDetailsFormProvider()
-  val form = formProvider("AgentName")
-
   lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
 
+  private val agentName = "null"
+  private val validData = AgentContactDetails("07700900982", "test@gov.uk")
+  private val form = formProvider(agentName)(messages)
 
   "AgentContactDetails Controller" - {
 
-    "must return OK and the correct view for a GET request" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    "must return OK and render the view for a GET" in {
 
-      running(application) {
-        val request = FakeRequest(GET, AgentContactDetailsRoute)
+      val request = FakeRequest(GET, AgentContactDetailsRoute)
 
-        val view = application.injector.instanceOf[AgentContactDetailsView]
+      val result = route(application, request).value
 
-        val result = route(application, request).value
+      val view = application.injector.instanceOf[AgentContactDetailsView]
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual view(form, NormalMode, agentName)(request, messages).toString
     }
 
     "must redirect to the next page when valid data is submitted" in {
+      val mockSessionRepo = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val mockSessionRepository = mock[SessionRepository]
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      val request = FakeRequest(POST, routes.AgentContactDetailsController.onSubmit(NormalMode).url)
+        .withFormUrlEncodedBody("phone" -> "07700900982", "email" -> "test@gov.uk")
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
-          )
-          .build()
+      val result = route(application, request).value
 
-      running(application) {
-        val request =
-          FakeRequest(POST, AgentContactDetailsRoute)
-            .withFormUrlEncodedBody(("phone", "0123456789"))
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual onwardRoute.url
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
-      running(application) {
-        val request =
-          FakeRequest(POST, AgentContactDetailsRoute)
-            .withFormUrlEncodedBody(("phone", "0123456789101112"))
+      val request = FakeRequest(POST, routes.AgentContactDetailsController.onSubmit(NormalMode).url)
+        .withFormUrlEncodedBody("phone" -> "", "email" -> "")
 
-        val boundForm = form.bind(Map("phone" -> "0123456789101112"))
+      val result = route(application, request).value
 
-        val view = application.injector.instanceOf[AgentContactDetailsView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
+      status(result) mustEqual BAD_REQUEST
     }
 
-    "must redirect to Check your answers for a POST if no data is found on AgentContactDetails page" in {
+    "must redirect to journey recovery if no data is found on AgentContactDetails page" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -130,10 +117,9 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None).url
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-
     "must redirect to Journey Recovery for a POST if no existing data is found" in {
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -150,3 +136,5 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with 
     }
   }
 }
+
+

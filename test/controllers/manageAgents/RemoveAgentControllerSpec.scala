@@ -33,11 +33,13 @@ import services.StampDutyLandTaxService
 import views.html.manageAgents.RemoveAgentView
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.i18n.Messages
 import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
+class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil with GuiceOneAppPerSuite {
 
   private val agentReferenceNumber: String = "ARN001"
 
@@ -48,10 +50,25 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
   lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(agentReferenceNumber).url
 
   val formProvider = new RemoveAgentFormProvider()
-
+  
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  val form: Form[RemoveAgent] = formProvider()
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  
+  val testAgentResponse = AgentDetailsResponse(
+    agentReferenceNumber = agentReferenceNumber,
+    agentName = "Harborview Estates",
+    houseNumber = "42",
+    addressLine1 = "Queensway",
+    addressLine2 = None,
+    addressLine3 = "Birmingham",
+    addressLine4 = None,
+    postcode = Some("B2 4ND"),
+    phone = "01214567890",
+    email = "info@harborviewestates.co.uk"
+  )
+
+  val form: Form[RemoveAgent] = formProvider(testAgentResponse)
 
   "RemoveAgentController" - {
 

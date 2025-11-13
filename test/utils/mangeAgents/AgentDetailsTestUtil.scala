@@ -46,7 +46,7 @@ trait AgentDetailsTestUtil {
       addressLine3         = "Lazy Town",
       addressLine4         = None,
       postcode             = Some("SW44GFS"),
-      phone                = Some("0543534534543"),
+      phone                = "0543534534543",
       email                = "agent@example.com"
     )
 
@@ -61,7 +61,7 @@ trait AgentDetailsTestUtil {
     addressLine3         = "Birmingham",
     addressLine4         = None,
     postcode             = Some("B2 4ND"),
-    phone                = Some("01214567890"),
+    phone                = "01214567890",
     email                = "info@harborviewestates.co.uk"
   )
 }
