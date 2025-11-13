@@ -96,7 +96,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetailsLegacy(any(), any())(any()))
+      when(service.getAgentDetails(any(), any())(any()))
         .thenReturn(Future.successful(None))
 
       running(application) {
@@ -106,7 +106,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(service, times(1)).getAgentDetailsLegacy(any(), any())(any())
+        verify(service, times(1)).getAgentDetails(any(), any())(any())
       }
     }
 
@@ -118,7 +118,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetailsLegacy(any(), any())(any()))
+      when(service.getAgentDetails(any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {
@@ -137,21 +137,20 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       val testAgentResponse = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Harborview Estates",
-        houseNumber = "42",
-        addressLine1 = "Queensway",
+        addressLine1 = "42 Queensway",
         addressLine2 = None,
-        addressLine3 = "Birmingham",
+        addressLine3 = Some("Birmingham"),
         addressLine4 = None,
         postcode = Some("B2 4ND"),
         phone = Some("01214567890"),
-        email = "info@harborviewestates.co.uk"
+        email = Some("info@harborviewestates.co.uk")
       )
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-      when(service.getAgentDetailsLegacy(any(), any())(any()))
+      when(service.getAgentDetails(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentResponse)))
 
       running(application) {
@@ -186,7 +185,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         status(result) mustEqual OK
 
-        verify(service, times(0)).getAgentDetailsLegacy(any(), any())(any())
+        verify(service, times(0)).getAgentDetails(any(), any())(any())
 
         body must include("John")
       }

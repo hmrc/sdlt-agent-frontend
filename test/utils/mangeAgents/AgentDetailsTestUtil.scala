@@ -40,14 +40,13 @@ trait AgentDetailsTestUtil {
     AgentDetailsResponse(
       agentReferenceNumber = "ARN001",
       agentName            = s"Agent $i",
-      houseNumber          = "64",
-      addressLine1         = s"Address $i",
+      addressLine1         = s"64 Address $i",
       addressLine2         = None,
-      addressLine3         = "Lazy Town",
+      addressLine3         = Some("Lazy Town"),
       addressLine4         = None,
       postcode             = Some("SW44GFS"),
       phone                = Some("0543534534543"),
-      email                = "agent@example.com"
+      email                = Some("agent@example.com")
     )
 
   def getAgentList(n: Int): List[AgentDetailsResponse] = (1 to n).map(agent).toList
@@ -55,13 +54,12 @@ trait AgentDetailsTestUtil {
   val testAgentDetails: AgentDetailsResponse = AgentDetailsResponse(
     agentReferenceNumber = "ARN001",
     agentName            = "Harborview Estates",
-    houseNumber          = "22A",
-    addressLine1         = "Queensway",
+    addressLine1         = "22A Queensway",
     addressLine2         = None,
-    addressLine3         = "Birmingham",
+    addressLine3         = Some("Birmingham"),
     addressLine4         = None,
     postcode             = Some("B2 4ND"),
     phone                = Some("01214567890"),
-    email                = "info@harborviewestates.co.uk"
+    email                = Some("info@harborviewestates.co.uk")
   )
 }

@@ -90,8 +90,8 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
 
   // TODO: TO BE REMOVED - DO NOT USE
   @deprecated
-  def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
+  def getAgentDetailsLegacy(storn: String, agentReferenceNumber: String)
+                           (implicit hc: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
     http
       .get(getAgentDetailsUrl(storn, agentReferenceNumber))
       .execute[Option[AgentDetailsResponse]]

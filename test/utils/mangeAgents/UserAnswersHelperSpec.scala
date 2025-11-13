@@ -48,14 +48,13 @@ class UserAnswersHelperSpec
       val be = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Harborview Estates",
-        houseNumber = "42",
-        addressLine1 = "Queensway",
+        addressLine1 = "42 Queensway",
         addressLine2 = None,
-        addressLine3 = "Birmingham",
+        addressLine3 = Some("Birmingham"),
         addressLine4 = None,
         postcode = Some("B2 4ND"),
         phone = Some("01214567890"),
-        email = "info@harborviewestates.co.uk"
+        email = Some("info@harborviewestates.co.uk")
       )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
@@ -81,14 +80,13 @@ class UserAnswersHelperSpec
       val be = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Sunrise Realty",
-        houseNumber = "8B",
-        addressLine1 = "Baker Street",
+        addressLine1 = "8B Baker Street",
         addressLine2 = Some("Marylebone"),
-        addressLine3 = "London",
+        addressLine3 = Some("London"),
         addressLine4 = Some("Greater London"),
         postcode = Some("NW1 6XE"),
         phone = Some("02071234567"),
-        email = "contact@sunriserealty.co.uk"
+        email = Some("contact@sunriserealty.co.uk")
       )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
@@ -113,14 +111,13 @@ class UserAnswersHelperSpec
       val be = AgentDetailsResponse(
         agentReferenceNumber = testArn,
         agentName = "Willow Properties",
-        houseNumber = "14",
-        addressLine1 = "High Street",
+        addressLine1 = "14 High Street",
         addressLine2 = None,
-        addressLine3 = "Manchester",
+        addressLine3 = Some("Manchester"),
         addressLine4 = None,
         postcode = Some("M1 2AB"),
         phone = None,
-        email = "hello@willow.co.uk"
+        email = Some("hello@willow.co.uk")
       )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
