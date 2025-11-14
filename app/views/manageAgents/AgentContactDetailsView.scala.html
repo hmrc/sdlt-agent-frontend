@@ -15,16 +15,20 @@
  *@
 
 @import viewmodels.InputWidth._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukInput: GovukInput,
-        govukButton: GovukButton
-    )
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading
 
-    @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+)
+
+    @(form: Form[_], mode: Mode,
+            agentName: String)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = title(form, messages("manageAgents.agentContactDetails.title"))) {
 
@@ -34,14 +38,17 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-
-        <span class="govuk-caption-xl">@messages("manageAgents.agentContactDetails.caption")</span>
-        <h1 class="govuk-heading-xl">@messages("manageAgents.agentContactDetails.heading")</h1>
+        @hmrcPageHeading(PageHeading(
+            text           = messages("manageAgents.agentContactDetails.heading", agentName),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-xl"),
+            section        = Some(messages("manageAgents.caption"))
+        ))
 
         @govukInput(
             InputViewModel(
                 field = form("phone"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1"))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentName))
         )
     .withWidth(Full)
         )
@@ -49,7 +56,7 @@
         @govukInput(
             InputViewModel(
                 field = form("email"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2"))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentName))
 
         )
     .withWidth(Full)

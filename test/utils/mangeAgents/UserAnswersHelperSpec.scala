@@ -53,8 +53,8 @@ class UserAnswersHelperSpec
         addressLine3 = Some("Birmingham"),
         addressLine4 = None,
         postcode = Some("B2 4ND"),
-        phone = Some("01214567890"),
-        email = Some("info@harborviewestates.co.uk")
+        phone = "01214567890",
+        email = "info@harborviewestates.co.uk"
       )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
@@ -71,7 +71,7 @@ class UserAnswersHelperSpec
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
+        AgentContactDetails(phone = "01214567890", email = "info@harborviewestates.co.uk")
     }
 
     "should populate Address when all address lines are present" in {
@@ -85,8 +85,8 @@ class UserAnswersHelperSpec
         addressLine3 = Some("London"),
         addressLine4 = Some("Greater London"),
         postcode = Some("NW1 6XE"),
-        phone = Some("02071234567"),
-        email = Some("contact@sunriserealty.co.uk")
+        phone = "02071234567",
+        email = "contact@sunriserealty.co.uk"
       )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
@@ -102,30 +102,7 @@ class UserAnswersHelperSpec
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("02071234567"), email = Some("contact@sunriserealty.co.uk"))
-    }
-
-    "should handle missing phone by writing None for phone and Some(email) for email" in {
-      val startUa = emptyUserAnswersWithStorn
-
-      val be = AgentDetailsResponse(
-        agentReferenceNumber = testArn,
-        agentName = "Willow Properties",
-        addressLine1 = "14 High Street",
-        addressLine2 = None,
-        addressLine3 = Some("Manchester"),
-        addressLine4 = None,
-        postcode = Some("M1 2AB"),
-        phone = None,
-        email = Some("hello@willow.co.uk")
-      )
-
-      implicit val dr: DataRequest[_] = mockDataRequest(startUa)
-
-      val updated = Helper.updateUserAnswers(be).success.value
-
-      updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = None, email = Some("hello@willow.co.uk"))
+        AgentContactDetails(phone = "02071234567", email = "contact@sunriserealty.co.uk")
     }
   }
 }

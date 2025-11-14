@@ -104,8 +104,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
               addressLine3 = Some("London"),
               addressLine4 = Some("Greater London"),
               postcode = Some("SW1A 2AA"),
-              phone = Some("02079460000"),
-              email = Some("info@acmeagents.co.uk")
+              phone = "02079460000",
+              email = "info@acmeagents.co.uk"
             ),
             AgentDetailsResponse(
               agentReferenceNumber = "ARN002",
@@ -115,8 +115,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
               addressLine3 = Some("Birmingham"),
               addressLine4 = None,
               postcode = Some("B2 4ND"),
-              phone = Some("01214567890"),
-              email = Some("info@harborviewestates.co.uk")
+              phone = "01214567890",
+              email = "info@harborviewestates.co.uk"
             )
           )
         )
@@ -170,8 +170,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = Some("02079460000"),
-      email = Some("info@acmeagents.co.uk")
+      phone = "02079460000",
+      email = "info@acmeagents.co.uk"
     )
 
     "return SubmitAgentDetailsResponse when BE returns 200 with valid JSON" in {

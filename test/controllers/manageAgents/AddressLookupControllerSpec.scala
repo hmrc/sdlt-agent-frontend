@@ -132,7 +132,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/manage-agents/agent-contact-details"
+        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/agent-details/agent-contact-details"
 
         verify(service, times(1)).getJourneyOutcome(any(), any())(any[HeaderCarrier])
       }
@@ -149,7 +149,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/manage-agents/check-your-answers"
+        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/agent-details/check-your-answers"
 
         verify(service, times(1)).getJourneyOutcome(any(), any())(any[HeaderCarrier])
       }

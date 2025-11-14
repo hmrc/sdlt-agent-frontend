@@ -16,11 +16,7 @@
 
 package controllers.manageAgents
 
-import controllers.actions.IdentifierAction
-import models.Mode
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.I18nSupport
-import controllers.JourneyRecoveryController
+import javax.inject.Singleton
 import controllers.actions.*
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.manageAgents.AgentContactDetails
@@ -28,10 +24,13 @@ import models.manageAgents.AgentContactDetails
 import javax.inject.Inject
 import navigation.Navigator
 import models.Mode
-import pages.manageAgents.{AgentContactDetailsPage, AgentCheckYourAnswersPage}
+import models.requests.DataRequest
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentContactDetailsView
 
@@ -51,31 +50,46 @@ class AgentContactDetailsController @Inject()(
                                                view: AgentContactDetailsView
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  val form = formProvider()
 
+  private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =
+    request.userAnswers.get(AgentNamePage) match {
+      case Some(name) => Right(name)
+      case None =>
+        Left {
+          logger.error("Agent name not found in user answers")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
+    }
+  
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      val preparedForm = request.userAnswers.get(AgentContactDetailsPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+      getAgentName match {
+        case Left(redirect) => redirect
+        case Right(agentName) =>
+          val form = formProvider(agentName)
+          val preparedForm = request.userAnswers.get(AgentContactDetailsPage)
+            .fold(form)(form.fill)
+          Ok(view(preparedForm, mode, agentName))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
-      )
+      getAgentName match {
+        case Left(redirect) => Future.successful(redirect)
+        case Right(agentName) =>
+          val form = formProvider(agentName)
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode, agentName))),
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
+          )
+      }
   }
 }

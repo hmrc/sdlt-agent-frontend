@@ -19,20 +19,35 @@ package forms.manageAgents
 import forms.constraints.{OptionalEmailFormat, OptionalMaxLength}
 import models.manageAgents.AgentContactDetails
 import play.api.data.Form
-import play.api.data.Forms.{mapping, optional, text}
+import forms.mappings.Mappings
+import play.api.data.Forms.mapping
 import play.api.data.validation.Constraint
+import play.api.i18n.Messages
 
-class AgentContactDetailsFormProvider {
+import javax.inject.Inject
 
-  def apply(): Form[AgentContactDetails] = {
+class AgentContactDetailsFormProvider @Inject() extends Mappings {
+
+  private val phoneInvalidRegex = "^[0-9+\\-\\s()]+$"
+  private val phoneInvalidFormatRegex = "^[0-9+\\-\\s()]+$"
+  private val emailInvalidFormatRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+  private val emailInvalidRegex = "^[A-Za-z0-9&'@\\/.\\-? ]+$"
+  private val maxAgentPhoneLength = 14
+  private val maxAgentEmailLength = 36
+
+  def apply(agentName: String)(implicit messages: Messages): Form[AgentContactDetails] =
+
     Form(
       mapping(
-        "phone" -> optional(text)
-          .verifying(OptionalMaxLength(14, "manageAgents.agentContactDetails.error.phoneLength")),
-        "email" -> optional(text)
-          .verifying(OptionalMaxLength(36, "manageAgents.agentContactDetails.error.emailLength"))
-          .verifying(OptionalEmailFormat("manageAgents.agentContactDetails.error.emailInvalid"))
+        "phone" -> text(messages("manageAgents.agentContactDetails.error.phoneRequired", agentName))
+          .verifying(maxLength(maxAgentPhoneLength, messages("manageAgents.agentContactDetails.error.phoneLength", agentName)))
+            .verifying(regexp(phoneInvalidRegex, messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)))
+            .verifying(regexp(phoneInvalidFormatRegex, "manageAgents.agentContactDetails.error.phoneInvalidFormat")),
+
+        "email" -> text(messages("manageAgents.agentContactDetails.error.emailRequired", agentName))
+          .verifying(maxLength(maxAgentEmailLength, messages("manageAgents.agentContactDetails.error.emailLength", agentName)))
+          .verifying(regexp(emailInvalidFormatRegex, messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName)))
+          .verifying(regexp(emailInvalidRegex, messages("manageAgents.agentContactDetails.error.emailInvalid", agentName))),
       )(AgentContactDetails.apply)(contactDetails => Some((contactDetails.phone, contactDetails.email)))
     )
-  }
 }
