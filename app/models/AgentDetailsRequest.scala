@@ -16,11 +16,12 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 case class AgentDetailsRequest(
                                 agentName            : String,
-                                addressLine1         : String,
+                                addressLine1         : Option[String],
                                 addressLine2         : Option[String],
                                 addressLine3         : Option[String],
                                 addressLine4         : Option[String],
@@ -30,5 +31,19 @@ case class AgentDetailsRequest(
 )
 
 object AgentDetailsRequest {
-  implicit val format: OFormat[AgentDetailsRequest] = Json.format[AgentDetailsRequest]
+
+  implicit val reads: Reads[AgentDetailsRequest] = (
+    (__ \ "agentName").read[String] and
+      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
+      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(1)) and
+      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(2)) and
+      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(3)) and
+      (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
+      (__ \ "agentContactDetails" \ "phone").readNullable[String] and
+      (__ \ "agentContactDetails" \ "email").readNullable[String]
+    )(AgentDetailsRequest.apply _)
+
+
+  implicit val writes:OWrites[AgentDetailsRequest] = Json.writes[AgentDetailsRequest]
 }
+

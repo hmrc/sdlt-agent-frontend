@@ -39,8 +39,9 @@ POST        /agent-details/agent-contact-details         controllers.manageAgent
 GET         /agent-details/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /agent-details/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /agent-details/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(agentReferenceNumber: Option[String])
-POST        /agent-details/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
+
+GET         /manage-agents/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(agentReferenceNumber: Option[String])
+POST        /manage-agents/submit-agent                  controllers.manageAgents.CheckYourAnswersController.onSubmit(agentReferenceNumber: Option[String])
 
 GET         /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad(agentReferenceNumber: String)
 POST        /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit(agentReferenceNumber: String)

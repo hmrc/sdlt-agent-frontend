@@ -165,7 +165,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
     val agentDetails = AgentDetailsRequest(
       agentName = "Acme Property Agents Ltd",
-      addressLine1 = "42 High Street",
+      addressLine1 = Some("42 High Street"),
       addressLine2 = Some("Westminster"),
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),

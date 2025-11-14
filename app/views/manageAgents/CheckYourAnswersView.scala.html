@@ -17,13 +17,12 @@
 @import viewmodels.govuk.button.ButtonViewModel
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    h1: components.H1,
-    govukSummaryList: GovukSummaryList,
-    govukButton: GovukButton
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        h1: components.H1,
+        govukSummaryList: GovukSummaryList,
+        govukButton: GovukButton
 )
-
 @(list: SummaryList, postAction: Call)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("manageAgents.checkYourAnswers.title"))) {

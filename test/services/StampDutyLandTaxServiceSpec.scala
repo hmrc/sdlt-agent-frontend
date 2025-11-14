@@ -142,7 +142,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
     val payload = AgentDetailsRequest(
       agentName = "42 Acme Property Agents Ltd",
-      addressLine1 = "High Street",
+      addressLine1 = Some("High Street"),
       addressLine2 = Some("Westminster"),
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
