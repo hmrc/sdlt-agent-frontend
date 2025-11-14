@@ -59,8 +59,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           addressLine3 = Some("Greater London"),
           addressLine4 = None,
           postcode = Some("SW1A 1AA"),
-          phone = Some("02071234567"),
-          email = Some("info@smithco.co.uk"),
+          phone = "02071234567",
+          email = "info@smithco.co.uk",
           agentReferenceNumber = "ARN001"
         ),
         AgentDetailsResponse(
@@ -70,8 +70,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           addressLine3 = None,
           addressLine4 = None,
           postcode = Some("NW1 6XE"),
-          phone = None,
-          email = Some("contact@andersonlegal.com"),
+          phone = "02077644567",
+          email = "contact@andersonlegal.com",
           agentReferenceNumber = "ARN002"
         )
       )
@@ -147,8 +147,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = Some("02079460000"),
-      email = Some("info@acmeagents.co.uk")
+      phone = "02079460000",
+      email = "info@acmeagents.co.uk"
     )
 
     "delegate to connector with the given AgentDetails and return the success json" in {
