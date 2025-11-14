@@ -21,7 +21,7 @@ import play.api.libs.json.*
 
 case class AgentDetailsRequest(
                                 agentName            : String,
-                                addressLine1         : String,
+                                addressLine1         : Option[String],
                                 addressLine2         : Option[String],
                                 addressLine3         : Option[String],
                                 addressLine4         : Option[String],
@@ -34,11 +34,7 @@ object AgentDetailsRequest {
 
   implicit val reads: Reads[AgentDetailsRequest] = (
     (__ \ "agentName").read[String] and
-      // Require the first line: will throw a JsError if missing
-      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map {
-        case head +: _ => head
-        case Nil => throw new RuntimeException("addressLine1 is required but missing")
-      } and
+      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(1)) and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(2)) and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(3)) and

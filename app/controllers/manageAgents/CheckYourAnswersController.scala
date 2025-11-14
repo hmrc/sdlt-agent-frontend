@@ -32,6 +32,7 @@ import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future.never.recover
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -53,6 +54,7 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
 
       val postAction: Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
+
       def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
           AgentNameSummary.row(userAnswers),
@@ -94,20 +96,24 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       agentReferenceNumber match {
         case None =>
-          print(s"Payload structure:${request.userAnswers.data}")
           request.userAnswers.data.asOpt[AgentDetailsRequest] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(agentDetails) =>
-              print(s"Agent Details Structure $agentDetails")
-              stampDutyLandTaxService.submitAgentDetails(agentDetails) map {
-                _ => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-              } recover {
+              val emptiedUserAnswers = UserAnswers(request.userId)
+              (for {
+                _              <- stampDutyLandTaxService.submitAgentDetails(agentDetails)
+                updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                _              <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+              )).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
+
           }
         case Some(arn) =>
           logger.warn("[CheckYourAnswersController][onSubmit] Duplicate submission attempt detected; blocking progression")
