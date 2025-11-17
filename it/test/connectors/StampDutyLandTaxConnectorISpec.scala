@@ -165,13 +165,13 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
     val agentDetails = AgentDetailsRequest(
       agentName = "Acme Property Agents Ltd",
-      addressLine1 = "42 High Street",
+      addressLine1 = Some("42 High Street"),
       addressLine2 = Some("Westminster"),
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = "02079460000",
-      email = "info@acmeagents.co.uk"
+      phone = Some("02079460000"),
+      email = Some("info@acmeagents.co.uk")
     )
 
     "return SubmitAgentDetailsResponse when BE returns 200 with valid JSON" in {

@@ -40,7 +40,7 @@ GET         /agent-details/check-agent-contact-details   controllers.manageAgent
 POST        /agent-details/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
 GET         /agent-details/check-your-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(agentReferenceNumber: Option[String])
-POST        /agent-details/submit-agent                  controllers.manageAgents.SubmitAgentController.onSubmit()
+POST        /agent-details/submit-agent                  controllers.manageAgents.CheckYourAnswersController.onSubmit(agentReferenceNumber: Option[String])
 
 GET         /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad(agentReferenceNumber: String)
 POST        /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit(agentReferenceNumber: String)

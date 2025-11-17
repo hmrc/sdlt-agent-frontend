@@ -17,10 +17,11 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.UserAnswers
+import models.{AgentDetailsRequest, NormalMode, UserAnswers}
 import models.manageAgents.AgentContactDetails
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import navigation.Navigator
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage, StornPage}
 import play.api.Logging
 
 import javax.inject.{Inject, Singleton}
@@ -44,6 +45,7 @@ class CheckYourAnswersController @Inject()(
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
                                             sessionRepository: SessionRepository,
+                                            navigator: Navigator,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
@@ -53,8 +55,7 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
-      // TODO: This is a dummy postAction call -> must be replaced with an actual call to the BE
-      val postAction: Call = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
+      val postAction: Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
 
       def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
@@ -73,7 +74,7 @@ class CheckYourAnswersController @Inject()(
             case Some(agentDetails) =>
 
               updateUserAnswers(agentDetails)
-                .fold ({ error =>
+                .fold({ error =>
                   logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
@@ -91,5 +92,37 @@ class CheckYourAnswersController @Inject()(
               Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
           }
       }
+  }
+
+  def onSubmit(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
+    implicit request =>
+      agentReferenceNumber match {
+        case None =>
+          request.userAnswers.data.asOpt[AgentDetailsRequest] match {
+            case None =>
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(agentDetails) =>
+              val emptiedUserAnswers = UserAnswers(request.userId)
+              (for {
+                _ <- stampDutyLandTaxService.submitAgentDetails(agentDetails)
+                updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+              )).recover {
+                case ex =>
+                  logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
+
+          }
+        case Some(arn) =>
+          logger.warn("[CheckYourAnswersController][onSubmit] Duplicate submission attempt detected; blocking progression")
+          //TODO: Need to add a real backend call to update a pre-existing agent
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+
+
   }
 }
