@@ -27,8 +27,8 @@ class AgentContactDetailsSpec extends AnyWordSpec with Matchers {
 
     "serialize to JSON correctly if all fields are present" in {
       val contactDetails = AgentContactDetails(
-        phone = Some("0123456789"),
-        email = Some("thomastkelly@gmail.com")
+        phone = "0123456789",
+        email = "thomastkelly@gmail.com"
       )
 
       val json = Json.toJson(contactDetails)
@@ -50,8 +50,8 @@ class AgentContactDetailsSpec extends AnyWordSpec with Matchers {
       val json = Json.parse(jsonString)
       val contactDetails = json.as[AgentContactDetails]
 
-      contactDetails.phone mustBe Some("0123456789")
-      contactDetails.email mustBe Some("thomastkelly@gmail.com")
+      contactDetails.phone mustBe "0123456789"
+      contactDetails.email mustBe "thomastkelly@gmail.com"
     }
   }
 }

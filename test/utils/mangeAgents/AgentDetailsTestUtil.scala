@@ -45,8 +45,8 @@ trait AgentDetailsTestUtil {
       addressLine3         = Some("Lazy Town"),
       addressLine4         = None,
       postcode             = Some("SW44GFS"),
-      phone                = Some("0543534534543"),
-      email                = Some("agent@example.com")
+      phone                = "0543534534543",
+      email                = "agent@example.com"
     )
 
   def getAgentList(n: Int): List[AgentDetailsResponse] = (1 to n).map(agent).toList
@@ -59,7 +59,7 @@ trait AgentDetailsTestUtil {
     addressLine3         = Some("Birmingham"),
     addressLine4         = None,
     postcode             = Some("B2 4ND"),
-    phone                = Some("01214567890"),
-    email                = Some("info@harborviewestates.co.uk")
+    phone                = "01214567890",
+    email                = "info@harborviewestates.co.uk"
   )
 }

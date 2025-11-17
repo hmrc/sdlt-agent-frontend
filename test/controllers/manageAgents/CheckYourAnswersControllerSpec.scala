@@ -67,12 +67,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             view(
               list = SummaryListViewModel(
                 Seq(
-                  AgentNameSummary.row(ua)(messages(application)).get,
-                  AddressSummary.row(ua)(messages(application)).get,
-                  ContactPhoneNumberSummary.row(ua)(messages(application)).get,
-                  ContactEmailSummary.row(ua)(messages(application)).get
-                )),
-              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+                  AgentNameSummary.row(ua)(messages(application)),
+                  AddressSummary.row(ua)(messages(application)),
+                  ContactPhoneNumberSummary.row(ua)(messages(application)),
+                  ContactEmailSummary.row(ua)(messages(application))
+                ).flatten
+              ),
+              postAction = controllers.manageAgents.routes.SubmitAgentController.onSubmit()
             )(request, messages(application)).toString
         }
       }
@@ -148,8 +149,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           addressLine3 = Some("Birmingham"),
           addressLine4 = None,
           postcode = Some("B2 4ND"),
-          phone = Some("01214567890"),
-          email = Some("info@harborviewestates.co.uk")
+          phone = "01214567890",
+          email = "info@harborviewestates.co.uk"
         )
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))

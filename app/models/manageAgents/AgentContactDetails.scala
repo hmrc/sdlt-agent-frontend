@@ -19,7 +19,7 @@ package models.manageAgents
 import play.api.libs.json.{Json, OFormat}
 
 case class AgentContactDetails(
-                                phone: Option[String], email: Option[String]
+                                phone: String, email: String
                               )
 
 object AgentContactDetails {

@@ -26,8 +26,8 @@ case class AgentDetailsRequest(
                                 addressLine3         : Option[String],
                                 addressLine4         : Option[String],
                                 postcode             : Option[String],
-                                phone                : Option[String],
-                                email                : Option[String]
+                                phone                : String,
+                                email                : String
 )
 
 object AgentDetailsRequest {
