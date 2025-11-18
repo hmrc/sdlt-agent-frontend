@@ -36,13 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class StartAddAgentController @Inject()(
-                                         val controllerComponents: MessagesControllerComponents,
-                                         identify: IdentifierAction,
-                                         stampDutyLandTaxService: StampDutyLandTaxService,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator
-                                       )(implicit appConfig: FrontendAppConfig,
-                                         executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                     val controllerComponents: MessagesControllerComponents,
+                                     identify: IdentifierAction,
+                                     stampDutyLandTaxService: StampDutyLandTaxService,
+                                     sessionRepository: SessionRepository,
+                                     navigator: Navigator
+                                   )(implicit appConfig: FrontendAppConfig,
+                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
