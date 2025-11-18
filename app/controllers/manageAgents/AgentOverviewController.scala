@@ -50,7 +50,7 @@ class AgentOverviewController @Inject()(
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
-    val postAction: Call = StartAddAgentController.onSubmit()
+    val postAction: Call = StartAddAgentController.onPageLoad()
 
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn).map {
