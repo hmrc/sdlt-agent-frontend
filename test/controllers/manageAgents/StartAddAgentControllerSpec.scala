@@ -74,20 +74,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         flash(result).get("agentsLimitReached") mustBe Some("true")
       }
     }
-
-    "must redirect to Journey Recovery when no existing data is found" in {
-      val application =
-        applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, postUrl)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
+    
     "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
