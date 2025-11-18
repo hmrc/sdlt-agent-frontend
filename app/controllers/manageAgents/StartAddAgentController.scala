@@ -38,9 +38,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class StartAddAgentController @Inject()(
                                      val controllerComponents: MessagesControllerComponents,
                                      identify: IdentifierAction,
-                                     getData: DataRetrievalAction,
-                                     requireData: DataRequiredAction,
-                                     stornRequiredAction: StornRequiredAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                      sessionRepository: SessionRepository,
                                      navigator: Navigator
@@ -49,13 +46,21 @@ class StartAddAgentController @Inject()(
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn)
       .flatMap {
         case agents if agents.size >= MAX_AGENTS =>
-          Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-            .flashing("agentsLimitReached" -> "true"))
+
+          val userAnswers = UserAnswers(id = request.userId)
+
+          for {
+            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
+                         _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers))
+            .flashing("agentsLimitReached" -> "true")
+
         case _ =>
 
           val emptiedUserAnswers = UserAnswers(id = request.userId)
@@ -65,9 +70,9 @@ class StartAddAgentController @Inject()(
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers))
       } recover {
-        case ex =>
-          logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
-          Redirect(JourneyRecoveryController.onPageLoad())
-      }
+      case ex =>
+        logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
+        Redirect(JourneyRecoveryController.onPageLoad())
     }
+  }
 }
