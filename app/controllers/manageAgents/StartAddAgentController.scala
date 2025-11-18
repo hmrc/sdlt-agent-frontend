@@ -49,7 +49,7 @@ class StartAddAgentController @Inject()(
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn)
       .flatMap {
