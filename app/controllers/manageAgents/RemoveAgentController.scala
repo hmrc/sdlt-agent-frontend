@@ -51,8 +51,6 @@ class RemoveAgentController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   // TODO: Tidy up logic on this page
-  
-  
 
   val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
 
@@ -80,13 +78,15 @@ class RemoveAgentController @Inject()(
       stampDutyLandTaxService.getAgentDetails(request.storn, agentReferenceNumber) flatMap {
         case Some(agentDetails) =>
           val form: Form[RemoveAgent] = formProvider(agentDetails)
+
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
+
             removeChoice =>
-              val agentName = agentDetails.agentName // TODO: Send to agent overview page upon successful deletion
               removeChoice match {
                 case RemoveAgent.Option1 =>
+                  val agentName = agentDetails.agentName // TODO: Send to agent overview page upon successful deletion
                   stampDutyLandTaxService
                     .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap {
                       case true =>
@@ -95,13 +95,14 @@ class RemoveAgentController @Inject()(
                       case false =>
                         logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
                         Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-              }
+                    }
+
                 case RemoveAgent.Option2 =>
                   logger.error(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
                   Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
               }
-
           )
+
         case None =>
           logger.error(s"[RemoveAgentController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
           Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
