@@ -202,7 +202,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       when(service.removeAgentDetails(any(), any())(any()))
-        .thenReturn(Future.successful(true))
+        .thenReturn(Future.unit)
 
       running(application) {
         val request =

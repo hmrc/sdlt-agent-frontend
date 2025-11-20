@@ -47,7 +47,7 @@ class StampDutyLandTaxService @Inject() (
       .submitAgentDetails(agentDetails)
 
   def removeAgentDetails(storn: String, agentReferenceNumber: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
+                        (implicit headerCarrier: HeaderCarrier): Future[Unit] =
     stampDutyLandTaxConnector
       .removeAgentDetails(storn, agentReferenceNumber)
       
