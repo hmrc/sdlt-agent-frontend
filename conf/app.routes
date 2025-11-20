@@ -17,7 +17,7 @@ GET         /account/signed-out                          controllers.auth.Signed
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
 GET         /agent-details/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
-POST        /agent-details/start-add-agent               controllers.manageAgents.StartAddAgentController.onSubmit()
+GET         /agent-details/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
 
 GET         /agent-details/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
 POST        /agent-details/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)

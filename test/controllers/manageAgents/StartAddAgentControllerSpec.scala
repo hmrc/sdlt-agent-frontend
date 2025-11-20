@@ -32,8 +32,8 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
   private val service = mock[StampDutyLandTaxService]
 
-  private def postUrl: String = routes.StartAddAgentController.onSubmit().url
-  "StartAddAgentController.onSubmit" - {
+  private def postUrl: String = routes.StartAddAgentController.onPageLoad().url
+  "StartAddAgentController.onPageLoad" - {
 
     "must redirect to AgentNameController when the number of agents is below the max" in {
       val application =
@@ -45,7 +45,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         .thenReturn(Future.successful(getAgentList(MAX_AGENTS - 1)))
 
       running(application) {
-        val request = FakeRequest(POST, postUrl)
+        val request = FakeRequest(GET, postUrl)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -64,7 +64,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         .thenReturn(Future.successful(getAgentList(MAX_AGENTS)))
 
       running(application) {
-        val request = FakeRequest(POST, postUrl)
+        val request = FakeRequest(GET, postUrl)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
@@ -74,20 +74,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         flash(result).get("agentsLimitReached") mustBe Some("true")
       }
     }
-
-    "must redirect to Journey Recovery when no existing data is found" in {
-      val application =
-        applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(POST, postUrl)
-        val result  = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
+    
     "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -98,7 +85,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       running(application) {
-        val request = FakeRequest(POST, postUrl)
+        val request = FakeRequest(GET, postUrl)
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER

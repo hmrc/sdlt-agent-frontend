@@ -37,7 +37,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
     controllers.manageAgents.routes.AgentOverviewController.onPageLoad(page).url
 
   private def startAddAgentJourneyUrl =
-    controllers.manageAgents.routes.StartAddAgentController.onSubmit().url
+    controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
 
   private val agents22 = getAgentList(22)
 
@@ -64,7 +64,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
             maybeSummaryList   = None,
             pagination         = None,
             paginationInfoText = None,
-            postAction         = controllers.manageAgents.routes.StartAddAgentController.onSubmit()
+            redirect           = controllers.manageAgents.routes.StartAddAgentController.onPageLoad()
           )(request, messages(application)).toString
       }
     }
@@ -89,7 +89,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         body must include("Agent 10")
         body must not include "Agent 11"
 
-        body must include(s"""action="$startAddAgentJourneyUrl"""")
+        body must include(s"""href="$startAddAgentJourneyUrl"""")
 
         body must include("pagination")
         body must include("Next")
