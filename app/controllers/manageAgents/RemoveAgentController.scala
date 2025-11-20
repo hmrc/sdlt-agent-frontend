@@ -86,11 +86,12 @@ class RemoveAgentController @Inject()(
             removeChoice =>
               removeChoice match {
                 case RemoveAgent.Option1 =>
-                  val agentName = agentDetails.agentName // TODO: Send to agent overview page upon successful deletion
                   stampDutyLandTaxService
                     .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap { _ =>
                         logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
-                        Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
+                        Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+                          .flashing("agentRemoved" -> agentDetails.agentName)
+                        )
                     }
 
                 case RemoveAgent.Option2 =>

@@ -99,6 +99,7 @@ manageAgents.agentDetails.heading                   = Agent Overview
 manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
 manageAgents.agentDetails.limitReached              = You have reached the limit of 25 agents. To add a new agent, you must delete one
+manageAgents.agentDetails.removeAgent.notification  = You have removed {0}
 
 manageAgents.unauthorised.org.title                 = Sorry, you’re unable to use this service
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
