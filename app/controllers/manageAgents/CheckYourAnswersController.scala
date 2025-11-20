@@ -18,13 +18,9 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.{AgentDetailsRequest, NormalMode, UserAnswers}
-import models.manageAgents.AgentContactDetails
-import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage, StornPage}
+import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.Logging
-
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -35,6 +31,7 @@ import viewmodels.govuk.summarylist.*
 import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -110,7 +107,8 @@ class CheckYourAnswersController @Inject()(
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              )).recover {
+              ).flashing("agentCreated" -> agentDetails.agentName)
+                ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

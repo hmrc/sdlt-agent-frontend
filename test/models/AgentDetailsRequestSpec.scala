@@ -16,17 +16,17 @@
 
 package models
 
+import generators.AgentDetailsRequestGenerator
 import org.scalacheck.Gen
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, Json, JsonValidationError, __}
 
-class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks {
+class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with AgentDetailsRequestGenerator {
 
   "AgentDetailsRequest" - {
     "must serialise into json from agentDetails" in {
-      val nonEmptyString: Gen[String] = Gen.alphaNumStr.suchThat(_.nonEmpty)
       forAll(nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString) {
         (agentName, addressLine1, addressLine2, addressLine3, addressLine4) => {
           val agentDetails = AgentDetailsRequest(

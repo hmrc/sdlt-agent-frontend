@@ -224,7 +224,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         }
       }
-      "must redirect to next AgentOverviewPage after submitting agentDetails to StampDutyLandTaxService.submitAgentDetails in BE" in {
+      "must redirect to AgentOverviewPage with flash after successfully submitting agentDetails to StampDutyLandTaxService.submitAgentDetails in BE" in {
         val navigator = new Navigator
         val service = mock[StampDutyLandTaxService]
         val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
@@ -241,6 +241,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           status(result) mustEqual SEE_OTHER
 
           redirectLocation(result).value mustEqual navigator.nextPage(AgentOverviewPage, NormalMode, emptyUserAnswers).url
+
+          flash(result).get("agentCreated") mustBe Some("John")
 
           verify(service, times(1)).submitAgentDetails(any())(any())
 

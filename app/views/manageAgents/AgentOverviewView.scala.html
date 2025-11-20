@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 @import views.html.components._
+@import views.html.components.SuccessNotificationBanner
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import controllers.manageAgents.routes._
 
@@ -27,13 +28,14 @@
         govukErrorSummary: GovukErrorSummary,
         formHelper: FormWithCSRF,
         p: Paragraph,
-        hmrcPageHeading: HmrcPageHeading
+        hmrcPageHeading: HmrcPageHeading,
+        successNotificationBanner: SuccessNotificationBanner
 )
 @(
-        maybeSummaryList:   Option[SummaryList],
-        pagination:         Option[Pagination],
+        maybeSummaryList: Option[SummaryList],
+        pagination: Option[Pagination],
         paginationInfoText: Option[String],
-        postAction:         Call
+        postAction: Call
 )(
         implicit request: Request[_],
         messages: Messages
@@ -43,6 +45,11 @@
     pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
     showBackLink = false
 ) {
+
+    @request.flash.get("agentCreated").map { agentName =>
+        @successNotificationBanner(agentName)
+
+    }
 
     @request.flash.get("agentsLimitReached").map { _ =>
         @govukErrorSummary(
@@ -57,32 +64,36 @@
         )
     }
 
+
     @hmrcPageHeading(PageHeading(
-        text    = messages("manageAgents.agentDetails.heading"),
+        text = messages("manageAgents.agentDetails.heading"),
         headingClasses = Some("govuk-heading-l"),
         captionClasses = Some("govuk-caption-xl"),
         section = Some(messages("manageAgents.caption"))
     ))
 
-
-    @{maybeSummaryList match {
-        case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
-        case None          => p(messages("manageAgents.agentOverview.noAgents.info.text"))
-    }}
+    @{
+        maybeSummaryList match {
+            case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
+            case None => p(messages("manageAgents.agentOverview.noAgents.info.text"))
+        }
+    }
 
     @paginationInfoText.map(p(_))
 
-    @{maybeSummaryList match {
-        case Some(summary) => govukSummaryList(summary)
-        case None          => p(messages("manageAgents.agentOverview.noAgents.text"))
-    }}
+    @{
+        maybeSummaryList match {
+            case Some(summary) => govukSummaryList(summary)
+            case None => p(messages("manageAgents.agentOverview.noAgents.text"))
+        }
+    }
 
     @pagination.map(govukPagination(_))
 
     @formHelper(action = postAction) {
         @govukButton(
             ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                .withCssClass("govuk-!-margin-top-2")
+            .withCssClass("govuk-!-margin-top-2")
         )
     }
 }
