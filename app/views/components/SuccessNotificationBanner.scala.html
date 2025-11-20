@@ -14,22 +14,19 @@
  * limitations under the License.
  *@
 
-@this()
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@this(govukNotificationBanner: GovukNotificationBanner)
 
 @(
-    agentName: String
+        agentName: String
 )(implicit messages: Messages)
 
-
-<div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-    <div class="govuk-notification-banner__header">
-        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-            @messages("site.success")
-        </h2>
-    </div>
-    <div class="govuk-notification-banner__content">
-        <p class="govuk-notification-banner__heading">
-            @messages("manageAgents.submitAgentDetails.notification", agentName)
-        </p>
-    </div>
-</div>
+@html = {
+    <h3 class="govuk-notification-banner__heading">
+        @messages("manageAgents.submitAgentDetails.notification", agentName)
+    </h3>
+}
+@govukNotificationBanner(NotificationBanner(
+    content = HtmlContent(html),
+    bannerType = Some("success")
+))
