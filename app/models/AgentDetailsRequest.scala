@@ -20,15 +20,15 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OWrites, Reads, __}
 
 case class AgentDetailsRequest(
-                                agentName            : String,
-                                addressLine1         : Option[String],
-                                addressLine2         : Option[String],
-                                addressLine3         : Option[String],
-                                addressLine4         : Option[String],
-                                postcode             : Option[String],
-                                phone                : Option[String],
-                                email                : Option[String]
-)
+                                agentName: String,
+                                addressLine1: Option[String],
+                                addressLine2: Option[String],
+                                addressLine3: Option[String],
+                                addressLine4: Option[String],
+                                postcode: Option[String],
+                                phone: Option[String],
+                                email: Option[String]
+                              )
 
 object AgentDetailsRequest {
 
@@ -44,5 +44,5 @@ object AgentDetailsRequest {
     )(AgentDetailsRequest.apply _)
 
 
-  implicit val writes:OWrites[AgentDetailsRequest] = Json.writes[AgentDetailsRequest]
+  implicit val writes: OWrites[AgentDetailsRequest] = Json.writes[AgentDetailsRequest]
 }
