@@ -75,7 +75,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .get(removeAgentDetailsUrl(storn, agentReferenceNumber))
       .execute[HttpResponse]
       .flatMap { response =>
-        if(response.status / 100 == 2) Future.unit
+        if(response.status == 200) Future.unit
         else Future.failed(new RuntimeException(s"Failed to remove agent: status=${response.status}, body=${response.body}"))
       }
       .recover {
