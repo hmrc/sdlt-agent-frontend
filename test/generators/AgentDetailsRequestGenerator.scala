@@ -20,7 +20,7 @@ import org.scalacheck.Gen
 
 trait AgentDetailsRequestGenerator {
 
-  def nonEmptyString: Gen[String] =
+  implicit lazy val nonEmptyString: Gen[String] =
     Gen.nonEmptyListOf[Char](Gen.alphaNumChar).map(_.mkString)
 
 }

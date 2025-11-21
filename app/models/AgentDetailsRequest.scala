@@ -20,6 +20,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OWrites, Reads, __}
 
 case class AgentDetailsRequest(
+                                storn: String,
                                 agentName: String,
                                 addressLine1: Option[String],
                                 addressLine2: Option[String],
@@ -33,7 +34,8 @@ case class AgentDetailsRequest(
 object AgentDetailsRequest {
 
   implicit val reads: Reads[AgentDetailsRequest] = (
-    (__ \ "agentName").read[String] and
+    (__ \ "storn").read[String] and
+      (__ \ "agentName").read[String] and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(1)) and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(2)) and

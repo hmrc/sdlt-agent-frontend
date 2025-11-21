@@ -17,7 +17,6 @@
 package models
 
 import generators.AgentDetailsRequestGenerator
-import org.scalacheck.Gen
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -27,9 +26,11 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
 
   "AgentDetailsRequest" - {
     "must serialise into json from agentDetails" in {
+      val testSorn: String = "STN001"
       forAll(nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString) {
         (agentName, addressLine1, addressLine2, addressLine3, addressLine4) => {
           val agentDetails = AgentDetailsRequest(
+            storn = testSorn,
             agentName = agentName,
             addressLine1 = Some(addressLine1),
             addressLine2 = Some(addressLine2),
@@ -42,6 +43,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
           Json.toJson(agentDetails) mustEqual Json.parse(
             s"""
                |{
+               |"storn": "$testSorn",
                |"agentName":"$agentName",
                |"addressLine1":"$addressLine1",
                |"addressLine2":"$addressLine2",
@@ -55,11 +57,11 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
         }
       }
     }
-    "must serialise into json when only agentName is given" in {
-      val nonEmptyString: Gen[String] = Gen.alphaNumStr.suchThat(_.nonEmpty)
-      forAll(nonEmptyString) {
-        agentName => {
+    "must serialise into json when only agentName and storn is given" in {
+      forAll(nonEmptyString, nonEmptyString) {
+        (storn, agentName) => {
           val agentDetails = AgentDetailsRequest(
+            storn = storn,
             agentName = agentName,
             addressLine1 = None,
             addressLine2 = None,
@@ -72,6 +74,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
           Json.toJson(agentDetails) mustEqual Json.parse(
             s"""
                |{
+               |"storn": "$storn",
                |"agentName":"$agentName"
                |}
                |""".stripMargin)
@@ -80,11 +83,11 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
     }
 
     "must deserialize from mongo" - {
-      "when agent name is given" in {
-        val nonEmptyString: Gen[String] = Gen.alphaNumStr.suchThat(_.nonEmpty)
-        forAll(nonEmptyString) {
-          agentName => {
+      "when agent name and storn are given" in {
+        forAll(nonEmptyString, nonEmptyString) {
+          (storn, agentName) => {
             val agentDetailsRequest = AgentDetailsRequest(
+              storn = storn,
               agentName = agentName,
               addressLine1 = Some("WoodLane"),
               addressLine2 = None,
@@ -98,6 +101,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
               .parse(
                 s"""
                    |{
+                   |"storn": "$storn",
                    |"agentName":"$agentName",
                    |"agentAddress":{
                    | "address":{
@@ -121,10 +125,11 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
       }
     }
     "must fail to deserialize from mongo" - {
-      "when agent name is not given" in {
+      "when agentName is not given" in {
         val jsonWithMissingAgentName = Json.parse(
           s"""
              |{
+             |"storn":"STN001",
              |"agentAddress":{
              | "address":{
              | "lines":[
@@ -144,6 +149,60 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
         val result = jsonWithMissingAgentName.validate[AgentDetailsRequest]
         result mustEqual JsError(Seq(
           __ \ "agentName" -> Seq(JsonValidationError("error.path.missing"))
+        ))
+
+      }
+      "when storn  is not given" in {
+        val jsonWithMissingStorn = Json.parse(
+          s"""
+             |{
+             |"agentName": "mark",
+             |"agentAddress":{
+             | "address":{
+             | "lines":[
+             | "WoodLane"
+             | ],
+             | "postcode": "DY28AB"
+             | }
+             |},
+             |"agentContactDetails":{
+             |"phone":"123456",
+             |"email":"testexample@email.com"
+             |}
+             |}
+             |""".stripMargin)
+
+
+        val result = jsonWithMissingStorn.validate[AgentDetailsRequest]
+        result mustEqual JsError(Seq(
+          __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
+        ))
+
+      }
+      "when storn and agentName  are not given" in {
+        val jsonWithMissingStornAndAgentName = Json.parse(
+          s"""
+             |{
+             |"agentAddress":{
+             | "address":{
+             | "lines":[
+             | "WoodLane"
+             | ],
+             | "postcode": "DY28AB"
+             | }
+             |},
+             |"agentContactDetails":{
+             |"phone":"123456",
+             |"email":"testexample@email.com"
+             |}
+             |}
+             |""".stripMargin)
+
+
+        val result = jsonWithMissingStornAndAgentName.validate[AgentDetailsRequest]
+        result mustEqual JsError(Seq(
+          __ \ "agentName" -> Seq(JsonValidationError("error.path.missing")),
+          __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
         ))
 
       }

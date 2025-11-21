@@ -164,6 +164,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
     val submitAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
     val agentDetails = AgentDetailsRequest(
+      storn = "STN001",
       agentName = "Acme Property Agents Ltd",
       addressLine1 = Some("42 High Street"),
       addressLine2 = Some("Westminster"),
@@ -180,13 +181,13 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody("""{ "agentResourceRef": "ARN4324234" }""")
+              .withBody("""{ "agentResourceRef": "ARN4324234", "agentId" : "1234" }""")
           )
       )
 
       val result = connector.submitAgentDetails(agentDetails).futureValue
 
-      result mustBe SubmitAgentDetailsResponse(agentResourceRef = "ARN4324234")
+      result mustBe SubmitAgentDetailsResponse(agentResourceRef = "ARN4324234", agentId = "1234")
     }
 
     "fail when BE returns 200 with invalid JSON" in {

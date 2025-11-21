@@ -232,7 +232,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           .build()
 
         when(service.submitAgentDetails(any())(any()))
-          .thenReturn(Future.successful(SubmitAgentDetailsResponse("OK")))
+          .thenReturn(Future.successful(SubmitAgentDetailsResponse("agentResourceRef", "agentId")))
 
         running(application) {
           val request = FakeRequest(POST, submitAnswerUrl(None))
