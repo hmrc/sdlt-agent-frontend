@@ -17,8 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
-import models.{AgentDetailsAfterCreation, AgentDetailsRequest, AgentDetailsResponse}
+import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 

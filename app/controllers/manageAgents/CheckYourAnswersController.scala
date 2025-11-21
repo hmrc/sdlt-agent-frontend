@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.{AgentDetailsBeforeCreation, NormalMode, UserAnswers}
+import models.{AgentDetailsBeforeCreation, AgentDetailsAfterCreation, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.Logging
@@ -116,11 +116,28 @@ class CheckYourAnswersController @Inject()(
 
           }
         case Some(arn) =>
-          logger.warn("[CheckYourAnswersController][onSubmit] Duplicate submission attempt detected; blocking progression")
-          //TODO: Need to add a real backend call to update a pre-existing agent
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+          request.userAnswers.data.asOpt[AgentDetailsAfterCreation] match {
+            case None =>
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(agentDetailsAfterCreation) =>
+              val emptiedUserAnswers = UserAnswers(request.userId)
+              val updated = agentDetailsAfterCreation.copy(agentReferenceNumber = arn)
+              (for {
+                _ <- stampDutyLandTaxService.updateAgentDetails(updated)
+                updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+              ).flashing("agentUpdated" -> agentDetailsAfterCreation.agentName)
+                ).recover {
+                case ex =>
+                  logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
 
+          }
+      }
 
   }
 }
