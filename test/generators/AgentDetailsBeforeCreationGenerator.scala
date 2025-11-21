@@ -18,11 +18,10 @@ package generators
 
 import org.scalacheck.Gen
 
-trait AgentDetailsRequestGenerator {
+trait AgentDetailsBeforeCreationGenerator {
 
   implicit lazy val nonEmptyString: Gen[String] =
     Gen.nonEmptyListOf[Char](Gen.alphaNumChar).map(_.mkString)
 
 }
-
 

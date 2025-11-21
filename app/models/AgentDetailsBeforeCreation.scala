@@ -19,7 +19,7 @@ package models
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OWrites, Reads, __}
 
-case class AgentDetailsRequest(
+case class AgentDetailsBeforeCreation(
                                 storn: String,
                                 agentName: String,
                                 addressLine1: Option[String],
@@ -31,9 +31,9 @@ case class AgentDetailsRequest(
                                 email: Option[String]
                               )
 
-object AgentDetailsRequest {
+object AgentDetailsBeforeCreation {
 
-  implicit val reads: Reads[AgentDetailsRequest] = (
+  implicit val reads: Reads[AgentDetailsBeforeCreation] = (
     (__ \ "storn").read[String] and
       (__ \ "agentName").read[String] and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
@@ -43,8 +43,8 @@ object AgentDetailsRequest {
       (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
       (__ \ "agentContactDetails" \ "phone").readNullable[String] and
       (__ \ "agentContactDetails" \ "email").readNullable[String]
-    )(AgentDetailsRequest.apply _)
+    )(AgentDetailsBeforeCreation.apply _)
 
 
-  implicit val writes: OWrites[AgentDetailsRequest] = Json.writes[AgentDetailsRequest]
+  implicit val writes: OWrites[AgentDetailsBeforeCreation] = Json.writes[AgentDetailsBeforeCreation]
 }

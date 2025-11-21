@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsRequest, AgentDetailsResponse}
+import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import org.scalatest.concurrent.ScalaFutures
@@ -140,7 +140,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "submitAgentDetails" should {
 
-    val payload = AgentDetailsRequest(
+    val payload = AgentDetailsBeforeCreation(
       storn = "STNOO1",
       agentName = "42 Acme Property Agents Ltd",
       addressLine1 = Some("High Street"),

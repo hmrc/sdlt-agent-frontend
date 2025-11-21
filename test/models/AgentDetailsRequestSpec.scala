@@ -16,20 +16,20 @@
 
 package models
 
-import generators.AgentDetailsRequestGenerator
+import generators.AgentDetailsBeforeCreationGenerator
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, Json, JsonValidationError, __}
 
-class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with AgentDetailsRequestGenerator {
+class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with AgentDetailsBeforeCreationGenerator {
 
-  "AgentDetailsRequest" - {
+  "AgentDetailsBeforeCreation" - {
     "must serialise into json from agentDetails" in {
       val testSorn: String = "STN001"
       forAll(nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString) {
         (agentName, addressLine1, addressLine2, addressLine3, addressLine4) => {
-          val agentDetails = AgentDetailsRequest(
+          val agentDetailsBeforeCreation = AgentDetailsBeforeCreation(
             storn = testSorn,
             agentName = agentName,
             addressLine1 = Some(addressLine1),
@@ -40,7 +40,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
             phone = Some("98765432"),
             email = Some("tyson31@gmail.com")
           )
-          Json.toJson(agentDetails) mustEqual Json.parse(
+          Json.toJson(agentDetailsBeforeCreation) mustEqual Json.parse(
             s"""
                |{
                |"storn": "$testSorn",
@@ -60,7 +60,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
     "must serialise into json when only agentName and storn is given" in {
       forAll(nonEmptyString, nonEmptyString) {
         (storn, agentName) => {
-          val agentDetails = AgentDetailsRequest(
+          val agentDetailsBeforeCreation = AgentDetailsBeforeCreation(
             storn = storn,
             agentName = agentName,
             addressLine1 = None,
@@ -71,7 +71,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
             phone = None,
             email = None
           )
-          Json.toJson(agentDetails) mustEqual Json.parse(
+          Json.toJson(agentDetailsBeforeCreation) mustEqual Json.parse(
             s"""
                |{
                |"storn": "$storn",
@@ -86,7 +86,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
       "when agent name and storn are given" in {
         forAll(nonEmptyString, nonEmptyString) {
           (storn, agentName) => {
-            val agentDetailsRequest = AgentDetailsRequest(
+            val agentDetailsBeforeCreation = AgentDetailsBeforeCreation(
               storn = storn,
               agentName = agentName,
               addressLine1 = Some("WoodLane"),
@@ -117,7 +117,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
                    |}
                    |}
                    |""".stripMargin)
-              .as[AgentDetailsRequest] mustBe agentDetailsRequest
+              .as[AgentDetailsBeforeCreation] mustBe agentDetailsBeforeCreation
 
           }
         }
@@ -146,7 +146,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
              |""".stripMargin)
 
 
-        val result = jsonWithMissingAgentName.validate[AgentDetailsRequest]
+        val result = jsonWithMissingAgentName.validate[AgentDetailsBeforeCreation]
         result mustEqual JsError(Seq(
           __ \ "agentName" -> Seq(JsonValidationError("error.path.missing"))
         ))
@@ -173,7 +173,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
              |""".stripMargin)
 
 
-        val result = jsonWithMissingStorn.validate[AgentDetailsRequest]
+        val result = jsonWithMissingStorn.validate[AgentDetailsBeforeCreation]
         result mustEqual JsError(Seq(
           __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
         ))
@@ -199,7 +199,7 @@ class AgentDetailsRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckP
              |""".stripMargin)
 
 
-        val result = jsonWithMissingStornAndAgentName.validate[AgentDetailsRequest]
+        val result = jsonWithMissingStornAndAgentName.validate[AgentDetailsBeforeCreation]
         result mustEqual JsError(Seq(
           __ \ "agentName" -> Seq(JsonValidationError("error.path.missing")),
           __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
