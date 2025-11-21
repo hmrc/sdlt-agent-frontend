@@ -120,18 +120,18 @@ class CheckYourAnswersController @Inject()(
         case Some(arn) =>
           request.userAnswers.data.asOpt[AgentDetailsAfterCreation] match {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsAfterCreation")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(agentDetailsAfterCreation) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
-              val updated = agentDetailsAfterCreation.copy(agentReferenceNumber = arn)
+              val updated = agentDetailsAfterCreation.copy(agentReferenceNumber = Some(arn))
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
                 updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              ).flashing("agentUpdated" -> agentDetailsAfterCreation.agentName)
+              ).flashing("agentCreated" -> agentDetailsAfterCreation.agentName)
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
