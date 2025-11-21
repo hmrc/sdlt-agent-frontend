@@ -20,7 +20,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OFormat, Reads, __}
 
 case class AgentDetailsAfterCreation (
-                                       agentReferenceNumber : String,
+                                       agentReferenceNumber        : Option[String], //still manditory, reference number is injected in controller
                                        storn                       : String,
                                        agentName                   : String,
                                        houseNumber                 : Option[String],
@@ -37,7 +37,7 @@ object AgentDetailsAfterCreation {
 
 
   implicit val reads: Reads[AgentDetailsAfterCreation] = (
-    (__ \ "agentReferenceNumber").read[String] and
+    (__ \ "agentReferenceNumber").readNullable[String] and
     (__ \ "storn").read[String] and
     (__ \ "agentName").read[String] and
     (__ \ "agentAddress" \ "address" \ "houseNumber").readNullable[String] and
