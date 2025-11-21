@@ -83,20 +83,19 @@ class RemoveAgentController @Inject()(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
 
-            removeChoice =>
-              removeChoice match {
-                case RemoveAgent.Option1 =>
-                  stampDutyLandTaxService
-                    .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap { _ =>
-                        logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
-                        Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-                          .flashing("agentRemoved" -> agentDetails.agentName)
-                        )
-                    }
+            removeChoice => removeChoice match {
+              case RemoveAgent.Option1 =>
+                stampDutyLandTaxService
+                  .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap { _ =>
+                    logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
+                    Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+                      .flashing("agentRemoved" -> agentDetails.agentName)
+                    )
+                  }
 
-                case RemoveAgent.Option2 =>
-                  logger.error(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
-                  Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
+              case RemoveAgent.Option2 =>
+                logger.error(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
+                Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
               }
           )
 
