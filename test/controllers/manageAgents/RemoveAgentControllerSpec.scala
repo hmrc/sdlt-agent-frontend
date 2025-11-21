@@ -17,7 +17,6 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import models.AgentDetailsResponse
 import navigation.{FakeNavigator, Navigator}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
@@ -27,6 +26,7 @@ import repositories.SessionRepository
 import controllers.routes
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
+import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 import play.api.mvc.Call
 import services.StampDutyLandTaxService
@@ -54,18 +54,23 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
   implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-  
-  val testAgentResponse = AgentDetailsResponse(
-    agentReferenceNumber = agentReferenceNumber,
-    agentName = "Harborview Estates",
-    addressLine1 = "Queensway",
-    addressLine2 = None,
-    addressLine3 = Some("Birmingham"),
-    addressLine4 = None,
+
+  val testAgentResponse: CreatedAgent = CreatedAgent(
+    storn = testStorn,
+    agentId = None,
+    name = "Harborview Estates",
+    houseNumber = None,
+    address1 = "Queensway",
+    address2 = None,
+    address3 = Some("Birmingham"),
+    address4 = None,
     postcode = Some("B2 4ND"),
     phone = "01214567890",
-    email = "info@harborviewestates.co.uk"
+    email = "info@harborviewestates.co.uk",
+    dxAddress = None,
+    agentResourceReference = agentReferenceNumber
   )
+
 
   val form: Form[RemoveAgent] = formProvider(testAgentResponse)
 

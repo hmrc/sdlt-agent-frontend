@@ -16,7 +16,8 @@
 
 package utils.mangeAgents
 
-import models.{AgentDetailsResponse, Mode, NormalMode}
+import models.responses.organisation.CreatedAgent
+import models.{Mode, NormalMode}
 import play.api.mvc.Call
 
 trait AgentDetailsTestUtil {
@@ -35,31 +36,39 @@ trait AgentDetailsTestUtil {
 
     val onwardRoute: Mode => Call = mode =>  controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
   }
-  
-  private def agent(i: Int): AgentDetailsResponse =
-    AgentDetailsResponse(
-      agentReferenceNumber = "ARN001",
-      agentName            = s"Agent $i",
-      addressLine1         = s"64 Address $i",
-      addressLine2         = None,
-      addressLine3         = Some("Lazy Town"),
-      addressLine4         = None,
-      postcode             = Some("SW44GFS"),
-      phone                = "0543534534543",
-      email                = "agent@example.com"
+
+  private def agent(i: Int): CreatedAgent =
+    CreatedAgent(
+      storn = "STN001",
+      agentId = None,
+      name = s"Agent $i",
+      houseNumber = None,
+      address1 = s"64 Address $i",
+      address2 = None,
+      address3 = Some("Lazy Town"),
+      address4 = None,
+      postcode = Some("SW44GFS"),
+      phone = "0543534534543",
+      email = "agent@example.com",
+      dxAddress = None,
+      agentResourceReference = "ARN001"
     )
 
-  def getAgentList(n: Int): List[AgentDetailsResponse] = (1 to n).map(agent).toList
+  def getAgentList(n: Int): List[CreatedAgent] = (1 to n).map(agent).toList
 
-  val testAgentDetails: AgentDetailsResponse = AgentDetailsResponse(
-    agentReferenceNumber = "ARN001",
-    agentName            = "Harborview Estates",
-    addressLine1         = "22A Queensway",
-    addressLine2         = None,
-    addressLine3         = Some("Birmingham"),
-    addressLine4         = None,
-    postcode             = Some("B2 4ND"),
-    phone                = "01214567890",
-    email                = "info@harborviewestates.co.uk"
+  val testAgentDetails: CreatedAgent = CreatedAgent(
+    storn = "STN001",
+    agentId = None,
+    name = "Harborview Estates",
+    houseNumber = None,
+    address1 = "22A Queensway",
+    address2 = None,
+    address3 = Some("Birmingham"),
+    address4 = None,
+    postcode = Some("B2 4ND"),
+    phone = "01214567890",
+    email = "info@harborviewestates.co.uk",
+    dxAddress = None,
+    agentResourceReference = "ARN001"
   )
 }

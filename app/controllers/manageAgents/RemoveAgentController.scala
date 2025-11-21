@@ -83,7 +83,7 @@ class RemoveAgentController @Inject()(
               Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
             _ =>
               stampDutyLandTaxService
-                .removeAgentDetails(request.storn, agentDetails.agentReferenceNumber) flatMap {
+                .removeAgentDetails(request.storn, agentDetails.agentResourceReference) flatMap {
                   case true =>
                     logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
                     Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))

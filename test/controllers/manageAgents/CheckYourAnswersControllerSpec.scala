@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import controllers.routes
-import models.{AgentDetailsResponse, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.libs.json.Json
 import services.StampDutyLandTaxService
@@ -27,6 +27,7 @@ import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, C
 import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
 import models.responses.SubmitAgentDetailsResponse
+import models.responses.organisation.CreatedAgent
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
@@ -141,17 +142,22 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val testAgentResponse = AgentDetailsResponse(
-          agentReferenceNumber = testArn,
-          agentName = "Harborview Estates",
-          addressLine1 = "42 Queensway",
-          addressLine2 = None,
-          addressLine3 = Some("Birmingham"),
-          addressLine4 = None,
+        val testAgentResponse: CreatedAgent = CreatedAgent(
+          storn = testStorn,
+          agentId = None,
+          name = "Harborview Estates",
+          houseNumber = None,
+          address1 = "42 Queensway",
+          address2 = None,
+          address3 = Some("Birmingham"),
+          address4 = None,
           postcode = Some("B2 4ND"),
           phone = "01214567890",
-          email = "info@harborviewestates.co.uk"
+          email = "info@harborviewestates.co.uk",
+          dxAddress = None,
+          agentResourceReference = testArn
         )
+
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))

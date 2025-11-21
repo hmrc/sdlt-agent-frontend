@@ -34,7 +34,7 @@ class RemoveAgentFormProviderSpec extends OptionFieldBehaviours with StringField
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = messages("manageAgents.removeAgent.error.required", testAgentDetails.agentName)
+    val requiredKey = messages("manageAgents.removeAgent.error.required", testAgentDetails.name)
 
     behave like optionsField[RemoveAgent](
       form,

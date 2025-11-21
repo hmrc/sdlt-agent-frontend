@@ -17,8 +17,8 @@
 package forms.manageAgents
 
 import forms.mappings.Mappings
-import models.AgentDetailsResponse
 import models.manageAgents.RemoveAgent
+import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 import play.api.i18n.Messages
 
@@ -26,8 +26,8 @@ import javax.inject.Inject
 
 class RemoveAgentFormProvider @Inject() extends Mappings {
 
-  def apply(agentdetails: AgentDetailsResponse )(implicit messages: Messages): Form[RemoveAgent] =
+  def apply(agentdetails: CreatedAgent)(implicit messages: Messages): Form[RemoveAgent] =
     Form(
-      "value" -> enumerable[RemoveAgent]( messages("manageAgents.removeAgent.error.required", agentdetails.agentName))
+      "value" -> enumerable[RemoveAgent]( messages("manageAgents.removeAgent.error.required", agentdetails.name))
     )
 }

@@ -17,8 +17,9 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
+import models.AgentDetailsBeforeCreation
 import models.responses.SubmitAgentDetailsResponse
+import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
@@ -30,13 +31,13 @@ class StampDutyLandTaxService @Inject() (
 )(implicit ec: ExecutionContext) {
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit headerCarrier: HeaderCarrier): Future[Option[AgentDetailsResponse]] =
+                     (implicit headerCarrier: HeaderCarrier): Future[Option[CreatedAgent]] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
-      .map(_.agents.find(_.agentReferenceNumber == agentReferenceNumber))
+      .map(_.agents.find(_.agentResourceReference.contains(agentReferenceNumber)))
 
   def getAllAgentDetails(storn: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[Seq[AgentDetailsResponse]] =
+                        (implicit headerCarrier: HeaderCarrier): Future[Seq[CreatedAgent]] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents)
@@ -55,5 +56,5 @@ class StampDutyLandTaxService @Inject() (
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
-      .map(_.agents.exists(_.agentName == name))
+      .map(_.agents.exists(_.name.contains(name)))
 }
