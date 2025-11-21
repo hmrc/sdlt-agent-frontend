@@ -23,7 +23,7 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -70,10 +70,14 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
 
   def removeAgentDetails(storn: String, agentReferenceNumber: String)
-                        (implicit hc: HeaderCarrier): Future[Boolean] =
+                        (implicit hc: HeaderCarrier): Future[Unit] =
     http
       .get(removeAgentDetailsUrl(storn, agentReferenceNumber))
-      .execute[Boolean]
+      .execute[HttpResponse]
+      .flatMap { response =>
+        if(response.status == 200) Future.unit
+        else Future.failed(new RuntimeException(s"Failed to remove agent: status=${response.status}, body=${response.body}"))
+      }
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][removeAgentDetails]: ${e.getMessage}")

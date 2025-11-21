@@ -27,7 +27,8 @@
         govukErrorSummary: GovukErrorSummary,
         formHelper: FormWithCSRF,
         p: Paragraph,
-        hmrcPageHeading: HmrcPageHeading
+        hmrcPageHeading: HmrcPageHeading,
+        successNotificationBanner: SuccessNotificationBanner
 )
 @(
         maybeSummaryList:   Option[SummaryList],
@@ -43,6 +44,10 @@
     pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
     showBackLink = false
 ) {
+
+    @request.flash.get("agentRemoved").map { agentName =>
+        @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
+    }
 
     @request.flash.get("agentsLimitReached").map { _ =>
         @govukErrorSummary(
