@@ -93,7 +93,7 @@ class RemoveAgentController @Inject()(
                     }
 
                 case RemoveAgent.Option2 =>
-                  logger.error(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
+                  logger.info(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
                   Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
               }
           )
