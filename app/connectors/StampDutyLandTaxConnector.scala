@@ -72,17 +72,17 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-    def updateAgentDetails(agentDetails: AgentDetailsAfterCreation)
-                          (implicit hc: HeaderCarrier): Future[Unit] =
-      http
-        .put(submitAgentDetailsUrl)
-        .withBody(Json.toJson(agentDetails))
-        .execute[Unit]
-        .recover {
-          case e: Throwable =>
-            logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")
-            throw new RuntimeException(e.getMessage)
-        }
+  def updateAgentDetails(agentDetailsAfterCreation: AgentDetailsAfterCreation)
+                        (implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .put(updateAgentDetailsUrl)
+      .withBody(Json.toJson(agentDetailsAfterCreation))
+      .execute[Unit]
+      .recover {
+        case e: Throwable =>
+          logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")
+          throw new RuntimeException(e.getMessage)
+      }
 
   def removeAgentDetails(storn: String, agentReferenceNumber: String)
                         (implicit hc: HeaderCarrier): Future[Unit] =
