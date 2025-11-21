@@ -18,6 +18,7 @@ package services
 
 import connectors.StampDutyLandTaxConnector
 import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
+import models.{AgentDetailsAfterCreation, AgentDetailsRequest, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -45,6 +46,11 @@ class StampDutyLandTaxService @Inject() (
                         (implicit headerCarrier: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     stampDutyLandTaxConnector
       .submitAgentDetails(agentDetails)
+
+  def updateAgentDetails(agentDetails: AgentDetailsAfterCreation)
+                        (implicit headerCarrier: HeaderCarrier): Future[Unit] =
+    stampDutyLandTaxConnector
+      .updateAgentDetails(agentDetails)
 
   def removeAgentDetails(storn: String, agentReferenceNumber: String)
                         (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
