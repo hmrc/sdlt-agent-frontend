@@ -22,7 +22,7 @@ import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import controllers.manageAgents.routes
-import models.AgentDetailsResponse
+import models.responses.organisation.CreatedAgent
 import utils.mangeAgents.AgentDetailsTestUtil
 
 class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTestUtil {
@@ -45,8 +45,8 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
 
   implicit private val messages: Messages = MessagesImpl(Lang("en"), messagesApi)
 
-  private val twentyTwoAgents: Seq[AgentDetailsResponse] = getAgentList(22)
-  private val nineAgents: Seq[AgentDetailsResponse]      = getAgentList(9)
+  private val twentyTwoAgents: Seq[CreatedAgent] = getAgentList(22)
+  private val nineAgents: Seq[CreatedAgent]      = getAgentList(9)
 
   "getNumberOfPages" should {
     "return 1 when up to 10 items" in {

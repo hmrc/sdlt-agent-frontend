@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import models.responses.organisation.CreatedAgent
 
 
 @this(
@@ -30,13 +31,13 @@
 @(
         form: Form[_],
         postAction: Call,
-        agentDetails: AgentDetailsResponse
+        agentDetails: CreatedAgent
 )(
         implicit request: Request[_],
         messages: Messages
 )
 
-@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title", agentDetails.agentName))) {
+@layout(pageTitle = title(form, messages("manageAgents.removeAgent.title", agentDetails.name))) {
 
     @formHelper(action = postAction, Symbol("autoComplete") -> "off") {
 
@@ -45,7 +46,7 @@
         }
 
         @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.removeAgent.heading", agentDetails.agentName),
+            text           = messages("manageAgents.removeAgent.heading", agentDetails.name),
             headingClasses = Some("govuk-heading-l"),
             captionClasses = Some("govuk-caption-xl"),
             section        = Some(messages("manageAgents.caption"))
