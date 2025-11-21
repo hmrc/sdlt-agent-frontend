@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.responses
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@this(govukNotificationBanner: GovukNotificationBanner)
 
-import play.api.libs.json.{Json, OFormat}
+@(
+        notificationMessage: String,
+        agentName: String
+)(implicit messages: Messages)
 
-final case class SubmitAgentDetailsResponse(agentResourceRef: String, agentId:String)
-object SubmitAgentDetailsResponse {
-  implicit val format: OFormat[SubmitAgentDetailsResponse] = Json.format[SubmitAgentDetailsResponse]
-}
+    @html = {
+        <h3 class="govuk-notification-banner__heading">
+        @messages(notificationMessage, agentName)
+        </h3>
+    }
+
+    @govukNotificationBanner(NotificationBanner(
+        content = HtmlContent(html),
+        bannerType = Some("success")
+    ))

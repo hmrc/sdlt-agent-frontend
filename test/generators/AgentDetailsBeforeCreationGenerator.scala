@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package models.responses
+package generators
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalacheck.Gen
 
-final case class SubmitAgentDetailsResponse(agentResourceRef: String, agentId:String)
-object SubmitAgentDetailsResponse {
-  implicit val format: OFormat[SubmitAgentDetailsResponse] = Json.format[SubmitAgentDetailsResponse]
+trait AgentDetailsBeforeCreationGenerator {
+
+  implicit lazy val nonEmptyString: Gen[String] =
+    Gen.nonEmptyListOf[Char](Gen.alphaNumChar).map(_.mkString)
+
 }
+

@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsRequest, AgentDetailsResponse}
+import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import org.scalatest.concurrent.ScalaFutures
@@ -140,22 +140,23 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "submitAgentDetails" should {
 
-    val payload = AgentDetailsRequest(
+    val payload = AgentDetailsBeforeCreation(
+      storn = "STNOO1",
       agentName = "42 Acme Property Agents Ltd",
-      addressLine1 = "High Street",
+      addressLine1 = Some("High Street"),
       addressLine2 = Some("Westminster"),
       addressLine3 = Some("London"),
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = "02079460000",
-      email = "info@acmeagents.co.uk"
+      phone = Some("02079460000"),
+      email = Some("info@acmeagents.co.uk")
     )
 
     "delegate to connector with the given AgentDetails and return the success json" in {
 
       val (service, connector) = newService()
 
-      val response = SubmitAgentDetailsResponse(agentResourceRef = "ARN-001")
+      val response = SubmitAgentDetailsResponse(agentResourceRef = "ARN-001", agentId = "1234")
 
       when(connector.submitAgentDetails(eqTo(payload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(response))

@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{AgentDetailsRequest, AgentDetailsResponse}
+import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
@@ -57,11 +57,11 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(agentDetails: AgentDetailsRequest)
+  def submitAgentDetails(agentDetailsBeforeCreation: AgentDetailsBeforeCreation)
                         (implicit hc: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
     http
       .post(submitAgentDetailsUrl)
-      .withBody(Json.toJson(agentDetails))
+      .withBody(Json.toJson(agentDetailsBeforeCreation))
       .execute[SubmitAgentDetailsResponse]
       .recover {
         case e: Throwable =>
