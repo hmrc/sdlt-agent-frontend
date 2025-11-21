@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
+import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation, AgentDetailsResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
@@ -43,6 +43,9 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
+  private val updateAgentDetailsUrl: URL =
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/update"
+
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
 
@@ -66,6 +69,18 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
+          throw new RuntimeException(e.getMessage)
+      }
+
+  def updateAgentDetails(agentDetailsAfterCreation: AgentDetailsAfterCreation)
+                        (implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .put(updateAgentDetailsUrl)
+      .withBody(Json.toJson(agentDetailsAfterCreation))
+      .execute[Unit]
+      .recover {
+        case e: Throwable =>
+          logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
