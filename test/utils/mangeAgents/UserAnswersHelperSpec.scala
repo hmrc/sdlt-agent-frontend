@@ -17,10 +17,11 @@
 package utils.mangeAgents
 
 import base.SpecBase
-import models.{AgentDetailsResponse, UserAnswers}
+import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import models.responses.organisation.CreatedAgent
 import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
@@ -45,17 +46,23 @@ class UserAnswersHelperSpec
     "should populate AgentName, Address (with missing optional lines), and ContactDetails" in {
       val startUa = emptyUserAnswersWithStorn
 
-      val be = AgentDetailsResponse(
-        agentReferenceNumber = testArn,
-        agentName = "Harborview Estates",
-        addressLine1 = "42 Queensway",
-        addressLine2 = None,
-        addressLine3 = Some("Birmingham"),
-        addressLine4 = None,
-        postcode = Some("B2 4ND"),
-        phone = "01214567890",
-        email = "info@harborviewestates.co.uk"
-      )
+      val be: CreatedAgent =
+        CreatedAgent(
+          storn = testStorn,
+          agentId = None,
+          name = "Harborview Estates",
+          houseNumber = None,
+          address1 = "42 Queensway",
+          address2 = None,
+          address3 = Some("Birmingham"),
+          address4 = None,
+          postcode = Some("B2 4ND"),
+          phone = "01214567890",
+          email = "info@harborviewestates.co.uk",
+          dxAddress = None,
+          agentResourceReference = testArn
+        )
+
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
 
@@ -77,17 +84,22 @@ class UserAnswersHelperSpec
     "should populate Address when all address lines are present" in {
       val startUa = emptyUserAnswersWithStorn
 
-      val be = AgentDetailsResponse(
-        agentReferenceNumber = testArn,
-        agentName = "Sunrise Realty",
-        addressLine1 = "8B Baker Street",
-        addressLine2 = Some("Marylebone"),
-        addressLine3 = Some("London"),
-        addressLine4 = Some("Greater London"),
-        postcode = Some("NW1 6XE"),
-        phone = "02071234567",
-        email = "contact@sunriserealty.co.uk"
-      )
+      val be: CreatedAgent =
+        CreatedAgent(
+          storn = testStorn,
+          agentId = None,
+          name = "Sunrise Realty",
+          houseNumber = None,
+          address1 = "8B Baker Street",
+          address2 = Some("Marylebone"),
+          address3 = Some("London"),
+          address4 = Some("Greater London"),
+          postcode = Some("NW1 6XE"),
+          phone = "02071234567",
+          email = "contact@sunriserealty.co.uk",
+          dxAddress = None,
+          agentResourceReference = testArn
+        )
 
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
 

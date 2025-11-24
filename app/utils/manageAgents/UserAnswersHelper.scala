@@ -16,19 +16,19 @@
 
 package utils.manageAgents
 
-import models.AgentDetailsResponse
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import models.responses.organisation.CreatedAgent
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
 
 trait UserAnswersHelper {
 
-  def updateUserAnswers(agentDetails: AgentDetailsResponse)(implicit request: DataRequest[_]) = {
+  def updateUserAnswers(agentDetails: CreatedAgent)(implicit request: DataRequest[_]) = {
     for {
       userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
-      userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.agentName)
-      addressLines = Seq(agentDetails.addressLine1, agentDetails.addressLine2.getOrElse(""), agentDetails.addressLine3.getOrElse(""), agentDetails.addressLine4.getOrElse(""))
+      userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
+      addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
       userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
       userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
     } yield userAnswersFour

@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package forms.manageAgents
+package generators
 
-import forms.mappings.Mappings
-import models.manageAgents.RemoveAgent
-import models.responses.organisation.CreatedAgent
-import play.api.data.Form
-import play.api.i18n.Messages
+import org.scalacheck.Gen
 
-import javax.inject.Inject
+trait AgentDetailsBeforeCreationGenerator {
 
-class RemoveAgentFormProvider @Inject() extends Mappings {
+  implicit lazy val nonEmptyString: Gen[String] =
+    Gen.nonEmptyListOf[Char](Gen.alphaNumChar).map(_.mkString)
 
-  def apply(agentdetails: CreatedAgent)(implicit messages: Messages): Form[RemoveAgent] =
-    Form(
-      "value" -> enumerable[RemoveAgent]( messages("manageAgents.removeAgent.error.required", agentdetails.name))
-    )
 }
+

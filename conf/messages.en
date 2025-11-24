@@ -104,6 +104,8 @@ manageAgents.agentDetails.removeAgent.notification  = You have removed {0}
 manageAgents.unauthorised.org.title                 = Sorry, you’re unable to use this service
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
 
+manageAgents.submitAgent.notification               = You have added {0}
+
 manageAgents.addressLookup.header.title             = Find the agent’s address – Agent details
 manageAgents.addressLookup.select.heading           = Choose {0}’s address
 manageAgents.addressLookup.lookup.heading           = Find {0}’s address

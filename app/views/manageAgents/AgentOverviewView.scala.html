@@ -40,49 +40,55 @@
         messages: Messages
 )
 
-@layout(
-    pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
-    showBackLink = false
-) {
+    @layout(
+        pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
+        showBackLink = false
+    ) {
 
-    @request.flash.get("agentRemoved").map { agentName =>
-        @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
-    }
+        @request.flash.get("agentRemoved").map { agentName =>
+            @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
+        }
+        @request.flash.get("agentCreated").map { agentName =>
+            @successNotificationBanner("manageAgents.submitAgent.notification", agentName)
+        }
 
-    @request.flash.get("agentsLimitReached").map { _ =>
-        @govukErrorSummary(
-            ErrorSummary(
-                title = Text(messages("error.summary.title")),
-                errorList = Seq(
-                    ErrorLink(
-                        content = Text(messages("manageAgents.agentDetails.limitReached"))
+        @request.flash.get("agentsLimitReached").map { _ =>
+            @govukErrorSummary(
+                ErrorSummary(
+                    title = Text(messages("error.summary.title")),
+                    errorList = Seq(
+                        ErrorLink(
+                            content = Text(messages("manageAgents.agentDetails.limitReached"))
+                        )
                     )
                 )
             )
-        )
-    }
+        }
 
-    @hmrcPageHeading(PageHeading(
-        text    = messages("manageAgents.agentDetails.heading"),
-        headingClasses = Some("govuk-heading-l"),
-        captionClasses = Some("govuk-caption-xl"),
-        section = Some(messages("manageAgents.caption"))
-    ))
+        @hmrcPageHeading(PageHeading(
+            text    = messages("manageAgents.agentDetails.heading"),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-xl"),
+            section = Some(messages("manageAgents.caption"))
+        ))
 
+        @{
+            maybeSummaryList match {
+                case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
+                case None => p(messages("manageAgents.agentOverview.noAgents.info.text"))
+            }
+        }
 
-    @{maybeSummaryList match {
-        case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
-        case None          => p(messages("manageAgents.agentOverview.noAgents.info.text"))
-    }}
+        @paginationInfoText.map(p(_))
 
-    @paginationInfoText.map(p(_))
+        @{
+            maybeSummaryList match {
+                case Some(summary) => govukSummaryList(summary)
+                case None => p(messages("manageAgents.agentOverview.noAgents.text"))
+            }
+        }
 
-    @{maybeSummaryList match {
-        case Some(summary) => govukSummaryList(summary)
-        case None          => p(messages("manageAgents.agentOverview.noAgents.text"))
-    }}
-
-    @pagination.map(govukPagination(_))
+        @pagination.map(govukPagination(_))
 
         @govukButton(
             ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))

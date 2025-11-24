@@ -18,17 +18,17 @@
 @this(govukNotificationBanner: GovukNotificationBanner)
 
 @(
-notificationMessage: String,
-agentName: String
+        notificationMessage: String,
+        agentName: String
 )(implicit messages: Messages)
 
-@html = {
-<h3 class="govuk-notification-banner__heading">
-    @messages(notificationMessage, agentName)
-</h3>
-}
+    @html = {
+        <h3 class="govuk-notification-banner__heading">
+        @messages(notificationMessage, agentName)
+        </h3>
+    }
 
-@govukNotificationBanner(NotificationBanner(
-content = HtmlContent(html),
-bannerType = Some("success")
-))
+    @govukNotificationBanner(NotificationBanner(
+        content = HtmlContent(html),
+        bannerType = Some("success")
+    ))
