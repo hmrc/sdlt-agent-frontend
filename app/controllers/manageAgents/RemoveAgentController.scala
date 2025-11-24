@@ -86,7 +86,7 @@ class RemoveAgentController @Inject()(
                 case RemoveAgent.Option1 =>
                   stampDutyLandTaxService
                     .removeAgentDetails(request.storn, agentReferenceNumber) flatMap { _ =>
-                      logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
+                      logger.info(s"[RemoveAgentController][onSubmit] Agent with storn ${request.storn}. Successfully removed agent with reference number: ${agentReferenceNumber}")
                       Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
                         .flashing("agentRemoved" -> agentDetails.name)
                       )
@@ -99,7 +99,7 @@ class RemoveAgentController @Inject()(
           )
 
         case None =>
-          logger.error(s"[RemoveAgentController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
+          logger.error(s"[RemoveAgentController][onSubmit] Agent with storn ${request.storn}. Failed to remove agent with reference number: ${agentReferenceNumber}")
           Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       } recover {
         case ex =>
