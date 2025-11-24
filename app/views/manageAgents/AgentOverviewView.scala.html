@@ -16,7 +16,6 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 @import views.html.components._
-@import views.html.components.SuccessNotificationBanner
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import controllers.manageAgents.routes._
 
@@ -32,10 +31,10 @@
         successNotificationBanner: SuccessNotificationBanner
 )
 @(
-        maybeSummaryList: Option[SummaryList],
-        pagination: Option[Pagination],
+        maybeSummaryList:   Option[SummaryList],
+        pagination:         Option[Pagination],
         paginationInfoText: Option[String],
-        redirect: Call
+        redirect:           Call
 )(
         implicit request: Request[_],
         messages: Messages
@@ -46,6 +45,9 @@
         showBackLink = false
     ) {
 
+        @request.flash.get("agentRemoved").map { agentName =>
+            @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
+        }
         @request.flash.get("agentCreated").map { agentName =>
             @successNotificationBanner("manageAgents.submitAgent.notification", agentName)
         }
@@ -93,4 +95,4 @@
             .asLink(redirect.url)
             .withCssClass("govuk-!-margin-top-2")
         )
-    }
+}

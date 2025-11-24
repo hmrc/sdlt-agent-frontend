@@ -188,7 +188,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted and user chooses to delete agent" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -207,12 +207,42 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
       when(service.removeAgentDetails(any(), any())(any()))
-        .thenReturn(Future.successful(true))
+        .thenReturn(Future.unit)
 
       running(application) {
         val request =
           FakeRequest(POST, removeAgentRequestRoute)
             .withFormUrlEncodedBody(("value", RemoveAgent.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted and user chooses not to delete agent" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(agentNameOnwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[StampDutyLandTaxService].toInstance(service)
+          )
+          .build()
+
+      when(service.getAgentDetails(any(), any())(any()))
+        .thenReturn(Future.successful(Some(testAgentDetails)))
+
+      running(application) {
+        val request =
+          FakeRequest(POST, removeAgentRequestRoute)
+            .withFormUrlEncodedBody(("value", RemoveAgent.values.last.toString))
 
         val result = route(application, request).value
 

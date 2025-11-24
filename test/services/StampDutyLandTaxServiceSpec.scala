@@ -91,13 +91,11 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      val payload = true
-
       when(connector.removeAgentDetails(eqTo(storn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payload))
+        .thenReturn(Future.unit)
 
       val result = service.removeAgentDetails(storn, agentReferenceNumber).futureValue
-      result mustBe payload
+      result mustBe ()
 
       verify(connector).removeAgentDetails(eqTo(storn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)

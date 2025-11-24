@@ -49,8 +49,6 @@ class RemoveAgentController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   // TODO: Tidy up logic on this page
-  
-  
 
   val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
 
@@ -78,22 +76,30 @@ class RemoveAgentController @Inject()(
       stampDutyLandTaxService.getAgentDetails(request.storn, agentReferenceNumber) flatMap {
         case Some(agentDetails) =>
           val form: Form[RemoveAgent] = formProvider(agentDetails)
+
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
-            _ =>
-              stampDutyLandTaxService
-                .removeAgentDetails(request.storn, agentDetails.agentResourceReference) flatMap {
-                  case true =>
-                    logger.info(s"[RemoveAgentController][onSubmit] Successfully removed agent with storn: ${request.storn}")
-                    Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
-                  case false =>
-                    logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent with storn: ${request.storn}")
-                    Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+
+            removeChoice =>
+              removeChoice match {
+                case RemoveAgent.Option1 =>
+                  stampDutyLandTaxService
+                    .removeAgentDetails(request.storn, agentReferenceNumber) flatMap { _ =>
+                      logger.info(s"[RemoveAgentController][onSubmit] Agent with storn ${request.storn}. Successfully removed agent with reference number: ${agentReferenceNumber}")
+                      Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+                        .flashing("agentRemoved" -> agentDetails.name)
+                      )
+                    }
+
+                case RemoveAgent.Option2 =>
+                  logger.info(s"[RemoveAgentController][onSubmit] User chose 'No'. Sending back to Agent Overview")
+                  Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
               }
           )
+
         case None =>
-          logger.error(s"[RemoveAgentController][onSubmit] Failed to retrieve details for agent with storn: ${request.storn}")
+          logger.error(s"[RemoveAgentController][onSubmit] Agent with storn ${request.storn}. Failed to remove agent with reference number: ${agentReferenceNumber}")
           Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
       } recover {
         case ex =>

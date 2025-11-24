@@ -244,7 +244,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
     val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove"
 
-    "return true when BE returns 200 with valid JSON" in {
+    "return Unit when BE returns 200 with valid JSON" in {
       stubFor(
         get(urlPathEqualTo(removeAgentDetailsUrl))
           .withQueryParam("storn", equalTo(storn))
@@ -253,32 +253,14 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
             aResponse()
               .withStatus(OK)
               .withBody(
-                Json.stringify(JsBoolean(true))
+                ("""{ "message": "Agent with reference number ARN001 deleted for user with storn STN001" }""")
               )
           )
       )
 
-      val result = connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+      val result: Unit = connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
 
-      result mustBe true
-    }
-
-    "fail when BE returns 200 with invalid JSON" in {
-      stubFor(
-        get(urlPathEqualTo(removeAgentDetailsUrl))
-          .withQueryParam("storn", equalTo(storn))
-          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody("""{ "unexpectedField": true }""")
-          )
-      )
-
-      val ex = intercept[Exception] {
-        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
-      }
-      ex.getMessage.toLowerCase must include("jsboolean")
+      result mustBe ()
     }
 
     "propagate an upstream error when BE returns 500" in {
@@ -296,7 +278,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       val ex = intercept[Exception] {
         connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
       }
-      ex.getMessage must include("returned 500")
+      ex.getMessage must include("boom")
     }
   }
 
