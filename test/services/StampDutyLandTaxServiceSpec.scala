@@ -17,9 +17,9 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsBeforeCreation, AgentDetailsResponse}
+import models.AgentDetailsBeforeCreation
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisationResponse
+import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -48,34 +48,43 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   val payload: SdltOrganisationResponse =
     SdltOrganisationResponse(
       storn = "STN001",
-      version = 1,
-      isReturnUser = "Y",
-      doNotDisplayWelcomePage = "N",
+      version = Some("1"),
+      isReturnUser = Some("Y"),
+      doNotDisplayWelcomePage = Some("N"),
       agents = Seq(
-        AgentDetailsResponse(
-          agentName = "Smith & Co Solicitors",
-          addressLine1 = "12 High Street",
-          addressLine2 = Some("London"),
-          addressLine3 = Some("Greater London"),
-          addressLine4 = None,
+        CreatedAgent(
+          storn = "STN001",
+          agentId = None,
+          name = "Smith & Co Solicitors",
+          houseNumber = None,
+          address1 = "12 High Street",
+          address2 = Some("London"),
+          address3 = Some("Greater London"),
+          address4 = None,
           postcode = Some("SW1A 1AA"),
           phone = "02071234567",
           email = "info@smithco.co.uk",
-          agentReferenceNumber = "ARN001"
+          dxAddress = None,
+          agentResourceReference = "ARN001"
         ),
-        AgentDetailsResponse(
-          agentName = "Anderson Legal LLP",
-          addressLine1 = "45B Baker Street",
-          addressLine2 = None,
-          addressLine3 = None,
-          addressLine4 = None,
+        CreatedAgent(
+          storn = "STN001",
+          agentId = None,
+          name = "Anderson Legal LLP",
+          houseNumber = None,
+          address1 = "45B Baker Street",
+          address2 = None,
+          address3 = None,
+          address4 = None,
           postcode = Some("NW1 6XE"),
           phone = "02077644567",
           email = "contact@andersonlegal.com",
-          agentReferenceNumber = "ARN002"
+          dxAddress = None,
+          agentResourceReference = "ARN002"
         )
       )
     )
+
 
   "removeAgentDetails" should {
     "delegate to connector with the given storn and return the payload" in {
