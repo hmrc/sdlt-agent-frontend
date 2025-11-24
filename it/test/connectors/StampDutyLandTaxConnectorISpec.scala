@@ -253,7 +253,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
             aResponse()
               .withStatus(OK)
               .withBody(
-                ("""{ "message": Agent Deleted }""")
+                ("""{ "message": "Agent deleted with reference number: ARN001" }""")
               )
           )
       )
