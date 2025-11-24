@@ -66,7 +66,7 @@
         }
 
         @hmrcPageHeading(PageHeading(
-            text    = messages("manageAgents.agentDetails.heading"),
+            text = messages("manageAgents.agentDetails.heading"),
             headingClasses = Some("govuk-heading-l"),
             captionClasses = Some("govuk-caption-xl"),
             section = Some(messages("manageAgents.caption"))
@@ -92,7 +92,7 @@
 
         @govukButton(
             ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                .asLink(redirect.url)
-                .withCssClass("govuk-!-margin-top-2")
+            .asLink(redirect.url)
+            .withCssClass("govuk-!-margin-top-2")
         )
 }
