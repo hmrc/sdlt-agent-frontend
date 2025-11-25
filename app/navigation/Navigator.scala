@@ -36,18 +36,18 @@ class Navigator @Inject()() {
     case _                             => _ =>                          routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = {
-    case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
-    case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
-    case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
-    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
-    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
+  private def checkRouteMap(arn:Option[String]): Page => UserAnswers => Option[String] => Call = {
+    case AgentNamePage                 => _ => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
+    case AgentNameDuplicateWarningPage => _ => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
+    case AgentContactDetailsPage       => _ => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+    case AgentCheckYourAnswersPage     => _ => _ =>  controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(arn)
+    case _                             => _ => _ =>  controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(arn)
   }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, arn: Option[String] = None): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode =>
-      checkRouteMap(page)(userAnswers)
+      checkRouteMap(arn)(page)(userAnswers)(arn)
   }
 }

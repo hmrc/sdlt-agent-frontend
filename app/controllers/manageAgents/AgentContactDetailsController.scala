@@ -25,7 +25,7 @@ import javax.inject.Inject
 import navigation.Navigator
 import models.Mode
 import models.requests.DataRequest
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage, AgentReferenceNumberPage}
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -88,7 +88,7 @@ class AgentContactDetailsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
+              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
           )
       }
   }
