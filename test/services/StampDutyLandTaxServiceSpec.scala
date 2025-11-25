@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.AgentDetailsBeforeCreation
+import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
@@ -183,6 +183,50 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val ex = intercept[RuntimeException] {
         service.submitAgentDetails(payload).futureValue
+      }
+
+      ex.getMessage must include("boom")
+    }
+  }
+
+  "updateAgentDetails" should {
+
+    val payload = AgentDetailsAfterCreation(
+      agentReferenceNumber = Some("ARN001"),
+      storn = "STNOO1",
+      houseNumber = None,
+      agentName = "42 Acme Property Agents Ltd",
+      addressLine1 = Some("High Street"),
+      addressLine2 = Some("Westminster"),
+      addressLine3 = Some("London"),
+      addressLine4 = Some("Greater London"),
+      postcode = Some("SW1A 2AA"),
+      phone = Some("02079460000"),
+      email = Some("info@acmeagents.co.uk")
+    )
+
+    "delegate to connector with the given AgentDetails" in {
+
+      val (service, connector) = newService()
+
+      when(connector.updateAgentDetails(eqTo(payload))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(()))
+
+      val result = service.updateAgentDetails(payload).futureValue
+      result mustBe (): Unit
+
+      verify(connector).updateAgentDetails(eqTo(payload))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+    "propagate failures from the connector" in {
+
+      val (service, connector) = newService()
+
+      when(connector.updateAgentDetails(eqTo(payload))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = intercept[RuntimeException] {
+        service.updateAgentDetails(payload).futureValue
       }
 
       ex.getMessage must include("boom")
