@@ -65,7 +65,7 @@ trait PaginationHelper {
             )
               .withCssClass("govuk-!-width-one-third govuk-!-font-weight-regular hmrc-summary-list__key"),
             value = ValueViewModel(
-              Text(agentDetails.address1)
+              Text(agentDetails.getAddressWithHouseNumberLegacy)
             )
               .withCssClass("govuk-summary-list__value govuk-!-width-one-third"),
             actions = Seq(
