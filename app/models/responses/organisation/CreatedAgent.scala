@@ -32,7 +32,11 @@ case class CreatedAgent(
                          email:                  String,
                          dxAddress:              Option[String],
                          agentResourceReference: String
-                       )
+                       ) {
+
+  def getAddressWithHouseNumberLegacy: String =
+    houseNumber.fold(address1)(hn => s"$hn $address1")
+}
 
 object CreatedAgent {
   implicit val format: OFormat[CreatedAgent] = Json.format[CreatedAgent]
