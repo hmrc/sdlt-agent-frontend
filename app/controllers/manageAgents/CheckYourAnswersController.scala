@@ -123,7 +123,6 @@ class CheckYourAnswersController @Inject()(
               }
           }
         case Some(arn) =>
-          logger.info(s"REFERENCE NUMBER IS $agentReferenceNumber")
           request.userAnswers.data.asOpt[AgentDetailsAfterCreation] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsAfterCreation")
