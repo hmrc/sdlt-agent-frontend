@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
@@ -191,8 +191,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "updateAgentDetails" should {
 
-    val payload = AgentDetailsAfterCreation(
-      agentReferenceNumber = Some("ARN001"),
+    val payload = UpdatePredefinedAgent(
+      agentResourceReference = Some("ARN001"),
       storn = "STNOO1",
       houseNumber = None,
       agentName = "42 Acme Property Agents Ltd",

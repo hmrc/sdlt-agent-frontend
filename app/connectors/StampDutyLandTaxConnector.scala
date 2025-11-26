@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
+import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
@@ -72,12 +72,19 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def updateAgentDetails(agentDetailsAfterCreation: AgentDetailsAfterCreation)
+  def updateAgentDetails(UpdatePredefinedAgent: UpdatePredefinedAgent)
                         (implicit hc: HeaderCarrier): Future[Unit] =
     http
-      .put(updateAgentDetailsUrl)
-      .withBody(Json.toJson(agentDetailsAfterCreation))
-      .execute[Unit]
+      .post(updateAgentDetailsUrl)
+      .withBody(Json.toJson(UpdatePredefinedAgent))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        if(response.status == 200) {
+          Future.unit
+        }else{
+          Future.failed(new RuntimeException(s"Failed to update agent: status=${response.status}, body=${response.body}"))
+        }
+      }
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")

@@ -19,8 +19,8 @@ package models
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OFormat, Reads, __}
 
-case class AgentDetailsAfterCreation (
-                                       agentReferenceNumber        : Option[String], //still manditory, reference number is injected in controller
+case class UpdatePredefinedAgent (
+                                       agentResourceReference        : Option[String], //still mandatory, reference number is injected in controller
                                        storn                       : String,
                                        agentName                   : String,
                                        houseNumber                 : Option[String],
@@ -33,11 +33,11 @@ case class AgentDetailsAfterCreation (
                                        email                       : Option[String]
                                      )
 
-object AgentDetailsAfterCreation {
+object UpdatePredefinedAgent {
 
 
-  implicit val reads: Reads[AgentDetailsAfterCreation] = (
-    (__ \ "agentReferenceNumber").readNullable[String] and
+  implicit val reads: Reads[UpdatePredefinedAgent] = (
+    (__ \ "agentResourceReference").readNullable[String] and
     (__ \ "storn").read[String] and
     (__ \ "agentName").read[String] and
     (__ \ "agentAddress" \ "address" \ "houseNumber").readNullable[String] and
@@ -48,10 +48,10 @@ object AgentDetailsAfterCreation {
     (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
     (__ \ "agentContactDetails" \ "phone").readNullable[String] and
     (__ \ "agentContactDetails" \ "email").readNullable[String]
-    )(AgentDetailsAfterCreation.apply _)
+    )(UpdatePredefinedAgent.apply _)
 
 
-  implicit val format: OFormat[AgentDetailsAfterCreation] = Json.format[AgentDetailsAfterCreation]
+  implicit val format: OFormat[UpdatePredefinedAgent] = Json.format[UpdatePredefinedAgent]
 }
 
 
