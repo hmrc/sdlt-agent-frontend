@@ -33,6 +33,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
+import play.api.mvc.Results.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 
@@ -277,6 +278,55 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
       }
       "with ARN population" - {
+        
+        "must redirect to AgentOverviewPage with flash after successfully updating agentDetails to StampDutyLandTaxService.updateAgentDetails in BE" in {
+          val navigator = new Navigator
+          val service = mock[StampDutyLandTaxService]
+
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+              .overrides(bind[StampDutyLandTaxService].toInstance(service))
+              .build()
+
+          when(service.updateAgentDetails(any())(any()))
+            .thenReturn(Future.successful(()))
+
+          running(application) {
+            val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual
+              navigator.nextPage(AgentOverviewPage, NormalMode, populatedUserAnswersWithArn).url
+
+            flash(result).get("agentUpdated") mustBe Some("John")
+
+            verify(service, times(1)).updateAgentDetails(any())(any())
+          }
+        }
+
+        "must redirect to Journey Recovery Controller when required fields are missing from userAnswers " in {
+
+          val service = mock[StampDutyLandTaxService]
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithoutAgentName))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
+
+          when(service.updateAgentDetails(any())(any()))
+            .thenReturn(Future.successful(()))
+
+          running(application) {
+            val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+            verify(service, times(0)).updateAgentDetails(any())(any())
+          }
+        }
         "must redirect to Journey Recovery controller when ARN is not found " in {
           val service = mock[StampDutyLandTaxService]
 
@@ -294,9 +344,28 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           }
         }
+        "must throw and exception after getting error response from StampDutyLandTaxService.updateAgentDetails" in {
+          val service = mock[StampDutyLandTaxService]
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
+
+          when(service.updateAgentDetails(any())(any()))
+            .thenReturn(Future.failed(new RuntimeException("An unexpected error occurred")))
+
+          running(application) {
+            val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+
+            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+
+            verify(service, times(1)).updateAgentDetails(any())(any())
+
+          }
+        }
       }
-
-
     }
   }
 

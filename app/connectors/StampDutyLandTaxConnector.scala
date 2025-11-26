@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.AgentDetailsBeforeCreation
+import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
@@ -43,6 +43,9 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
+  private val updateAgentDetailsUrl: URL =
+    url"$base/stamp-duty-land-tax/manage-agents/agent-details/update"
+
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
 
@@ -66,6 +69,25 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
+          throw new RuntimeException(e.getMessage)
+      }
+
+  def updateAgentDetails(UpdatePredefinedAgent: UpdatePredefinedAgent)
+                        (implicit hc: HeaderCarrier): Future[Unit] =
+    http
+      .post(updateAgentDetailsUrl)
+      .withBody(Json.toJson(UpdatePredefinedAgent))
+      .execute[HttpResponse]
+      .flatMap { response =>
+        if(response.status == 200) {
+          Future.unit
+        }else{
+          Future.failed(new RuntimeException(s"Failed to update agent: status=${response.status}, body=${response.body}"))
+        }
+      }
+      .recover {
+        case e: Throwable =>
+          logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 

@@ -23,7 +23,7 @@ import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentReferenceNumberPage}
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,6 +60,7 @@ class AddressLookupController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
+
     Logger("application").debug(s"[AddressLookupController] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
@@ -73,7 +74,8 @@ class AddressLookupController @Inject()(
       Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
       Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
-      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
+      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer, request.userAnswers.get(AgentReferenceNumberPage)
+    ))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
       Redirect(JourneyRecoveryController.onPageLoad())

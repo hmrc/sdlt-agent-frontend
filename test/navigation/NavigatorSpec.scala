@@ -62,16 +62,17 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id"))mustBe
+          controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
       }
 
       "must go from AgentNamePage to AgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id")) mustBe
+        navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id"), Some("ARN001")) mustBe
           controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
       }
 
       "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
+        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id"), Some("ARN001")) mustBe
           controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
       }
     }

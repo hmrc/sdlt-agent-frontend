@@ -45,6 +45,9 @@
         showBackLink = false
     ) {
 
+        @request.flash.get("agentUpdated").map { agentName =>
+            @successNotificationBanner("manageAgents.updateAgent.notification", agentName)
+        }
         @request.flash.get("agentRemoved").map { agentName =>
             @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
         }
