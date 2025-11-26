@@ -16,7 +16,7 @@
 
 package connectors
 
-import models.{AgentDetailsAfterCreation, AgentDetailsRequest}
+import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging

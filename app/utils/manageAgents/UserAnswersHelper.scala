@@ -31,7 +31,7 @@ trait UserAnswersHelper {
       addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
       userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
       userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
-      userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentReferenceNumber)
+      userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
     } yield userAnswersFive
   }
 }
