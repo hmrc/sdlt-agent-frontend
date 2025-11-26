@@ -17,6 +17,7 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation, NormalMode, UserAnswers}
 import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation, NormalMode, UserAnswers}
 import models.{AgentDetailsBeforeCreation, AgentDetailsAfterCreation, NormalMode, UserAnswers}
 import models.requests.CreatePredefinedAgentRequest
@@ -123,20 +124,20 @@ class CheckYourAnswersController @Inject()(
               }
           }
         case Some(arn) =>
-          request.userAnswers.data.asOpt[AgentDetailsAfterCreation] match {
+          request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsAfterCreation")
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct UpdatePredefinedAgent")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            case Some(agentDetailsAfterCreation) =>
+            case Some(updatePredefinedAgent) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
-              val updated = agentDetailsAfterCreation.copy(agentReferenceNumber = Some(arn))
+              val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
                 updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              ).flashing("agentUpdated" -> agentDetailsAfterCreation.agentName)
+              ).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
