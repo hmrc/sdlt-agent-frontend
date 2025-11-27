@@ -192,17 +192,19 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   "updateAgentDetails" should {
 
     val payload = CreatedAgent(
-      agentResourceReference = Some("ARN001"),
+      agentResourceReference = "ARN001",
+      agentId = Some("ARN001"),
       storn = "STNOO1",
       houseNumber = None,
-      agentName = "42 Acme Property Agents Ltd",
-      addressLine1 = Some("High Street"),
-      addressLine2 = Some("Westminster"),
-      addressLine3 = Some("London"),
-      addressLine4 = Some("Greater London"),
+      name = "42 Acme Property Agents Ltd",
+      address1 = "High Street",
+      address2 = Some("Westminster"),
+      address3 = Some("London"),
+      address4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
-      phone = Some("02079460000"),
-      email = Some("info@acmeagents.co.uk")
+      phone = "02079460000",
+      dxAddress = Some("some-address"),
+      email = "info@acmeagents.co.uk"
     )
 
     "delegate to connector with the given AgentDetails" in {
