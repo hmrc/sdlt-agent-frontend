@@ -25,7 +25,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import controllers.routes
 import forms.manageAgents.RemoveAgentFormProvider
-import models.manageAgents.RemoveAgent
+import models.manageAgents.{DeletePredefinedAgentResponse, RemoveAgent}
 import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 import play.api.mvc.Call
@@ -35,6 +35,7 @@ import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
+import play.api.libs.json.Json
 import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
@@ -188,7 +189,7 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
       }
     }
 
-    "must redirect to the next page when valid data is submitted and user chooses to delete agent" in {
+    "must redirect to AgentOverviewPage with flash when valid data is submitted and user chooses to delete agent" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
@@ -206,8 +207,8 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
       when(service.getAgentDetails(any(), any())(any()))
         .thenReturn(Future.successful(Some(testAgentDetails)))
 
-      when(service.removeAgentDetails(any(), any())(any()))
-        .thenReturn(Future.unit)
+      when(service.deletePredefinedAgent(any())(any()))
+        .thenReturn(Future.successful(DeletePredefinedAgentResponse(true)))
 
       running(application) {
         val request =
@@ -218,6 +219,8 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
+        flash(result).get("agentRemoved") mustBe Some("Harborview Estates")
+        verify(service, times(1)).deletePredefinedAgent(any())(any())
       }
     }
 
@@ -337,8 +340,8 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentDetails)))
 
-        when(service.removeAgentDetails(any(), any())(any()))
-          .thenReturn(Future.successful(false))
+        when(service.deletePredefinedAgent(any())(any()))
+          .thenReturn(Future.successful(DeletePredefinedAgentResponse(false)))
 
         val result = route(application, request).value
 

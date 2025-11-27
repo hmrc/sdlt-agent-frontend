@@ -19,6 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.AgentDetailsBeforeCreation
+import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -240,34 +241,31 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
     }
   }
 
-  "removeAgentDetails" should {
+  "deletePredefinedAgent" should {
 
-    val removeAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/agent-details/remove"
+    val removeAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
+    val req = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
 
-    "return Unit when BE returns 200 with valid JSON" in {
+    "return Boolean when BE returns 200 with valid JSON" in {
       stubFor(
-        get(urlPathEqualTo(removeAgentDetailsUrl))
-          .withQueryParam("storn", equalTo(storn))
-          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
+        post(urlPathEqualTo(removeAgentDetailsUrl))
           .willReturn(
             aResponse()
               .withStatus(OK)
               .withBody(
-                ("""{ "message": "Agent with reference number ARN001 deleted for user with storn STN001" }""")
+                ("""{ "deleted": true }""")
               )
           )
       )
 
-      val result: Unit = connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+      val result: DeletePredefinedAgentResponse = connector.deletePredefinedAgent(req).futureValue
 
-      result mustBe ()
+      result mustBe DeletePredefinedAgentResponse(true)
     }
 
     "propagate an upstream error when BE returns 500" in {
       stubFor(
-        get(urlPathEqualTo(removeAgentDetailsUrl))
-          .withQueryParam("storn", equalTo(storn))
-          .withQueryParam("agentReferenceNumber", equalTo(agentReferenceNumber))
+        post(urlPathEqualTo(removeAgentDetailsUrl))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -276,7 +274,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       )
 
       val ex = intercept[Exception] {
-        connector.removeAgentDetails(storn, agentReferenceNumber).futureValue
+        connector.deletePredefinedAgent(req).futureValue
       }
       ex.getMessage must include("boom")
     }

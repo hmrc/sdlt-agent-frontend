@@ -17,13 +17,14 @@
 package connectors
 
 import models.AgentDetailsBeforeCreation
+import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -43,8 +44,8 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
-  private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
+  private val removeAgentDetailsUrl: URL =
+    url"$base/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
 
   def getSdltOrganisation(storn: String)
                          (implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =
@@ -69,18 +70,21 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def removeAgentDetails(storn: String, agentReferenceNumber: String)
-                        (implicit hc: HeaderCarrier): Future[Unit] =
+  def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
+                        (implicit hc: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
     http
-      .get(removeAgentDetailsUrl(storn, agentReferenceNumber))
-      .execute[HttpResponse]
-      .flatMap { response =>
-        if(response.status == 200) Future.unit
-        else Future.failed(new RuntimeException(s"Failed to remove agent: status=${response.status}, body=${response.body}"))
+      .post(removeAgentDetailsUrl)
+      .withBody(Json.toJson(deletePredefinedAgentRequest))
+      .execute[Either[UpstreamErrorResponse, DeletePredefinedAgentResponse]]
+      .flatMap {
+        case Right(response) =>
+          Future.successful(response)
+        case Left(error) =>
+          Future.failed(error)
       }
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][removeAgentDetails]: ${e.getMessage}")
+          logger.error(s"[StampDutyLandTaxConnector][deletePredefinedAgent]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 }
