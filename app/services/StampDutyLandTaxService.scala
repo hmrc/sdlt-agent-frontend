@@ -17,7 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
+import models.AgentDetailsBeforeCreation
 import models.responses.SubmitAgentDetailsResponse
 import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,7 +47,7 @@ class StampDutyLandTaxService @Inject() (
     stampDutyLandTaxConnector
       .submitAgentDetails(agentDetails)
 
-  def updateAgentDetails(agentDetails: UpdatePredefinedAgent)
+  def updateAgentDetails(agentDetails: CreatedAgent)
                         (implicit headerCarrier: HeaderCarrier): Future[Unit] =
     stampDutyLandTaxConnector
       .updateAgentDetails(agentDetails)

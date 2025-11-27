@@ -16,9 +16,9 @@
 
 package connectors
 
-import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
+import models.AgentDetailsBeforeCreation
 import models.responses.SubmitAgentDetailsResponse
-import models.responses.organisation.SdltOrganisationResponse
+import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -72,7 +72,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def updateAgentDetails(UpdatePredefinedAgent: UpdatePredefinedAgent)
+  def updateAgentDetails(UpdatePredefinedAgent: CreatedAgent)
                         (implicit hc: HeaderCarrier): Future[Unit] =
     http
       .post(updateAgentDetailsUrl)

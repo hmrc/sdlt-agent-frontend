@@ -35,6 +35,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentContactDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 
 @Singleton
@@ -88,7 +89,7 @@ class AgentContactDetailsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
+              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
           )
       }
   }

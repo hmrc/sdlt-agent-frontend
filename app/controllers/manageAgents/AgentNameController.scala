@@ -75,7 +75,7 @@ class AgentNameController@Inject()(
           } yield if (isDuplicate) {
             Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
           } else {
-            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
+            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
           }
       )
   }

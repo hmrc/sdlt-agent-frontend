@@ -17,7 +17,7 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation, NormalMode, UserAnswers}
+import models.{AgentDetailsBeforeCreation, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import play.api.Logging
@@ -52,7 +52,7 @@ class CheckYourAnswersController @Inject()(
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
-      val postAction: Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
+      val postAction: Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
 
       def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
         rows = Seq(
@@ -120,28 +120,28 @@ class CheckYourAnswersController @Inject()(
               }
           }
         case Some(arn) =>
-          request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
+          stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct UpdatePredefinedAgent")
+              logger.error("[CheckYourAnswersController][onSubmit] Failed to get UpdatePredefinedAgent")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
-              val emptiedUserAnswers = UserAnswers(request.userId)
-              val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
+              
               (for {
-                _ <- stampDutyLandTaxService.updateAgentDetails(updated)
-                updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
-                navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              ).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
-                ).recover {
+                _                 <- stampDutyLandTaxService.updateAgentDetails(updatePredefinedAgent)
+                emptiedUserAnswers = UserAnswers(request.userId)
+                uaWithStorn       <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                uaWithStornAndArn <- Future.fromTry(emptiedUserAnswers.set(AgentReferenceNumberPage, arn))
+                _                 <- sessionRepository.set(uaWithStornAndArn)
+              } yield
+                Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, uaWithStornAndArn))
+                  .flashing("agentUpdated" -> updatePredefinedAgent.name)
+                ) recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
-
+            }
           }
       }
-
   }
-}
+
