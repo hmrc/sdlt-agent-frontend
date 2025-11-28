@@ -18,7 +18,7 @@ package models.responses
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class SubmitAgentDetailsResponse(agentResourceRef: String, agentId:String)
-object SubmitAgentDetailsResponse {
-  implicit val format: OFormat[SubmitAgentDetailsResponse] = Json.format[SubmitAgentDetailsResponse]
+final case class CreatePredefinedAgentResponse(agentResourceRef: String, agentId:String)
+object CreatePredefinedAgentResponse {
+  implicit val format: OFormat[CreatePredefinedAgentResponse] = Json.format[CreatePredefinedAgentResponse]
 }

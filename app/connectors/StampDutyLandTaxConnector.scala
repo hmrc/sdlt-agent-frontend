@@ -16,8 +16,8 @@
 
 package connectors
 
-import models.AgentDetailsBeforeCreation
-import models.responses.SubmitAgentDetailsResponse
+import models.requests.CreatePredefinedAgentRequest
+import models.responses.CreatePredefinedAgentResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
@@ -41,7 +41,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/get-sdlt-organisation?storn=$storn"
 
   private val submitAgentDetailsUrl: URL =
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
+    url"$base/stamp-duty-land-tax/create/predefined-agent"
 
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
@@ -57,12 +57,12 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(agentDetailsBeforeCreation: AgentDetailsBeforeCreation)
-                        (implicit hc: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
+  def submitAgentDetails(createPredefinedAgentRequest: CreatePredefinedAgentRequest)
+                        (implicit hc: HeaderCarrier): Future[CreatePredefinedAgentResponse] =
     http
       .post(submitAgentDetailsUrl)
-      .withBody(Json.toJson(agentDetailsBeforeCreation))
-      .execute[SubmitAgentDetailsResponse]
+      .withBody(Json.toJson(createPredefinedAgentRequest))
+      .execute[CreatePredefinedAgentResponse]
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")

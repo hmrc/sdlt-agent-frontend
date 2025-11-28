@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.requests
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Json, OWrites, Reads, __}
 
-case class AgentDetailsBeforeCreation(
+case class CreatePredefinedAgentRequest(
                                 storn: String,
                                 agentName: String,
                                 addressLine1: Option[String],
@@ -31,9 +31,9 @@ case class AgentDetailsBeforeCreation(
                                 email: Option[String]
                               )
 
-object AgentDetailsBeforeCreation {
+object CreatePredefinedAgentRequest {
 
-  implicit val reads: Reads[AgentDetailsBeforeCreation] = (
+  implicit val reads: Reads[CreatePredefinedAgentRequest] = (
     (__ \ "storn").read[String] and
       (__ \ "agentName").read[String] and
       (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
@@ -43,8 +43,8 @@ object AgentDetailsBeforeCreation {
       (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
       (__ \ "agentContactDetails" \ "phone").readNullable[String] and
       (__ \ "agentContactDetails" \ "email").readNullable[String]
-    )(AgentDetailsBeforeCreation.apply _)
+    )(CreatePredefinedAgentRequest.apply _)
 
 
-  implicit val writes: OWrites[AgentDetailsBeforeCreation] = Json.writes[AgentDetailsBeforeCreation]
+  implicit val writes: OWrites[CreatePredefinedAgentRequest] = Json.writes[CreatePredefinedAgentRequest]
 }
