@@ -16,9 +16,10 @@
 
 package connectors
 
-import models.AgentDetailsBeforeCreation
+import models.requests.CreatePredefinedAgentRequest
+import models.responses.CreatePredefinedAgentResponse
 import models.requests.DeletePredefinedAgentRequest
-import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
@@ -42,7 +43,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/get-sdlt-organisation?storn=$storn"
 
   private val submitAgentDetailsUrl: URL =
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
+    url"$base/stamp-duty-land-tax/create/predefined-agent"
 
   private val deletePredefinedAgentUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
@@ -58,12 +59,12 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
           throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(agentDetailsBeforeCreation: AgentDetailsBeforeCreation)
-                        (implicit hc: HeaderCarrier): Future[SubmitAgentDetailsResponse] =
+  def submitAgentDetails(createPredefinedAgentRequest: CreatePredefinedAgentRequest)
+                        (implicit hc: HeaderCarrier): Future[CreatePredefinedAgentResponse] =
     http
       .post(submitAgentDetailsUrl)
-      .withBody(Json.toJson(agentDetailsBeforeCreation))
-      .execute[SubmitAgentDetailsResponse]
+      .withBody(Json.toJson(createPredefinedAgentRequest))
+      .execute[CreatePredefinedAgentResponse]
       .recover {
         case e: Throwable =>
           logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")

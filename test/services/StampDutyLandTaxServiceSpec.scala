@@ -17,9 +17,10 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.AgentDetailsBeforeCreation
+import models.requests.CreatePredefinedAgentRequest
+import models.responses.CreatePredefinedAgentResponse
 import models.requests.DeletePredefinedAgentRequest
-import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -151,7 +152,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   "submitAgentDetails" should {
 
-    val payload = AgentDetailsBeforeCreation(
+    val payload = CreatePredefinedAgentRequest(
       storn = "STNOO1",
       agentName = "42 Acme Property Agents Ltd",
       addressLine1 = Some("High Street"),
@@ -167,7 +168,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      val response = SubmitAgentDetailsResponse(agentResourceRef = "ARN-001", agentId = "1234")
+      val response = CreatePredefinedAgentResponse(agentResourceRef = "ARN-001", agentId = "1234")
 
       when(connector.submitAgentDetails(eqTo(payload))(any[HeaderCarrier]))
         .thenReturn(Future.successful(response))

@@ -18,9 +18,10 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.AgentDetailsBeforeCreation
+import models.requests.CreatePredefinedAgentRequest
+import models.responses.CreatePredefinedAgentResponse
 import models.requests.DeletePredefinedAgentRequest
-import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -178,9 +179,9 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   "submitAgentDetails" should {
 
-    val submitAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/agent-details/submit"
+    val submitAgentDetailsUrl = "/stamp-duty-land-tax/create/predefined-agent"
 
-    val agentDetails = AgentDetailsBeforeCreation(
+    val agentDetails = CreatePredefinedAgentRequest(
       storn = "STN001",
       agentName = "Acme Property Agents Ltd",
       addressLine1 = Some("42 High Street"),
@@ -192,7 +193,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       email = Some("info@acmeagents.co.uk")
     )
 
-    "return SubmitAgentDetailsResponse when BE returns 200 with valid JSON" in {
+    "return CreatePredefinedAgentResponse when BE returns 200 with valid JSON" in {
       stubFor(
         post(urlPathEqualTo(submitAgentDetailsUrl))
           .willReturn(
@@ -204,7 +205,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
       val result = connector.submitAgentDetails(agentDetails).futureValue
 
-      result mustBe SubmitAgentDetailsResponse(agentResourceRef = "ARN4324234", agentId = "1234")
+      result mustBe CreatePredefinedAgentResponse(agentResourceRef = "ARN4324234", agentId = "1234")
     }
 
     "fail when BE returns 200 with invalid JSON" in {

@@ -17,7 +17,8 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.{AgentDetailsBeforeCreation, NormalMode, UserAnswers}
+import models.requests.CreatePredefinedAgentRequest
+import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.Logging
@@ -95,19 +96,19 @@ class CheckYourAnswersController @Inject()(
     implicit request =>
       agentReferenceNumber match {
         case None =>
-          request.userAnswers.data.asOpt[AgentDetailsBeforeCreation] match {
+          request.userAnswers.data.asOpt[CreatePredefinedAgentRequest] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            case Some(agentDetailsBeforeCreation) =>
+            case Some(createPredefinedAgentRequest) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
               (for {
-                _ <- stampDutyLandTaxService.submitAgentDetails(agentDetailsBeforeCreation)
+                _ <- stampDutyLandTaxService.submitAgentDetails(createPredefinedAgentRequest)
                 updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
                 _ <- sessionRepository.set(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              ).flashing("agentCreated" -> agentDetailsBeforeCreation.agentName)
+              ).flashing("agentCreated" -> createPredefinedAgentRequest.agentName)
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
