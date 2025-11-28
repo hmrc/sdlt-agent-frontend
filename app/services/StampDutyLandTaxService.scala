@@ -19,6 +19,8 @@ package services
 import connectors.StampDutyLandTaxConnector
 import models.requests.CreatePredefinedAgentRequest
 import models.responses.CreatePredefinedAgentResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -47,10 +49,10 @@ class StampDutyLandTaxService @Inject() (
     stampDutyLandTaxConnector
       .submitAgentDetails(agentDetails)
 
-  def removeAgentDetails(storn: String, agentReferenceNumber: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[Unit] =
+  def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
+                        (implicit headerCarrier: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
     stampDutyLandTaxConnector
-      .removeAgentDetails(storn, agentReferenceNumber)
+      .deletePredefinedAgent(deletePredefinedAgentRequest)
       
   def isDuplicate(storn: String, name: String)
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =

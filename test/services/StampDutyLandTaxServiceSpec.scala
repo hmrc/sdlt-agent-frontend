@@ -19,6 +19,8 @@ package services
 import connectors.StampDutyLandTaxConnector
 import models.requests.CreatePredefinedAgentRequest
 import models.responses.CreatePredefinedAgentResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -42,7 +44,6 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   }
 
   val storn = "SN001"
-  
   val agentReferenceNumber = "ARN001"
 
   val payload: SdltOrganisationResponse =
@@ -86,18 +87,22 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
     )
 
 
-  "removeAgentDetails" should {
-    "delegate to connector with the given storn and return the payload" in {
+  "deletePredefinedAgent" should {
+
+    val deletePredefinedAgentRequest = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
+    val deletePredefinedAgentResponse = DeletePredefinedAgentResponse(true)
+
+    "delegate to connector with the given valid DeletePredefinedAgentRequest and return the payload" in {
 
       val (service, connector) = newService()
 
-      when(connector.removeAgentDetails(eqTo(storn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
-        .thenReturn(Future.unit)
+      when(connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier]))
+        .thenReturn(Future(deletePredefinedAgentResponse))
 
-      val result = service.removeAgentDetails(storn, agentReferenceNumber).futureValue
-      result mustBe ()
+      val result = service.deletePredefinedAgent(deletePredefinedAgentRequest).futureValue
+      result mustBe deletePredefinedAgentResponse
 
-      verify(connector).removeAgentDetails(eqTo(storn), eqTo(agentReferenceNumber))(any[HeaderCarrier])
+      verify(connector).deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
 
@@ -105,11 +110,11 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       val (service, connector) = newService()
 
-      when(connector.removeAgentDetails(eqTo(storn), eqTo(agentReferenceNumber))(any[HeaderCarrier]))
+      when(connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
-        service.removeAgentDetails(storn, agentReferenceNumber).futureValue
+        service.deletePredefinedAgent(deletePredefinedAgentRequest).futureValue
       }
 
       ex.getMessage must include("boom")
