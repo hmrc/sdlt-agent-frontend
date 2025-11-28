@@ -25,7 +25,8 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 import controllers.routes
 import forms.manageAgents.RemoveAgentFormProvider
-import models.manageAgents.{DeletePredefinedAgentResponse, RemoveAgent}
+import models.manageAgents.RemoveAgent
+import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 import play.api.mvc.Call
@@ -35,7 +36,6 @@ import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
-import play.api.libs.json.Json
 import utils.mangeAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future

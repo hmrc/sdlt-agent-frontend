@@ -17,14 +17,14 @@
 package connectors
 
 import models.AgentDetailsBeforeCreation
-import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
-import models.responses.SubmitAgentDetailsResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
 import models.responses.organisation.SdltOrganisationResponse
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -44,7 +44,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val submitAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/submit"
 
-  private val removeAgentDetailsUrl: URL =
+  private val deletePredefinedAgentUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
 
   def getSdltOrganisation(storn: String)
@@ -73,7 +73,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
                         (implicit hc: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
     http
-      .post(removeAgentDetailsUrl)
+      .post(deletePredefinedAgentUrl)
       .withBody(Json.toJson(deletePredefinedAgentRequest))
       .execute[Either[UpstreamErrorResponse, DeletePredefinedAgentResponse]]
       .flatMap {

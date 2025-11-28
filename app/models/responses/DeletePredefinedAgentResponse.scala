@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package models.manageAgents
+package models.responses
 
 import play.api.libs.json.{Json, OFormat}
 
-case class DeletePredefinedAgentRequest(
-                                     storn: String,
-                                     agentReferenceNumber: String
-                                   )
-
-object DeletePredefinedAgentRequest {
-  implicit val format: OFormat[DeletePredefinedAgentRequest] = Json.format[DeletePredefinedAgentRequest]
-}
-
 case class DeletePredefinedAgentResponse(
-                                    deleted: Boolean
-                                  )
+                                          deleted: Boolean
+                                        )
 
 object DeletePredefinedAgentResponse {
   implicit val format: OFormat[DeletePredefinedAgentResponse] = Json.format[DeletePredefinedAgentResponse]

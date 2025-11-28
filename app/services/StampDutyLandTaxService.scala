@@ -18,8 +18,8 @@ package services
 
 import connectors.StampDutyLandTaxConnector
 import models.AgentDetailsBeforeCreation
-import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
-import models.responses.SubmitAgentDetailsResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
 import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
 

@@ -18,7 +18,7 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.RemoveAgentFormProvider
-import models.manageAgents.{DeletePredefinedAgentRequest, RemoveAgent}
+import models.manageAgents.RemoveAgent
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -30,6 +30,7 @@ import controllers.routes.*
 
 import javax.inject.{Inject, Singleton}
 import models.NormalMode
+import models.requests.DeletePredefinedAgentRequest
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
 

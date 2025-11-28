@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package models.manageAgents
+package models
 
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.DeletePredefinedAgentResponse
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}

@@ -18,8 +18,8 @@ package services
 
 import connectors.StampDutyLandTaxConnector
 import models.AgentDetailsBeforeCreation
-import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
-import models.responses.SubmitAgentDetailsResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -90,7 +90,7 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
     val deletePredefinedAgentRequest = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
     val deletePredefinedAgentResponse = DeletePredefinedAgentResponse(true)
-    
+
     "delegate to connector with the given valid DeletePredefinedAgentRequest and return the payload" in {
 
       val (service, connector) = newService()

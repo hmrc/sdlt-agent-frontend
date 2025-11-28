@@ -19,14 +19,13 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
 import models.AgentDetailsBeforeCreation
-import models.manageAgents.{DeletePredefinedAgentRequest, DeletePredefinedAgentResponse}
-import models.responses.SubmitAgentDetailsResponse
+import models.requests.DeletePredefinedAgentRequest
+import models.responses.{DeletePredefinedAgentResponse, SubmitAgentDetailsResponse}
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
-import play.api.libs.json.{JsBoolean, Json}
 import uk.gov.hmrc.http.HeaderCarrier
 
 class StampDutyLandTaxConnectorISpec extends AnyWordSpec
@@ -246,7 +245,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
     val removeAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
     val req = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
 
-    "return Boolean when BE returns 200 with valid JSON" in {
+    "return JSON Boolean when BE returns 200 with valid JSON" in {
       stubFor(
         post(urlPathEqualTo(removeAgentDetailsUrl))
           .willReturn(
