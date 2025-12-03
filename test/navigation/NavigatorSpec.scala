@@ -67,12 +67,12 @@ class NavigatorSpec extends SpecBase {
       }
 
       "must go from AgentNamePage to AgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id"), Some("ARN001")) mustBe
+        navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
       }
 
       "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id"), Some("ARN001")) mustBe
+        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
       }
     }

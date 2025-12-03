@@ -116,7 +116,7 @@ trait SpecBase
   val populatedUserAnswers: UserAnswers =
     emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswers)
     
- val populatedUserAnswersWithArn: UserAnswers =
+  val populatedUserAnswersWithArn: UserAnswers =
     emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswersWithArn)
 
   val populatedUserAnswersWithoutAgentName: UserAnswers =
