@@ -207,7 +207,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       addressLine4 = Some("Greater London"),
       postcode = Some("SW1A 2AA"),
       phone = Some("02079460000"),
-      email = Some("info@acmeagents.co.uk")
+      email = Some("info@acmeagents.co.uk"),
+      dxAddress = None
     )
 
     "delegate to connector with the given AgentDetails" in {

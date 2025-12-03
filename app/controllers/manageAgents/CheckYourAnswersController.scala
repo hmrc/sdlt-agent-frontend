@@ -126,6 +126,7 @@ class CheckYourAnswersController @Inject()(
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
+              logger.info(s"\n $updated \n")
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(StornPage, request.storn))

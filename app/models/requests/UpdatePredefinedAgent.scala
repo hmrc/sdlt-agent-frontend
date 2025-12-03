@@ -30,7 +30,8 @@ case class UpdatePredefinedAgent (
                                        addressLine4                : Option[String],
                                        postcode                    : Option[String],
                                        phone                       : Option[String],
-                                       email                       : Option[String]
+                                       email                       : Option[String],
+                                       dxAddress                   : Option[String]
                                      )
 
 object UpdatePredefinedAgent {
@@ -47,7 +48,8 @@ object UpdatePredefinedAgent {
     (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(3)) and
     (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
     (__ \ "agentContactDetails" \ "phone").readNullable[String] and
-    (__ \ "agentContactDetails" \ "email").readNullable[String]
+    (__ \ "agentContactDetails" \ "email").readNullable[String] and
+    (__ \ "dxAddress").readNullable[String]
     )(UpdatePredefinedAgent.apply _)
 
 
