@@ -74,8 +74,7 @@ class AddressLookupController @Inject()(
       Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
       Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
-      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer, request.userAnswers.get(AgentReferenceNumberPage)
-    ))
+      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
       Redirect(JourneyRecoveryController.onPageLoad())

@@ -17,9 +17,7 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation}
-import models.responses.SubmitAgentDetailsResponse
-import models.requests.CreatePredefinedAgentRequest
+import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.responses.CreatePredefinedAgentResponse
 import models.requests.DeletePredefinedAgentRequest
 import models.responses.DeletePredefinedAgentResponse

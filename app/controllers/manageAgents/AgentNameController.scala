@@ -17,21 +17,20 @@
 package controllers.manageAgents
 
 import controllers.actions.*
+import controllers.manageAgents.routes.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
-
-import javax.inject.{Inject, Singleton}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentNameView
-import controllers.manageAgents.routes.*
-import play.api.data.Form
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -75,7 +74,7 @@ class AgentNameController@Inject()(
           } yield if (isDuplicate) {
             Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
           } else {
-            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
+            Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
           }
       )
   }

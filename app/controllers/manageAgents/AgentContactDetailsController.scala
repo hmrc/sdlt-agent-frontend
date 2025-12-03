@@ -16,15 +16,12 @@
 
 package controllers.manageAgents
 
-import javax.inject.Singleton
 import controllers.actions.*
 import forms.manageAgents.AgentContactDetailsFormProvider
-import models.manageAgents.AgentContactDetails
-
-import javax.inject.Inject
-import navigation.Navigator
 import models.Mode
+import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
+import navigation.Navigator
 import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage, AgentReferenceNumberPage}
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +31,7 @@ import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentContactDetailsView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -88,7 +86,7 @@ class AgentContactDetailsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
+              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
           )
       }
   }

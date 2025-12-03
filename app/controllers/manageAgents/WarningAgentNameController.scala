@@ -68,7 +68,7 @@ class WarningAgentNameController@Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers, request.userAnswers.get(AgentReferenceNumberPage)))
+          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
       )
   }
 }

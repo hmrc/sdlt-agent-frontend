@@ -17,10 +17,7 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.{UpdatePredefinedAgent, AgentDetailsBeforeCreation, NormalMode, UserAnswers}
-import models.{AgentDetailsAfterCreation, AgentDetailsBeforeCreation, NormalMode, UserAnswers}
-import models.{AgentDetailsBeforeCreation, AgentDetailsAfterCreation, NormalMode, UserAnswers}
-import models.requests.CreatePredefinedAgentRequest
+import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
@@ -82,7 +79,6 @@ class CheckYourAnswersController @Inject()(
                       logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
                       Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                     }, { userAnswers =>
-                      logger.info(s"\nTHE DATA IS:\n ${userAnswers.data}")
                       sessionRepository.set(userAnswers).map { _ =>
                         Ok(view(getSummaryListRows(userAnswers), postAction))
                       }
@@ -126,21 +122,20 @@ class CheckYourAnswersController @Inject()(
         case Some(arn) =>
           request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct UpdatePredefinedAgent")
+              logger.error("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
-              val emptiedUserAnswers = UserAnswers(request.userId)
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
-                updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(StornPage, request.storn))
                 _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(
+              } yield Redirect({
                 navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
-              ).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
+              }).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
                 ).recover {
                 case ex =>
-                  logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
+                  logger.error("[CheckYourAnswersController][onSubmit update] Unexpected failure", ex)
                   Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
               }
 

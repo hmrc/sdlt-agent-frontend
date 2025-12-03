@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package models.requests
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Json, OFormat, Reads, __}
+import play.api.libs.json.*
 
 case class UpdatePredefinedAgent (
-                                       agentResourceReference        : Option[String], //still mandatory, reference number is injected in controller
+                                       agentResourceReference      : Option[String],
                                        storn                       : String,
                                        agentName                   : String,
                                        houseNumber                 : Option[String],
@@ -51,7 +51,7 @@ object UpdatePredefinedAgent {
     )(UpdatePredefinedAgent.apply _)
 
 
-  implicit val format: OFormat[UpdatePredefinedAgent] = Json.format[UpdatePredefinedAgent]
+  implicit val format: OWrites[UpdatePredefinedAgent] = Json.writes[UpdatePredefinedAgent]
 }
 
 
