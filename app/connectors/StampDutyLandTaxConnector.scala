@@ -46,7 +46,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val deletePredefinedAgentUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
   private val updateAgentDetailsUrl: URL =
-    url"$base/stamp-duty-land-tax/manage-agents/update/predefined-agen"
+    url"$base/stamp-duty-land-tax/manage-agents/update/predefined-agent"
 
   private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
     url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
