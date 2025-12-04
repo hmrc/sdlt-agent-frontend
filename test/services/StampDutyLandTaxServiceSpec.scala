@@ -18,9 +18,8 @@ package services
 
 import connectors.StampDutyLandTaxConnector
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
-import models.responses.CreatePredefinedAgentResponse
+import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.requests.DeletePredefinedAgentRequest
-import models.responses.DeletePredefinedAgentResponse
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
@@ -216,10 +215,10 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       val (service, connector) = newService()
 
       when(connector.updateAgentDetails(eqTo(payload))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(()))
+        .thenReturn(Future(UpdatePredefinedAgentResponse(true)))
 
       val result = service.updateAgentDetails(payload).futureValue
-      result mustBe (): Unit
+      result mustBe UpdatePredefinedAgentResponse(true)
 
       verify(connector).updateAgentDetails(eqTo(payload))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)

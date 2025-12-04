@@ -26,7 +26,7 @@ import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
-import models.responses.CreatePredefinedAgentResponse
+import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -289,7 +289,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
               .build()
 
           when(service.updateAgentDetails(any())(any()))
-            .thenReturn(Future.successful(()))
+            .thenReturn(Future.successful(UpdatePredefinedAgentResponse(true)))
 
           running(application) {
             val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))

@@ -18,7 +18,7 @@ package connectors
 
 import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.responses.organisation.SdltOrganisationResponse
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse}
+import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -75,23 +75,23 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
 
   def updateAgentDetails(UpdatePredefinedAgent: UpdatePredefinedAgent)
-                        (implicit hc: HeaderCarrier): Future[Unit] =
+                        (implicit hc: HeaderCarrier): Future[UpdatePredefinedAgentResponse] =
     http
       .post(updateAgentDetailsUrl)
       .withBody(Json.toJson(UpdatePredefinedAgent))
-      .execute[HttpResponse]
-      .flatMap { response =>
-        if(response.status == 200) {
-          Future.unit
-        }else{
-          Future.failed(new RuntimeException(s"Failed to update agent: status=${response.status}, body=${response.body}"))
-        }
+      .execute[Either[UpstreamErrorResponse, UpdatePredefinedAgentResponse]]
+      .flatMap {
+        case Right(response) =>
+          Future.successful(response)
+        case Left(error) =>
+          Future.failed(error)
       }
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][updateAgentDetails]: ${e.getMessage}")
+          logger.error(s"[StampDutyLandTaxConnector][updatePredefinedAgent]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
+
 
   def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
                         (implicit hc: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
