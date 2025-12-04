@@ -16,12 +16,13 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
-import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage}
+import pages.*
+import pages.manageAgents.*
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
@@ -37,11 +38,11 @@ class Navigator @Inject()() {
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
-    case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
-    case AgentContactDetailsPage       => _ => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
-    case AgentCheckYourAnswersPage     => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
-    case _                             => _ => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
+    case AgentNamePage                 => _  => controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
+    case AgentNameDuplicateWarningPage => _  => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
+    case AgentContactDetailsPage       => _  => controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode)
+    case AgentCheckYourAnswersPage     => ua => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(ua.get(AgentReferenceNumberPage))
+    case _                             => ua  => controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(ua.get(AgentReferenceNumberPage))
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
