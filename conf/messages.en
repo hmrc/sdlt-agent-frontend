@@ -49,6 +49,11 @@ manageAgents.contactEmail.change.hidden =
 manageAgents.checkYourAnswers.title = Check your answers – Agent details
 manageAgents.checkYourAnswers.heading = Check your answers
 
+accessDenied.title = Sorry, there is a problem with the service
+accessDenied.heading = Sorry, there is a problem with the service
+accessDenied.p1 = You do not have access to this service.
+accessDenied.link = Continue to your account
+
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
 journeyRecovery.continue.guidance = Try again later.
