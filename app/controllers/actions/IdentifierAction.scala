@@ -63,7 +63,8 @@ class AuthenticatedIdentifierAction @Inject()(
               block(IdentifierRequest(request, internalId, storn))
             }
             .getOrElse(
-                Future.successful(Redirect(routes.AccessDeniedController.onPageLoad()))
+                Future.successful(
+                  Redirect(routes.AccessDeniedController.onPageLoad()))
             )
     } recover {
       case _: NoActiveSession =>

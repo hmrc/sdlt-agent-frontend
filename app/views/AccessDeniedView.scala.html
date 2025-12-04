@@ -27,20 +27,20 @@ link: Link
 
 @()(implicit request: RequestHeader, appConfig: FrontendAppConfig, messages: Messages)
 
-    @layout(
-        pageTitle = titleNoForm(messages("accessDenied.title")),
-        showBackLink = false,
-        showSignOut = false
-    ) {
+@layout(
+    pageTitle = titleNoForm(messages("accessDenied.title")),
+    showBackLink = false,
+    showSignOut = false
+) {
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("accessDenied.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
-        @paragraph(message = messages("accessDenied.p1"))
-        @link(
-            linkTextKey  = "accessDenied.link",
-            linkUrl      = appConfig.govUKUrl,
-            extraClasses = "govuk-!-margin-bottom-4"
-        )
-    }
+    @hmrcPageHeading(PageHeading(
+        text           = messages("accessDenied.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
+    @paragraph(message = messages("accessDenied.p1"))
+    @link(
+        linkTextKey  = "accessDenied.link",
+        linkUrl      = appConfig.govUKUrl,
+        extraClasses = "govuk-!-margin-bottom-4"
+    )
+}
