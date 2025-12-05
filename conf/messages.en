@@ -31,6 +31,14 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
+pageNotFound.title      = Page not found
+pageNotFound.heading    = Page not found
+pageNotFound.p1         = If you typed the web address, check it is correct.
+pageNotFound.p2         = If you pasted the web address, check you copied the entire address.
+pageNotFound.p3         = If the web address is correct or you selected a link or button, contact the
+pageNotFound.link       = HMRC Online Services Helpdesk
+pageNotFound.p4         = if you need to speak to someone.
+
 index.title = sdlt-agent-frontend
 index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
