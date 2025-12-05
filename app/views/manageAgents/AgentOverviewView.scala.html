@@ -41,8 +41,7 @@
 )
 
     @layout(
-        pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
-        showBackLink = false
+        pageTitle = titleNoForm(messages("manageAgents.agentOverview.title"))
     ) {
 
         @request.flash.get("agentUpdated").map { agentName =>
