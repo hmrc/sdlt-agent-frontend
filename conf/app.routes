@@ -46,3 +46,5 @@ GET         /agent-details/remove-agent                  controllers.manageAgent
 POST        /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit(agentReferenceNumber: String)
 
 GET         /agent-details/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
+
+GET        /system-error/there-is-a-problem              controllers.SystemErrorController.onPageLoad()

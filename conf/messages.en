@@ -63,6 +63,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+systemError.title       = Sorry, there is a problem with this service
+systemError.heading     = Sorry, there is a problem with this service
+systemError.paragraph1  = Try again later or contact the
+systemError.link        = HMRC Online Services Helpdesk
+
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?
 manageAgents.agentContactDetails.question1 = What is {0}’s phone number?
