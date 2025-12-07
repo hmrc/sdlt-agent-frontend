@@ -84,13 +84,14 @@ class CheckYourAnswersController @Inject()(
                       }
                     })
 
-            case None =>
-              logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          } recover {
-            case ex =>
-              logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
-              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+                case None =>
+                  logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              } recover {
+                case ex =>
+                  logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
+              }
           }
       }
   }
@@ -122,7 +123,7 @@ class CheckYourAnswersController @Inject()(
           request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
               logger.info(s"\n $updated \n")
@@ -136,7 +137,7 @@ class CheckYourAnswersController @Inject()(
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit update] Unexpected failure", ex)
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
 
           }
@@ -144,3 +145,4 @@ class CheckYourAnswersController @Inject()(
 
   }
 }
+
