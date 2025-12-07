@@ -35,7 +35,6 @@ class SystemErrorController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request => {
-      logger.info("[SystemErrorController][onSubmit] Calling SystemErrorView")
       Ok(view())
     }
   }

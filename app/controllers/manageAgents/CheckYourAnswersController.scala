@@ -99,7 +99,7 @@ class CheckYourAnswersController @Inject()(
           request.userAnswers.data.asOpt[CreatePredefinedAgentRequest] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(createPredefinedAgentRequest) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
               (for {

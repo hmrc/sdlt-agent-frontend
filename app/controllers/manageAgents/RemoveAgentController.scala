@@ -95,7 +95,7 @@ class RemoveAgentController @Inject()(
                           .flashing("agentRemoved" -> agentDetails.name)
                       } else {
                         logger.error(s"[RemoveAgentController][onSubmit] Failed to remove agent: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber")
-                        Redirect(JourneyRecoveryController.onPageLoad())
+                        Redirect(controllers.routes.SystemErrorController.onPageLoad())
                       }
                     }
 
