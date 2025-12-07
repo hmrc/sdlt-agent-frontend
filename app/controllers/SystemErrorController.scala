@@ -16,7 +16,9 @@
 
 package controllers
 
-import play.api.i18n.I18nSupport
+import config.FrontendAppConfig
+import play.api.Logging
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SystemErrorView
@@ -25,14 +27,16 @@ import javax.inject.Inject
 
 
 class SystemErrorController @Inject()(
+                                       override val messagesApi: MessagesApi,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: SystemErrorView,
-                                     ) extends FrontendBaseController
+                                     )(implicit config: FrontendAppConfig) extends FrontendBaseController with Logging
   with I18nSupport {
-  
+
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request => {
-          Ok(view())
+      logger.info("[SystemErrorController][onSubmit] Calling SystemErrorView")
+      Ok(view())
     }
   }
 

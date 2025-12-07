@@ -87,7 +87,7 @@ class CheckYourAnswersController @Inject()(
           } recover {
             case ex =>
               logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
-              Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
           }
       }
   }
@@ -112,7 +112,7 @@ class CheckYourAnswersController @Inject()(
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
 
           }

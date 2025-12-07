@@ -66,7 +66,7 @@ unauthorised.heading = You can’t access this service with this account
 systemError.title       = Sorry, there is a problem with this service
 systemError.heading     = Sorry, there is a problem with this service
 systemError.paragraph1  = Try again later or contact the
-systemError.link        = HMRC Online Services Helpdesk
+systemError.link        = HMRC Online Services Helpdesk.
 
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?

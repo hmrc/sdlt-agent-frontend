@@ -69,7 +69,7 @@ class RemoveAgentController @Inject()(
       } recover {
         case ex =>
           logger.error("[RemoveAgentController][onPageLoad] Unexpected failure", ex)
-          Redirect(JourneyRecoveryController.onPageLoad())
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
   }
 
@@ -111,7 +111,7 @@ class RemoveAgentController @Inject()(
       } recover {
         case ex =>
           logger.error("[RemoveAgentController][onSubmit] Unexpected failure", ex)
-          Redirect(JourneyRecoveryController.onPageLoad())
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
       }
   }
 }

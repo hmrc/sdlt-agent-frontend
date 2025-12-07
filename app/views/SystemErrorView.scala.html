@@ -14,23 +14,28 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+@import views.html.components.Heading
+@import views.html.components.ParagraphWithLink
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        heading: Heading,
+        paragraphWithLink: ParagraphWithLink
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages, appConfig: FrontendAppConfig)
 
-@layout(pageTitle = titleNoForm(messages("systemError.title"))) {
+@layout(pageTitle = titleNoForm(messages("systemError.title")),
+    showBackLink = true,
+    showSignOut = false
 
-    <h1 class="govuk-heading-xl">@messages("systemError.heading")</h1>
+) {
 
-    <p class="govuk-body">@messages("systemError.paragraph1")</p>
+    @heading(messages("systemError.heading"))
+    @paragraphWithLink(
+        messages("systemError.paragraph1"),
+        messages("systemError.link"),
+        appConfig.hmrcOnlineServiceDeskUrl
 
-    <p class="govuk-body">
-    @govukButton(
-        ButtonViewModel(messages("site.startAgain"))
-        .asLink(routes.IndexController.onPageLoad().url)
     )
-    </p>
 }
