@@ -17,10 +17,10 @@
 package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import models.requests.CreatePredefinedAgentRequest
+import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentOverviewPage, StornPage}
+import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
@@ -64,22 +64,25 @@ class CheckYourAnswersController @Inject()(
         ).flatten
       )
 
-      agentReferenceNumber match {
-        case None =>
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+      request.userAnswers.get(AgentReferenceNumberPage) match {
         case Some(arn) =>
-          stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
-            case Some(agentDetails) =>
-
-              updateUserAnswers(agentDetails)
-                .fold({ error =>
-                  logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
-                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                }, { userAnswers =>
-                  sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(userAnswers), postAction))
-                  }
-                })
+          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+        case None =>
+          agentReferenceNumber match {
+            case None =>
+              Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+            case Some(arn) =>
+              stampDutyLandTaxService.getAgentDetails(request.storn, arn) flatMap {
+                case Some(agentDetails) =>
+                  updateUserAnswers(agentDetails)
+                    .fold({ error =>
+                      logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
+                      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                    }, { userAnswers =>
+                      sessionRepository.set(userAnswers).map { _ =>
+                        Ok(view(getSummaryListRows(userAnswers), postAction))
+                      }
+                    })
 
             case None =>
               logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retried details for agent with agentReferenceNumber: $arn")
@@ -114,14 +117,30 @@ class CheckYourAnswersController @Inject()(
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
                   Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
-
           }
         case Some(arn) =>
-          logger.warn("[CheckYourAnswersController][onSubmit] Duplicate submission attempt detected; blocking progression")
-          //TODO: Need to add a real backend call to update a pre-existing agent
-          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
+          request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
+            case None =>
+              logger.error("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            case Some(updatePredefinedAgent) =>
+              val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
+              logger.info(s"\n $updated \n")
+              (for {
+                _ <- stampDutyLandTaxService.updateAgentDetails(updated)
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(StornPage, request.storn))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect({
+                navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+              }).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
+                ).recover {
+                case ex =>
+                  logger.error("[CheckYourAnswersController][onSubmit update] Unexpected failure", ex)
+                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+              }
 
+          }
+      }
 
   }
 }

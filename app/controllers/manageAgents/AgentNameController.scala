@@ -17,21 +17,20 @@
 package controllers.manageAgents
 
 import controllers.actions.*
+import controllers.manageAgents.routes.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage}
-
-import javax.inject.{Inject, Singleton}
+import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentNameView
-import controllers.manageAgents.routes.*
-import play.api.data.Form
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -62,6 +61,7 @@ class AgentNameController@Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+    
     form
       .bindFromRequest()
       .fold(
