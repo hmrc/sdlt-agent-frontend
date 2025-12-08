@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.EmptyString.emptyString
+package pages.manageAgents
 
-@this()
+import pages.QuestionPage
+import play.api.libs.json.*
 
-@(
-    msg: String,
-    classes: String = "govuk-heading-l",
-    id: Option[String] = None,
-    showCaption: Boolean = true
-)(implicit messages: Messages)
-
-<h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
-    @if(showCaption) {
-     <span class="caption-l">@messages("caption")</span>
-    }
-    @messages(msg)
-</h1>
+object AgentReferenceNumberPage extends QuestionPage[String] {
+  override def path: JsPath = JsPath \ "agentReferenceNumber"
+}

@@ -33,9 +33,11 @@
     @if(prefixTextKey.nonEmpty) {
         @{Html(messages(prefixTextKey))}
     }
+
     <a href="@linkUrl" class="govuk-link" @if(isNewTab){rel="noreferrer noopener" target="_blank"}>@{Html(messages(linkTextKey))}</a>@if(linkFullStop){.}
 
     @if(suffixTextKey.nonEmpty) {
         @{Html(messages(suffixTextKey))}
     }
+
 </p>

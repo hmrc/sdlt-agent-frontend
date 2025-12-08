@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import utils.EmptyString.emptyString
+package models.responses
 
-@this()
+import play.api.libs.json.{Json, OFormat}
 
-@(
-    msg: String,
-    classes: String = "govuk-heading-l",
-    id: Option[String] = None,
-    showCaption: Boolean = true
-)(implicit messages: Messages)
 
-<h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
-    @if(showCaption) {
-     <span class="caption-l">@messages("caption")</span>
-    }
-    @messages(msg)
-</h1>
+case class UpdatePredefinedAgentResponse(
+                                          updated: Boolean
+                                        )
+
+object UpdatePredefinedAgentResponse {
+  implicit val format: OFormat[UpdatePredefinedAgentResponse] = Json.format[UpdatePredefinedAgentResponse]
+}
+

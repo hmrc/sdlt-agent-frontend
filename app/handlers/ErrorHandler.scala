@@ -22,7 +22,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
-import views.html.{AccessDeniedView, ErrorTemplate}
+import views.html.{AccessDeniedView, ErrorTemplate, PageNotFoundView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,7 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ErrorHandler @Inject()(
                               val messagesApi: MessagesApi,
                               view: ErrorTemplate,
-                              accessDeniedView: AccessDeniedView
+                              accessDeniedview: AccessDeniedView,
+                              notFoundView: PageNotFoundView
                             )(implicit val ec: ExecutionContext, appConfig: FrontendAppConfig) extends FrontendErrorHandler with I18nSupport {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: RequestHeader): Future[Html] =
@@ -38,4 +39,7 @@ class ErrorHandler @Inject()(
 
   override def fallbackClientErrorTemplate(implicit request: RequestHeader): Future[Html] =
     Future.successful(accessDeniedView())
+
+  override def notFoundTemplate(implicit request: RequestHeader): Future[Html] =
+    Future.successful(notFoundView()(request, appConfig))
 }
