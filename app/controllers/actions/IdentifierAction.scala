@@ -24,7 +24,7 @@ import play.api.Logging
 import play.api.mvc.Results.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -51,10 +51,10 @@ class AuthenticatedIdentifierAction @Inject()(
 
     authorised(defaultPredicate)
       .retrieve(
-        Retrievals.internalId     and
-        Retrievals.allEnrolments  and
-        Retrievals.affinityGroup  and
-        Retrievals.credentialRole
+        Retrievals.internalId and
+          Retrievals.allEnrolments and
+          Retrievals.affinityGroup and
+          Retrievals.credentialRole
       ) {
         //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
@@ -63,10 +63,16 @@ class AuthenticatedIdentifierAction @Inject()(
               block(IdentifierRequest(request, internalId, storn))
             }
             .getOrElse(
-                Future.successful(
-                  Redirect(routes.AccessDeniedController.onPageLoad()))
+              Future.successful(
+                Redirect(routes.AccessDeniedController.onPageLoad()))
             )
-    } recover {
+
+        case Some(_) ~ _ ~ Some(Individual) ~ _ =>
+          logger.info("AuthenticatedIdentifierAction - Individual login attempt")
+          Future.successful(
+            Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
+          )
+      } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
       case _: AuthorisationException =>
