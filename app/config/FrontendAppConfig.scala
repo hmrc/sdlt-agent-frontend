@@ -65,4 +65,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val addressLookupProtocol: String = configuration.get[String]("address-lookup-frontend.protocol")
   val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
   val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
+
+  lazy val hmrcOnlineServiceDeskUrl: String = configuration.get[String]("urls.hmrcOnlineServiceDesk")
+  lazy val govUKUrl: String = configuration.get[String]("urls.govUK")
+
+  lazy val scheduledDeploymentTime: String = configuration.get[String]("scheduledDeploymentTime")
 }

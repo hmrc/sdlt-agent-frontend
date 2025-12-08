@@ -39,6 +39,10 @@ pageNotFound.p3         = If the web address is correct or you selected a link o
 pageNotFound.link       = HMRC Online Services Helpdesk
 pageNotFound.p4         = if you need to speak to someone.
 
+shuttering.title      = Sorry, this service is unavailable
+shuttering.heading    = Sorry, this service is unavailable
+shuttering.p1         = You will be able to use this service on {0} at {1}.
+
 index.title = sdlt-agent-frontend
 index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.

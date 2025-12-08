@@ -13,6 +13,8 @@ GET         /access-denied                               controllers.AccessDenie
 
 GET         /page-not-found                              controllers.PageNotFoundController.onPageLoad()
 
+GET         /service-is-unavailable                      controllers.ShutteringController.onPageLoad()
+
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
