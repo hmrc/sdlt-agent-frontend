@@ -23,7 +23,7 @@
         paragraphWithLink: ParagraphWithLink
 )
 
-@()(implicit request: Request[_], messages: Messages, appConfig: FrontendAppConfig)
+@()(implicit request: RequestHeader,  appConfig: FrontendAppConfig, messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("systemError.title")),
     showBackLink = true,
