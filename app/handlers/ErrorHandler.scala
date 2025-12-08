@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ErrorHandler @Inject()(
                               val messagesApi: MessagesApi,
                               view: ErrorTemplate,
-                              accessDeniedview: AccessDeniedView,
+                              accessDeniedView: AccessDeniedView,
                               notFoundView: PageNotFoundView
                             )(implicit val ec: ExecutionContext, appConfig: FrontendAppConfig) extends FrontendErrorHandler with I18nSupport {
 
