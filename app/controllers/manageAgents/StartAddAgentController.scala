@@ -72,7 +72,7 @@ class StartAddAgentController @Inject()(
       } recover {
       case ex =>
         logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
-        Redirect(JourneyRecoveryController.onPageLoad())
+        Redirect(controllers.routes.SystemErrorController.onPageLoad())
     }
   }
 }

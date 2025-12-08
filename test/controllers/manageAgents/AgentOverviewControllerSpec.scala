@@ -147,7 +147,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
       }
     }
   }

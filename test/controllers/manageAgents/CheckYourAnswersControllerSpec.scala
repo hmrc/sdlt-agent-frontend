@@ -135,7 +135,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
         }
       }
 
@@ -224,7 +224,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
 
           verify(service, times(0)).submitAgentDetails(any())(any())
 
@@ -270,7 +270,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
 
           verify(service, times(1)).submitAgentDetails(any())(any())
 
@@ -322,7 +322,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
 
             verify(service, times(0)).updateAgentDetails(any())(any())
           }
@@ -340,7 +340,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
 
           }
         }
@@ -359,7 +359,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+            redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
 
             verify(service, times(1)).updateAgentDetails(any())(any())
 

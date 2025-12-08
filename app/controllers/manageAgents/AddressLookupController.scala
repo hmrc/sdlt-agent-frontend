@@ -18,7 +18,7 @@ package controllers.manageAgents
 
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import controllers.routes.JourneyRecoveryController
+import controllers.routes.{SystemErrorController, JourneyRecoveryController}
 import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
@@ -55,7 +55,7 @@ class AddressLookupController @Inject()(
         Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
         Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
-        Redirect(JourneyRecoveryController.onPageLoad())
+        Redirect(SystemErrorController.onPageLoad())
     }
   }
 
@@ -77,7 +77,7 @@ class AddressLookupController @Inject()(
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
     case Left(ex) =>
       Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
-      Redirect(JourneyRecoveryController.onPageLoad())
+      Redirect(SystemErrorController.onPageLoad())
     }
   }
 

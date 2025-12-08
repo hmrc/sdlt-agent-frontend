@@ -90,10 +90,10 @@ class CheckYourAnswersController @Inject()(
               } recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
           }
-        }
+      }
   }
 
   def onSubmit(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
@@ -103,7 +103,7 @@ class CheckYourAnswersController @Inject()(
           request.userAnswers.data.asOpt[CreatePredefinedAgentRequest] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(createPredefinedAgentRequest) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
               (for {
@@ -116,14 +116,14 @@ class CheckYourAnswersController @Inject()(
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
           }
         case Some(arn) =>
           request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
             case None =>
               logger.error("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
               logger.info(s"\n $updated \n")
@@ -137,7 +137,7 @@ class CheckYourAnswersController @Inject()(
                 ).recover {
                 case ex =>
                   logger.error("[CheckYourAnswersController][onSubmit update] Unexpected failure", ex)
-                  Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
 
           }
@@ -145,3 +145,4 @@ class CheckYourAnswersController @Inject()(
 
   }
 }
+

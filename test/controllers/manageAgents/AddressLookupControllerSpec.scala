@@ -65,6 +65,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
     val id: String = "idToExtractAddress"
     val addressLookupExtract: Mode => String = (mode: Mode) => controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url + s"?id=$id"
     val thereIsProblemUrl : String = controllers.routes.JourneyRecoveryController.onPageLoad(None).url()
+    val systemErrorThereIsProblemUrl : String = controllers.routes.SystemErrorController.onPageLoad().url()
 
     val userId: String = "userID"
 
@@ -113,7 +114,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual thereIsProblemUrl
+        redirectLocation(result).value mustEqual systemErrorThereIsProblemUrl
       }
 
     }
@@ -166,7 +167,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual "/stamp-duty-land-tax-agent/there-is-a-problem"
+        redirectLocation(result).value mustEqual systemErrorThereIsProblemUrl
         verify(service, times(1)).getJourneyOutcome(any(), any())(any[HeaderCarrier])
       }
     }
