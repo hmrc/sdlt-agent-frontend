@@ -14,15 +14,13 @@
  * limitations under the License.
  *@
 
-@import utils.EmptyString.emptyString
-
 @this()
 
 @(
         paragraphContent: String,
         linkTextKey: String,
         linkUrl: String,
-        isNewTab: Boolean = true,
+        isNewTab: Boolean = false,
 )(implicit messages: Messages)
 
 <p class="govuk-body">@paragraphContent
