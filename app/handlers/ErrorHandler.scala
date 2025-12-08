@@ -43,4 +43,7 @@ class ErrorHandler @Inject()(
 
   override def notFoundTemplate(implicit request: RequestHeader): Future[Html] =
     Future.successful(notFoundView()(request, appConfig))
+
+  override def badRequestTemplate(implicit request: RequestHeader): Future[Html] =
+    Future.successful(notFoundView()(request, appConfig))
 }
