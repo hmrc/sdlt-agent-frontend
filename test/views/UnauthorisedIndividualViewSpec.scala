@@ -29,8 +29,6 @@ import views.html.UnauthorisedIndividualView
 
 class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
 
-  lazy val unauthorisedIndividualControllerRoute = controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad().url
-
   "UnauthorisedIndividualView" - {
     "render the page with correct title and heading" in new Setup {
       val html = view()
