@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
+import play.api.mvc.RequestHeader
 import play.api.routing.Router.empty.routes
 
 @Singleton
@@ -48,10 +49,10 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private val continueUrl = (mode: Mode) => appConfig.host +
     controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
-  private def setJourneyOptions(mode: Mode): Seq[(String, JsValue)] = {
+  private def setJourneyOptions(mode: Mode)(implicit rh: RequestHeader): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl(mode)),
-      "signOutHref" -> JsString(appConfig.exitSurveyUrl),
+      "signOutHref" -> JsString(appConfig.contactUrl),
       "ukMode" -> JsBoolean(true),
       // TODO: we expect Welsh translation to be disabled / not working as expected
       "disableTranslations" -> JsBoolean(true),
@@ -147,7 +148,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   private def buildConfig(agentName: Option[String], mode: Mode)
-      (implicit messages: Messages): JsValue = {
+      (implicit messages: Messages, rh: RequestHeader): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -167,7 +168,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
   // Step 1: Journey start/init
   def initJourney(agentName: Option[String], mode: Mode)
-                 (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
+                 (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
     Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")

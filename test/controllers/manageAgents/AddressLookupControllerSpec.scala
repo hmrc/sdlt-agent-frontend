@@ -75,7 +75,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
   "AddressLookupController init AL journey" - {
 
     "return location on success" in new Fixture {
-      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages]))
+      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages], any()))
         .thenReturn(Future.successful(Right(JourneyInitSuccessResponse(Some("locationUrl")))))
 
       running(app) {
@@ -90,7 +90,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to default error page: Journey Location is None" in new Fixture {
 
-      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages]))
+      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages], any()))
         .thenReturn(Future.successful(Right(JourneyInitSuccessResponse(None))))
 
       running(app) {
@@ -105,7 +105,7 @@ class AddressLookupControllerSpec extends SpecBase with MockitoSugar {
 
     "return failure status on error" in new Fixture {
 
-      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages]))
+      when(service.initJourney(any(), any(), any())(any[HeaderCarrier], any[Messages], any()))
         .thenReturn(Future.successful(Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))))
 
       running(app) {
