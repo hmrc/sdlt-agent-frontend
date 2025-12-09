@@ -73,8 +73,6 @@ class PageNotFoundViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockit
       val html = view()
       val doc = parseHtml(html)
 
-      println(doc)
-
       val link = doc.select("p.govuk-body a.govuk-link").attr("href")
 
       link mustBe appConfig.hmrcOnlineServiceDeskUrl
