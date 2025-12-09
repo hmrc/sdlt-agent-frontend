@@ -28,6 +28,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import repositories.SessionRepository
 import play.api.Logger
 import play.api.i18n.Messages
+import play.api.mvc.RequestHeader
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,7 +40,7 @@ class AddressLookupService @Inject()(
 
   // Step 1: Init AL journey
   def initJourney(userAnswers: UserAnswers, storn: String, mode: Mode)
-                 (implicit hc: HeaderCarrier, messages: Messages): Future[AddressLookupResponse] = {
+                 (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
     Logger("application").info(s"[AddressLookupService][initJourney]")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))

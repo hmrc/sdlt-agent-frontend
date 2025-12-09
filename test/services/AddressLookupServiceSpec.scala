@@ -38,6 +38,8 @@ import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.test.Helpers.stubMessages
 import org.scalactic.TripleEquals.*
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 
 
 class AddressLookupServiceSpec extends AnyWordSpec
@@ -48,6 +50,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val messages: Messages = stubMessages()
   implicit val ex: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val request: RequestHeader = FakeRequest("GET", "/dummy-url")
 
   trait Fixture {
     val storn: String = "SN001"
@@ -72,12 +75,27 @@ class AddressLookupServiceSpec extends AnyWordSpec
     "return new Location on success" in new Fixture {
       Seq(NormalMode, CheckMode).foreach { mode =>
         val expectedPayload = JourneyInitSuccessResponse(Some("locationA"))
-        when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
-          .thenReturn(Future.successful(Right(expectedPayload)))
+        when(
+          connector.initJourney(any(), any())(
+            any[HeaderCarrier],
+            any[Messages],
+            any[RequestHeader]
+          )
+        ).thenReturn(Future.successful(Right(expectedPayload)))
 
-        val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
+        val result: AddressLookupResponse =
+          service.initJourney(userAnswer, storn, mode).futureValue
+
         result mustBe Right(expectedPayload)
-        verify(connector, times(1)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
+
+        verify(connector, times(1)).initJourney(
+          any(),
+          eqTo(mode)
+        )(
+          any[HeaderCarrier],
+          any[Messages],
+          any[RequestHeader]
+        )
       }
     }
 
@@ -85,12 +103,27 @@ class AddressLookupServiceSpec extends AnyWordSpec
       Seq(NormalMode, CheckMode).foreach { mode =>
         val expectedError = JourneyInitFailureResponse(INTERNAL_SERVER_ERROR)
 
-        when(connector.initJourney(any(), any())(any[HeaderCarrier], any[Messages]))
-          .thenReturn(Future.successful(Left(expectedError)))
+        when(
+          connector.initJourney(any(), any())(
+            any[HeaderCarrier],
+            any[Messages],
+            any[RequestHeader]
+          )
+        ).thenReturn(Future.successful(Left(expectedError)))
 
-        val result: AddressLookupResponse = service.initJourney(userAnswer, storn, mode).futureValue
+        val result: AddressLookupResponse =
+          service.initJourney(userAnswer, storn, mode).futureValue
+
         result mustBe Left(expectedError)
-        verify(connector, times(1)).initJourney(any(), eqTo(mode) )(any[HeaderCarrier], any[Messages])
+
+        verify(connector, times(1)).initJourney(
+          any(),
+          eqTo(mode)
+        )(
+          any[HeaderCarrier],
+          any[Messages],
+          any[RequestHeader]
+        )
       }
     }
 

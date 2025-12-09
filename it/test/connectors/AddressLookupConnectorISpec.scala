@@ -32,6 +32,8 @@ import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.i18n.{Messages, MessagesApi}
 import uk.gov.hmrc.http.HeaderCarrier
 import org.mockito.Mockito.reset
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessages
 
 import scala.concurrent.ExecutionContext
@@ -50,6 +52,7 @@ class AddressLookupConnectorISpec extends AnyWordSpec
   implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = stubMessages()
   implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+  implicit val request: RequestHeader = FakeRequest("GET", "/dummy-url")
 
   private val agentName: Option[String] = Some("agentName")
   private val errorId = "errorId"
