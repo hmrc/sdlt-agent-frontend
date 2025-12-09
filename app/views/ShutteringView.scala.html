@@ -30,7 +30,7 @@
     showSignOut = false
 ) {
 
-    @heading(messages("shuttering.heading"))
-    @paragraph(messages("shuttering.p1"))
+    @heading(messages("shuttering.heading"), showCaption = false)
+    @paragraph(messages("shuttering.p1", appConfig.scheduledDeploymentDate, appConfig.scheduledDeploymentTime))
 
 }

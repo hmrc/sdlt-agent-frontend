@@ -52,4 +52,4 @@ POST        /agent-details/remove-agent                  controllers.manageAgent
 
 GET         /agent-details/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
 
-GET        /system-error/there-is-a-problem              controllers.SystemErrorController.onPageLoad()
+GET         /system-error/there-is-a-problem              controllers.SystemErrorController.onPageLoad()
