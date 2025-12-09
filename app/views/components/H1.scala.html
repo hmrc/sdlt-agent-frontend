@@ -22,12 +22,12 @@
     msg: String,
     classes: String = "govuk-heading-l",
     id: Option[String] = None,
-    showCaption: Boolean = true
+    showCaption: Boolean = false
 )(implicit messages: Messages)
 
 <h1 @{id.fold(emptyString)(id => s"id=$id")} class="@classes">
     @if(showCaption) {
-     <span class="caption-l">@messages("caption")</span>
+     <span class="govuk-caption-l">@messages("manageAgents.caption")</span>
     }
     @messages(msg)
 </h1>
