@@ -61,7 +61,7 @@ class ShutteringViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoS
       val paragraph = doc.select("p.govuk-body")
 
       paragraph.size() mustBe 1
-      paragraph.text() must include(messages("shuttering.p1"))
+      paragraph.text() must include(messages("shuttering.p1", appConfig.scheduledDeploymentDate, appConfig.scheduledDeploymentTime))
     }
   }
 }
