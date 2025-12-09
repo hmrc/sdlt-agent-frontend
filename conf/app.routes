@@ -39,6 +39,9 @@ GET         /agent-details/address-lookup                controllers.manageAgent
 GET         /agent-details/check-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
 GET         /agent-details/save-address-lookup           controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
+
+GET         /agent-details/confirm-agent-contact-details   controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad()
+POST        /agent-details/confirm-agent-contact-details   controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit()
 GET         /agent-details/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /agent-details/agent-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /agent-details/check-agent-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)

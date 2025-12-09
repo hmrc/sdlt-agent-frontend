@@ -18,12 +18,12 @@ package controllers.manageAgents
 
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import controllers.routes.{SystemErrorController, JourneyRecoveryController}
+import controllers.routes.{JourneyRecoveryController, SystemErrorController}
 import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentReferenceNumberPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentReferenceNumberPage, ConfirmAgentContactDetailsPage}
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -71,7 +71,7 @@ class AddressLookupController @Inject()(
   }.value.map {
     case Right(updatedAnswer) if mode == NormalMode =>
       Logger("application").info(s"[AddressLookupController] - address extracted and saved")
-      Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, updatedAnswer))
+      Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
       Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))

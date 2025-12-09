@@ -86,6 +86,10 @@ systemError.heading     = Sorry, there is a problem with this service
 systemError.paragraph1  = Try again later or contact the
 systemError.link        = HMRC Online Services Helpdesk.
 
+manageAgents.confirmAgentContactDetails.error.required = Confirm that you want to add agent contact details
+manageAgents.confirmAgentContactDetails.title = Do you want to add agent contact details – Agent details
+manageAgents.confirmAgentContactDetails.heading = Do you want to add contact details for {0}?
+
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?
 manageAgents.agentContactDetails.question1 = What is {0}’s phone number?

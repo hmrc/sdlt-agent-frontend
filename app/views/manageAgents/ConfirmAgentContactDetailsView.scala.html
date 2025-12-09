@@ -1,0 +1,75 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.Radios
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import models.responses.organisation.CreatedAgent
+
+
+@this(
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading
+)
+
+@(
+        form: Form[_],
+        agentName: String
+)(
+        implicit request: Request[_],
+        messages: Messages
+)
+
+@layout(pageTitle = title(form, messages("manageAgents.confirmAgentContactDetails.title", agentName))) {
+
+    @formHelper(action = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @hmrcPageHeading(PageHeading(
+            text           = messages("manageAgents.confirmAgentContactDetails.heading", agentName),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-xl"),
+            section        = Some(messages("manageAgents.caption"))
+        ))
+
+        @govukRadios(
+            RadiosViewModel(
+                field = form("value"),
+                legend = Legend(),
+                items = Seq(
+                    RadioItem(
+                        value = Some("true"),
+                        content = Text(messages("site.yes"))
+                    ),
+                    RadioItem(
+                        value = Some("false"),
+                        content = Text(messages("site.no"))
+                    )
+                )
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
+}
