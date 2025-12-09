@@ -20,16 +20,15 @@ import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.SystemErrorView
+import views.html.UnauthorisedIndividualView
 
 import javax.inject.Inject
 
-
-class SystemErrorController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: SystemErrorView,
-                                     )(implicit config: FrontendAppConfig) extends FrontendBaseController
+class UnauthorisedIndividualAffinityController @Inject()(
+                                                          override val messagesApi: MessagesApi,
+                                                          val controllerComponents: MessagesControllerComponents,
+                                                          view: UnauthorisedIndividualView
+                                                        )(implicit config: FrontendAppConfig) extends FrontendBaseController
   with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action {
@@ -37,5 +36,4 @@ class SystemErrorController @Inject()(
       Ok(view())
     }
   }
-
 }

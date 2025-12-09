@@ -76,6 +76,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+unauthorised.individual.title = Sorry, there is a problem with this service
+unauthorised.individual.heading = Sorry, there is a problem with this service
+unauthorised.individual.paragraph1 = You are signed in with an individual account. You need an organisation account to use this service.
+
+
 systemError.title       = Sorry, there is a problem with this service
 systemError.heading     = Sorry, there is a problem with this service
 systemError.paragraph1  = Try again later or contact the

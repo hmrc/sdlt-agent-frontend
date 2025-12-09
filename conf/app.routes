@@ -19,6 +19,8 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
+GET         /unauthorised/individual                     controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+
 GET         /agent-details/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
 GET         /agent-details/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
 
