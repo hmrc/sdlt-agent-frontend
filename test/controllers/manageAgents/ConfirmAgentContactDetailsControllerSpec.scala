@@ -17,10 +17,8 @@
 package controllers.manageAgents
 
 import base.SpecBase
-import forms.manageAgents.{AgentContactDetailsFormProvider, AgentNameFormProvider, ConfirmAgentContactDetailsFormProvider}
-import models.NormalMode
-import models.manageAgents.{AgentContactDetails, ConfirmAgentContactDetails}
-import navigation.{FakeNavigator, Navigator}
+import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
+import models.manageAgents.ConfirmAgentContactDetails
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,8 +30,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import services.StampDutyLandTaxService
-import views.html.manageAgents.{AgentContactDetailsView, ConfirmAgentContactDetailsView}
+import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import scala.concurrent.Future
 
@@ -68,6 +65,60 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         contentAsString(result) mustEqual view(form, agentName)(request, messages).toString
       }
     }
+
+    "must redirect to the Journey Recovery page for a GET when agent details are not found" in  {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, confirmAgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[ConfirmAgentContactDetailsView]
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the agent contact details page when valid YES option is submitted" in {
+      val mockSessionRepo = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
+
+      val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual yesOnwardRoute.url
+
+    }
+
+    "must redirect to the agent contact details page when valid NO option is submitted" in {
+      val mockSessionRepo = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
+
+      val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual noOnwardRoute.url
+
+    }
+
+
 
   }
 

@@ -62,8 +62,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           address3 = Some("Greater London"),
           address4 = None,
           postcode = Some("SW1A 1AA"),
-          phone = "02071234567",
-          email = "info@smithco.co.uk",
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
           dxAddress = None,
           agentResourceReference = "ARN001"
         ),
@@ -77,8 +77,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
           address3 = None,
           address4 = None,
           postcode = Some("NW1 6XE"),
-          phone = "02077644567",
-          email = "contact@andersonlegal.com",
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
           dxAddress = None,
           agentResourceReference = "ARN002"
         )
