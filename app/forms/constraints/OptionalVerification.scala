@@ -27,6 +27,15 @@ object OptionalMaxLength {
     }
 }
 
+object PhoneInvalidFormat {
+  def apply(errorKey: String): Constraint[Option[String]] =
+    Constraint("constraints.phone") {
+      case Some(value) if !value.matches("^[0-9+\\-\\s()]+$") =>
+        Invalid(ValidationError(errorKey))
+      case _ => Valid
+    }
+}
+
 object OptionalEmailFormat {
   def apply(errorKey: String): Constraint[Option[String]] =
     Constraint("constraints.email") {

@@ -18,7 +18,6 @@ package forms.manageAgents
 
 import forms.mappings.Mappings
 import models.manageAgents.ConfirmAgentContactDetails
-import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 import play.api.i18n.Messages
 

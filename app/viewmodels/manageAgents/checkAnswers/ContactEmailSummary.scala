@@ -30,7 +30,7 @@ object ContactEmailSummary {
     answers.get(AgentContactDetailsPage).map { answer =>
       SummaryListRowViewModel(
         key = s"manageAgents.contactEmail.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer.email).toString),
+        value = ValueViewModel(HtmlFormat.escape(answer.email.getOrElse("")).toString),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
