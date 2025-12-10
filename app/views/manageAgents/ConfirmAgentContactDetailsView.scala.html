@@ -65,7 +65,9 @@
                         content = Text(messages("site.no"))
                     )
                 )
-            )
+            ).withHint(Hint(
+                content = Text(messages("manageAgents.confirmAgentContactDetails.hint", agentName))
+            )),
         )
 
         @govukButton(
