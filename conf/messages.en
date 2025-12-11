@@ -130,7 +130,7 @@ manageAgents.unauthorised.org.heading               = Sorry, you’re unable to 
 manageAgents.submitAgent.notification               = You have added {0}
 manageAgents.updateAgent.notification               = You have updated {0}
 
-manageAgents.addressLookup.header.title             = Find {0}’s address – Agent details
+manageAgents.addressLookup.header.title             = Stamp Taxes Online
 manageAgents.addressLookup.select.heading           = Choose {0}’s address
 manageAgents.addressLookup.lookup.heading           = Find {0}’s address
 manageAgents.addressLookup.confirm.heading          = Review and confirm {0}’s address

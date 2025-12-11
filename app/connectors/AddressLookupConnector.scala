@@ -106,7 +106,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     Seq(
       "appLevelLabels" -> JsObject(
         Seq(
-          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title", agentName.getOrElse("")))
+          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title"))
         )
       ),
       "selectPageLabels" -> JsObject(
