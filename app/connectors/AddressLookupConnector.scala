@@ -81,7 +81,12 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "line1MaxLength" -> JsNumber(255),
           "line2MaxLength" -> JsNumber(255),
           "line3MaxLength" -> JsNumber(255),
-          "townMaxLength" -> JsNumber(255)
+          "townMaxLength" -> JsNumber(255),
+          "mandatoryFields" -> JsObject(
+            Seq(
+              "postcode" -> JsBoolean(true)
+            )
+          )
         )
       ),
       "timeoutConfig" -> JsObject(
@@ -99,7 +104,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     Seq(
       "appLevelLabels" -> JsObject(
         Seq(
-          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title"))
+          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title", agentName.getOrElse("")))
         )
       ),
       "selectPageLabels" -> JsObject(
