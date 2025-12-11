@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package models.manageAgents
+package forms.manageAgents
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import models.manageAgents.ConfirmAgentContactDetails
+import play.api.data.Form
+import play.api.i18n.Messages
 
-case class AgentContactDetails(
-                                phone: Option[String], email: Option[String]
-                              )
+import javax.inject.Inject
 
-object AgentContactDetails {
-  implicit val format: OFormat[AgentContactDetails] = Json.format[AgentContactDetails]
+class ConfirmAgentContactDetailsFormProvider @Inject() extends Mappings {
+
+  def apply(agentName: String)(implicit messages: Messages): Form[ConfirmAgentContactDetails] =
+    Form(
+      "value" -> enumerable[ConfirmAgentContactDetails]( messages("manageAgents.confirmAgentContactDetails.error.required", agentName))
+    )
 }

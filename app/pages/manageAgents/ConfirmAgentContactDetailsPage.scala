@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package models.manageAgents
+package pages.manageAgents
 
-import play.api.libs.json.{Json, OFormat}
+import pages.Page
 
-case class AgentContactDetails(
-                                phone: Option[String], email: Option[String]
-                              )
-
-object AgentContactDetails {
-  implicit val format: OFormat[AgentContactDetails] = Json.format[AgentContactDetails]
-}
+case object ConfirmAgentContactDetailsPage extends Page

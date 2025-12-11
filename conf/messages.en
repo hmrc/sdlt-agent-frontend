@@ -86,6 +86,11 @@ systemError.heading     = Sorry, there is a problem with this service
 systemError.paragraph1  = Try again later or contact the
 systemError.link        = HMRC Online Services Helpdesk.
 
+manageAgents.confirmAgentContactDetails.error.required = Confirm that you want to add agent contact details
+manageAgents.confirmAgentContactDetails.title = Do you want to add contact details – Agent details
+manageAgents.confirmAgentContactDetails.heading = Do you want to add contact details for {0}?
+manageAgents.confirmAgentContactDetails.hint = We’ll only use these details to contact {0} about this return
+
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?
 manageAgents.agentContactDetails.question1 = What is {0}’s phone number?
@@ -94,7 +99,7 @@ manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
 manageAgents.agentContactDetails.error.phoneRequired = Enter {0}’s phone number
 manageAgents.agentContactDetails.error.phoneLength = {0}’s phone number must be 14 characters or less
 manageAgents.agentContactDetails.error.phoneInvalid = {0}’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
-manageAgents.agentContactDetails.error.phoneInvalidFormat = Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192
+manageAgents.agentContactDetails.error.phoneInvalidFormat = Enter a phone number, like 01632960001, 07700900982
 manageAgents.agentContactDetails.error.emailRequired = Enter {0}’s email address
 manageAgents.agentContactDetails.error.emailInvalid = {0}’s email address must only include letters a to z without accents, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
 manageAgents.agentContactDetails.error.emailInvalidFormat = Enter {0}’s email address in the correct format, like name@example.com

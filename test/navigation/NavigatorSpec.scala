@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, ConfirmAgentContactDetailsPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -54,6 +54,11 @@ class NavigatorSpec extends SpecBase {
       "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(NormalMode)" in {
         navigator.nextPage(AgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+      }
+
+      "must go from ConfirmAgentContactDetailsPage to ConfirmAgentContactDetailsController.onPageLoad(NormalMode)" in {
+        navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
+          controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad()
       }
     }
 

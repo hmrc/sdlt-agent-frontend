@@ -87,7 +87,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
       val request = FakeRequest(POST, routes.AgentContactDetailsController.onSubmit(NormalMode).url)
-        .withFormUrlEncodedBody("phone" -> "", "email" -> "")
+        .withFormUrlEncodedBody("phone" -> "abcdef", "email" -> "bad-email")
 
       val result = route(application, request).value
 

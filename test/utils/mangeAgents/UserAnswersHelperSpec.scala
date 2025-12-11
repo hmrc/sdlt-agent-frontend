@@ -57,8 +57,8 @@ class UserAnswersHelperSpec
           address3 = Some("Birmingham"),
           address4 = None,
           postcode = Some("B2 4ND"),
-          phone = "01214567890",
-          email = "info@harborviewestates.co.uk",
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
           dxAddress = None,
           agentResourceReference = testArn
         )
@@ -78,7 +78,7 @@ class UserAnswersHelperSpec
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = "01214567890", email = "info@harborviewestates.co.uk")
+        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
     }
 
     "should populate Address when all address lines are present" in {
@@ -95,8 +95,8 @@ class UserAnswersHelperSpec
           address3 = Some("London"),
           address4 = Some("Greater London"),
           postcode = Some("NW1 6XE"),
-          phone = "02071234567",
-          email = "contact@sunriserealty.co.uk",
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
           dxAddress = None,
           agentResourceReference = testArn
         )
@@ -114,7 +114,7 @@ class UserAnswersHelperSpec
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = "02071234567", email = "contact@sunriserealty.co.uk")
+        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
     }
   }
 }

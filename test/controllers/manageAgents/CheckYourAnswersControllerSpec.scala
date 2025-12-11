@@ -153,8 +153,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           address3 = Some("Birmingham"),
           address4 = None,
           postcode = Some("B2 4ND"),
-          phone = "01214567890",
-          email = "info@harborviewestates.co.uk",
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
           dxAddress = None,
           agentResourceReference = testArn
         )

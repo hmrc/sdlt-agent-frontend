@@ -19,7 +19,7 @@ package forms.manageAgents
 import forms.behaviours.StringFieldBehaviours
 import models.manageAgents.AgentContactDetails
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 
 class AgentContactDetailsFormProviderSpec
@@ -32,61 +32,46 @@ class AgentContactDetailsFormProviderSpec
   val formProvider = new AgentContactDetailsFormProvider()
   val form: Form[AgentContactDetails] = formProvider(agentName)
 
-  val validPhone = "01234 567890"
-  val validEmail = "test@example.com"
+  val validPhone = Some("01234 567890")
+  val validEmail = Some("test@example.com")
 
   "AgentContactDetailsFormProvider" - {
 
     "must bind valid phone and email" in {
-      val result = form.bind(Map("phone" -> validPhone, "email" -> validEmail))
+      val result = form.bind(Map("phone" -> validPhone.get, "email" -> validEmail.get))
       result.errors mustBe empty
       result.value mustBe Some(AgentContactDetails(validPhone, validEmail))
     }
 
-    "must give required error when phone is missing" in {
-      val result = form.bind(Map("phone" -> "", "email" -> validEmail))
-      result.errors must contain only FormError(
-        "phone",
-        messages("manageAgents.agentContactDetails.error.phoneRequired", agentName)
-      )
-    }
-
-    "must give required error when email is missing" in {
-      val result = form.bind(Map("phone" -> validPhone, "email" -> ""))
-      result.errors must contain only FormError(
-        "email",
-        messages("manageAgents.agentContactDetails.error.emailRequired", agentName)
-      )
-    }
 
     "must not bind phone longer than 14 characters" in {
-      val result = form.bind(Map("phone" -> "0123456789012345", "email" -> validEmail))
+      val result = form.bind(Map("phone" -> "0123456789012345", "email" -> validEmail.get))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneLength", agentName)) mustBe true
     }
 
     "must not bind invalid phone characters" in {
-      val result = form.bind(Map("phone" -> "abcd1234", "email" -> validEmail))
+      val result = form.bind(Map("phone" -> "abcd1234", "email" -> validEmail.get))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
     }
 
     "must not bind invalid phone format" in {
-      val result = form.bind(Map("phone" -> "+44@", "email" -> validEmail))
-      result.errors.exists(_.message == "manageAgents.agentContactDetails.error.phoneInvalidFormat") mustBe true
+      val result = form.bind(Map("phone" -> "+988", "email" -> validEmail.get))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName)) mustBe true
     }
 
     "must not bind email longer than 36 characters" in {
       val longEmail = ("a" * 40) + "@example.com"
-      val result = form.bind(Map("phone" -> validPhone, "email" -> longEmail))
+      val result = form.bind(Map("phone" -> validPhone.get, "email" -> longEmail))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailLength", agentName)) mustBe true
     }
 
     "must not bind invalid email format" in {
-      val result = form.bind(Map("phone" -> validPhone, "email" -> "not-an-email"))
+      val result = form.bind(Map("phone" -> validPhone.get, "email" -> "not-an-email"))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName)) mustBe true
     }
 
     "must not bind email with invalid characters" in {
-      val result = form.bind(Map("phone" -> validPhone, "email" -> "bad#chars@email.com"))
+      val result = form.bind(Map("phone" -> validPhone.get, "email" -> "bad#chars@email.com"))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
     }
   }

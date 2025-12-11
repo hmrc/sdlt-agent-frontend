@@ -28,6 +28,7 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case ConfirmAgentContactDetailsPage => _ => controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad()
     case AgentNamePage                 => _ => controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
     case AgentNameDuplicateWarningPage => _ => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
     case AgentAddressPage              => _ => controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)

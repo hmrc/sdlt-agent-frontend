@@ -27,10 +27,18 @@ import viewmodels.implicits.*
 object ContactEmailSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(AgentContactDetailsPage).map { answer =>
+    val maybeEmail: Option[String] =
+      answers.get(AgentContactDetailsPage).flatMap(_.email)
+
+    val value =
+      ValueViewModel(
+        HtmlFormat.escape(maybeEmail.getOrElse("")).toString
+      )
+
+    Some(
       SummaryListRowViewModel(
         key = s"manageAgents.contactEmail.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer.email).toString),
+        value = value,
         actions = Seq(
           ActionItemViewModel(
             "site.change",
@@ -40,7 +48,7 @@ object ContactEmailSummary {
             .withAttribute("id" -> "change-agent-contact-details")
         )
       )
-    }
+    )
   }
 }
 
