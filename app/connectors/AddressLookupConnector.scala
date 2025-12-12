@@ -85,7 +85,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "mandatoryFields" -> JsObject(
             Seq(
               "addressLine1" -> JsBoolean(true),
-              "town" -> JsBoolean(true),
               "postcode" -> JsBoolean(true)
             )
           )
