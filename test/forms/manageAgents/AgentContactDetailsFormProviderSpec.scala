@@ -43,6 +43,11 @@ class AgentContactDetailsFormProviderSpec
       result.value mustBe Some(AgentContactDetails(validPhone, validEmail))
     }
 
+    "must bind valid phone and ignore whitespace exceeding 14 characters" in {
+      val result = form.bind(Map("phone" -> "0123456789012       ", "email" -> validEmail.get))
+      result.errors mustBe empty
+      result.value mustBe Some(AgentContactDetails(Some("0123456789012       "), validEmail))
+    }
 
     "must not bind phone longer than 14 characters" in {
       val result = form.bind(Map("phone" -> "0123456789012345", "email" -> validEmail.get))
@@ -55,7 +60,7 @@ class AgentContactDetailsFormProviderSpec
     }
 
     "must not bind invalid phone format" in {
-      val result = form.bind(Map("phone" -> "+988", "email" -> validEmail.get))
+      val result = form.bind(Map("phone" -> "*988", "email" -> validEmail.get))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName)) mustBe true
     }
 
