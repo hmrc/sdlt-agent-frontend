@@ -81,7 +81,13 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "line1MaxLength" -> JsNumber(255),
           "line2MaxLength" -> JsNumber(255),
           "line3MaxLength" -> JsNumber(255),
-          "townMaxLength" -> JsNumber(255)
+          "townMaxLength" -> JsNumber(255),
+          "mandatoryFields" -> JsObject(
+            Seq(
+              "addressLine1" -> JsBoolean(true),
+              "postcode" -> JsBoolean(true)
+            )
+          )
         )
       ),
       "timeoutConfig" -> JsObject(
