@@ -19,7 +19,6 @@ package forms.manageAgents
 import models.manageAgents.AgentContactDetails
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional, text}
-import play.api.data.validation.Constraints.*
 import play.api.i18n.Messages
 
 import javax.inject.Inject
@@ -38,6 +37,7 @@ class AgentContactDetailsFormProvider @Inject()  {
     Form(
       mapping(
         "phone" -> optional(text)
+          .transform[Option[String]](_.map(_.trim), identity)
           .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalid",agentName), _.forall(_.matches(phoneInvalidRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName), _.forall(_.matches(phoneInvalidFormatRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.phoneLength", agentName), _.forall(phone => phone.replaceAll("\\s", "").length <= maxAgentPhoneLength)),

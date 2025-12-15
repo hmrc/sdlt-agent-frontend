@@ -46,7 +46,7 @@ class AgentContactDetailsFormProviderSpec
     "must bind valid phone and ignore whitespace exceeding 14 characters" in {
       val result = form.bind(Map("phone" -> "0123456789012       ", "email" -> validEmail.get))
       result.errors mustBe empty
-      result.value mustBe Some(AgentContactDetails(Some("0123456789012       "), validEmail))
+      result.value mustBe Some(AgentContactDetails(Some("0123456789012"), validEmail))
     }
 
     "must not bind phone longer than 14 characters" in {
