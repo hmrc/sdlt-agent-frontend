@@ -108,7 +108,7 @@ manageAgents.agentContactDetails.error.emailLength = {0}’s email address must 
 manageAgents.agentName.error.invalid = The agent’s name must only include letters a to z, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
 manageAgents.agentName.error.length = The agent’s name must be 28 characters or less
 manageAgents.agentName.error.required = Enter the agent’s name
-manageAgents.agentName.warning = You cannot add this branch name as it already exists. Please check the details entered in the Maintain agent’s details list
+manageAgents.agentName.warning = This agent name already exists, are you sure you want to continue?
 
 manageAgents.agentName.title = What is the agent’s name? – Agent details
 manageAgents.agentName.heading = What is the agent’s name?
