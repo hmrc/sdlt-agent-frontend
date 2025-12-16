@@ -79,7 +79,6 @@ class CheckYourAnswersController @Inject()(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
-                    logger.error(s"*************[CheckYourAnswersController][onPageLoad] ************* Setting to session repo: ${userAnswers}")
                     Ok(view(getSummaryListRows(userAnswers), postAction))
                   }
                 })
@@ -130,7 +129,7 @@ class CheckYourAnswersController @Inject()(
               Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
-              logger.info(s"\n $updated \n")
+              logger.info(s"[CheckYourAnswersController][onSubmit] updatedAgent: ${updated}")
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(StornPage, request.storn))
