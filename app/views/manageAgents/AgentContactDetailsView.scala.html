@@ -50,6 +50,7 @@
                 field = form("phone"),
                 label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentName))
             ).withAutocomplete("tel")
+            .withInputType("tel")
             .withWidth(Full)
         )
 
@@ -57,7 +58,8 @@
             InputViewModel(
                 field = form("email"),
                 label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentName))
-            )
+            ).withAutocomplete("email")
+            .withInputType("email")
             .withWidth(Full)
             .withHint(HintViewModel(HtmlContent(messages("manageAgents.agentContactDetails.hint"))))
         )
