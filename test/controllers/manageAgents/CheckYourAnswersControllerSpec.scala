@@ -18,7 +18,7 @@ package controllers.manageAgents
 
 import controllers.routes
 import models.{NormalMode, UserAnswers}
-import pages.manageAgents.{AgentOverviewPage, StornPage}
+import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import play.api.libs.json.Json
 import services.StampDutyLandTaxService
 import utils.mangeAgents.AgentDetailsTestUtil
@@ -30,12 +30,13 @@ import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentRes
 import models.responses.organisation.CreatedAgent
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.mvc.Results.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 
 import scala.concurrent.Future
 
@@ -43,11 +44,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   private lazy val checkYourAnswersUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(agentReferenceNumber).url
-  
+
   private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
-    
-  "onPageLoad"- {
+
+  "onPageLoad" - {
     "Check Your Answers Controller (with no ARN population)" - {
 
       "must return OK and the correct view for a GET" in {
@@ -205,6 +206,167 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         }
       }
     }
+
+    "Check Your Answers Controller (with different value of `storedARN` an `urlARN`)" - {
+      //storedARN means the ARN(AgentReferenceNumber stored in AgentReferencePage) in session
+      //urlARN means the ARN in the query parameter in the URL
+
+      val testAgentResponse: CreatedAgent = CreatedAgent(
+        storn = testStorn,
+        agentId = None,
+        name = "Harborview Estates",
+        houseNumber = None,
+        address1 = "42 Queensway",
+        address2 = None,
+        address3 = Some("Birmingham"),
+        address4 = None,
+        postcode = Some("B2 4ND"),
+        phone = Some("01214567890"),
+        email = Some("info@harborviewestates.co.uk"),
+        dxAddress = None,
+        agentResourceReference = testArn
+      )
+      "when storedARN is None and have Some(value) of urlARN" - {
+        "must fetch the data from urlARN and save to session" in {
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          val testAgentResponse: CreatedAgent = CreatedAgent(
+            storn = testStorn,
+            agentId = None,
+            name = "Harborview Estates",
+            houseNumber = None,
+            address1 = "42 Queensway",
+            address2 = None,
+            address3 = Some("Birmingham"),
+            address4 = None,
+            postcode = Some("B2 4ND"),
+            phone = Some("01214567890"),
+            email = Some("info@harborviewestates.co.uk"),
+            dxAddress = None,
+            agentResourceReference = testArn
+          )
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          when(mockService.getAgentDetails(any(), any())(any()))
+            .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+
+            verify(mockSessionRepository, times(1)).set(any())
+            verify(mockService, times(1)).getAgentDetails(any(), any())(any())
+          }
+        }
+      }
+      "when storedARN and UrlARN are same" - {
+        "must reuse the current session and make no service calls " in {
+          val mockSessionRepository = mock[SessionRepository]
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          when(mockService.getAgentDetails(any(), any())(any()))
+            .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+
+            verify(mockSessionRepository, never()).set(any())
+            verify(mockService, never()).getAgentDetails(any(), any())(any())
+          }
+        }
+      }
+      "when storedARN and UrlARN are different" - {
+        "must fetch the agent from with UrlARN and override the session" in {
+
+          val userAnswers = emptyUserAnswers.set(AgentReferenceNumberPage, "A").success.value
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          when(mockService.getAgentDetails(any(), any())(any()))
+            .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+
+            verify(mockSessionRepository, times(1)).set(any())
+            verify(mockService, times(1)).getAgentDetails(any(), any())(any())
+          }
+        }
+      }
+      "when storedARN has Some(value) and UrlARN is None" - {
+        "must use the data from session" in {
+          val userAnswers = emptyUserAnswers.set(AgentReferenceNumberPage, "A").success.value
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          when(mockSessionRepository.set(any()))
+            .thenReturn(Future.successful(true))
+
+          when(mockService.getAgentDetails(any(), any())(any()))
+            .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(None))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual OK
+
+            verify(mockSessionRepository, never()).set(any())
+            verify(mockService, never()).getAgentDetails(any(), any())(any())
+
+          }
+        }
+      }
+
+    }
   }
   "onSubmit()" - {
     "with no ARN population" - {
@@ -278,7 +440,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
       }
       "with ARN population" - {
-        
+
         "must redirect to AgentOverviewPage with flash after successfully updating agentDetails to StampDutyLandTaxService.updateAgentDetails in BE" in {
           val navigator = new Navigator
           val service = mock[StampDutyLandTaxService]
