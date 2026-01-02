@@ -19,7 +19,6 @@ package controllers.manageAgents
 import cats.data.EitherT
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import controllers.routes.{JourneyRecoveryController, SystemErrorController}
-import jakarta.inject.Singleton
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
@@ -30,7 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
