@@ -23,7 +23,7 @@ import play.api.Logging
 object LoggerUtil extends Logging {
 
   def logInfo(content: String): Unit = logger.info(content)
-  //def logDebug(content: String): Unit = logger.debug(content)
+  def logDebug(content: String): Unit = logger.debug(content)
   def logWarn(content: String): Unit = logger.warn(content)
   def logError(content: String): Unit = logger.error(content)
 }

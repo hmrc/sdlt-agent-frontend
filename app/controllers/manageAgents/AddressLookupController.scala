@@ -28,6 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.LoggerUtil.{logDebug, logError, logInfo}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,13 +48,13 @@ class AddressLookupController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
-        Logger("application").debug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
+        logDebug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
-        Logger("application").error("[AddressLookupController] - Failed::Location not provided")
+        logError("[AddressLookupController] - Failed::Location not provided")
         Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
-        Logger("application").error(s"[AddressLookupController] - Failed to Init journey: $ex")
+        logError(s"[AddressLookupController] - Failed to Init journey: $ex")
         Redirect(SystemErrorController.onPageLoad())
     }
   }
@@ -69,13 +70,13 @@ class AddressLookupController @Inject()(
     } yield journeyOutcome
   }.value.map {
     case Right(updatedAnswer) if mode == NormalMode =>
-      Logger("application").info(s"[AddressLookupController] - address extracted and saved")
+      logInfo(s"[AddressLookupController] - address extracted and saved")
       Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
-      Logger("application").info(s"[AddressLookupController] - edit::address extracted and saved")
+      logInfo(s"[AddressLookupController] - edit::address extracted and saved")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
     case Left(ex) =>
-      Logger("application").error(s"[AddressLookupController] - failed to extract address: ${ex}")
+      logError(s"[AddressLookupController] - failed to extract address: ${ex}")
       Redirect(SystemErrorController.onPageLoad())
     }
   }

@@ -19,13 +19,13 @@ package connectors
 import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.responses.organisation.SdltOrganisationResponse
 import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
-import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import utils.LoggerUtil.logError
 
 import java.net.URL
 import javax.inject.Inject
@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
                                           config: ServicesConfig)
-                                         (implicit ec: ExecutionContext) extends Logging {
+                                         (implicit ec: ExecutionContext) {
 
   private val base = config.baseUrl("stamp-duty-land-tax")
 
@@ -58,7 +58,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .execute[SdltOrganisationResponse]
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}")
+          logError(s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
@@ -70,7 +70,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       .execute[CreatePredefinedAgentResponse]
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
+          logError(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
@@ -88,7 +88,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][updatePredefinedAgent]: ${e.getMessage}")
+          logError(s"[StampDutyLandTaxConnector][updatePredefinedAgent]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 
@@ -107,7 +107,7 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
       }
       .recover {
         case e: Throwable =>
-          logger.error(s"[StampDutyLandTaxConnector][deletePredefinedAgent]: ${e.getMessage}")
+          logError(s"[StampDutyLandTaxConnector][deletePredefinedAgent]: ${e.getMessage}")
           throw new RuntimeException(e.getMessage)
       }
 }
