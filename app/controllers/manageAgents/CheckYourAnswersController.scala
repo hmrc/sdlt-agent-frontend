@@ -21,12 +21,12 @@ import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
-import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.LoggerUtil.logError
 import utils.manageAgents.UserAnswersHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.manageAgents.checkAnswers.*
@@ -48,7 +48,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           )(implicit executionContext: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with Logging with UserAnswersHelper {
+  extends FrontendBaseController with I18nSupport  with UserAnswersHelper {
 
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
@@ -68,14 +68,14 @@ class CheckYourAnswersController @Inject()(
 
       (storedArn, agentReferenceNumber) match {
         case (Some(storedArn), Some(paramArn)) if storedArn == paramArn =>
-          logger.error(s"[CheckYourAnswersController][onPageLoad] storedArn: ${storedArn}, paramArn: ${paramArn}")
+          logError(s"[CheckYourAnswersController][onPageLoad] storedArn: ${storedArn}, paramArn: ${paramArn}")
           Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
         case (_, Some(paramArn)) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, paramArn) flatMap {
             case Some(agentDetails) =>
               updateUserAnswers(agentDetails)
                 .fold({ error =>
-                  logger.error(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}", error)
+                  logError(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}")
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
@@ -84,15 +84,15 @@ class CheckYourAnswersController @Inject()(
                 })
 
             case None =>
-              logger.error(s"[CheckYourAnswersController][onPageLoad]: Failed to retrieve details for agent with agentReferenceNumber: $paramArn")
+              logError(s"[CheckYourAnswersController][onPageLoad]: Failed to retrieve details for agent with agentReferenceNumber: $paramArn")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
           } recover {
             case ex =>
-              logger.error("[CheckYourAnswersController][onPageLoad] Unexpected failure", ex)
+              logError(s"[CheckYourAnswersController][onPageLoad] Unexpected failure: ${ex.getMessage}")
               Redirect(controllers.routes.SystemErrorController.onPageLoad())
           }
         case _ =>
-          logger.error(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
+          logError(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
           Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
       }
 
@@ -105,7 +105,7 @@ class CheckYourAnswersController @Inject()(
         case None =>
           request.userAnswers.data.asOpt[CreatePredefinedAgentRequest] match {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
+              logError("[CheckYourAnswersController][onSubmit] Failed to construct AgentDetailsRequest")
               Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(createPredefinedAgentRequest) =>
               val emptiedUserAnswers = UserAnswers(request.userId)
@@ -118,18 +118,18 @@ class CheckYourAnswersController @Inject()(
               ).flashing("agentCreated" -> createPredefinedAgentRequest.agentName)
                 ).recover {
                 case ex =>
-                  logger.error("[CheckYourAnswersController][onSubmit] Unexpected failure", ex)
+                  logError(s"[CheckYourAnswersController][onSubmit] Unexpected failure: ${ex.getMessage}")
                   Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
           }
         case Some(arn) =>
           request.userAnswers.data.asOpt[UpdatePredefinedAgent] match {
             case None =>
-              logger.error("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
+              logError("[CheckYourAnswersController][onSubmit Update] Failed to construct UpdatePredefinedAgent")
               Future.successful(Redirect(controllers.routes.SystemErrorController.onPageLoad()))
             case Some(updatePredefinedAgent) =>
               val updated = updatePredefinedAgent.copy(agentResourceReference = Some(arn))
-              logger.info(s"[CheckYourAnswersController][onSubmit] updatedAgent: ${updated}")
+              logError(s"[CheckYourAnswersController][onSubmit] updatedAgent: ${updated}")
               (for {
                 _ <- stampDutyLandTaxService.updateAgentDetails(updated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(StornPage, request.storn))
@@ -139,7 +139,7 @@ class CheckYourAnswersController @Inject()(
               }).flashing("agentUpdated" -> updatePredefinedAgent.agentName)
                 ).recover {
                 case ex =>
-                  logger.error("[CheckYourAnswersController][onSubmit update] Unexpected failure", ex)
+                  logError(s"[CheckYourAnswersController][onSubmit update] Unexpected failure: ${ex.getMessage}")
                   Redirect(controllers.routes.SystemErrorController.onPageLoad())
               }
 
