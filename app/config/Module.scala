@@ -16,10 +16,10 @@
 
 package config
 
-import com.google.inject.AbstractModule
 import controllers.actions._
 
 import java.time.{Clock, ZoneOffset}
+import com.google.inject.AbstractModule
 
 class Module extends AbstractModule {
 

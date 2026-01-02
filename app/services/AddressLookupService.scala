@@ -17,9 +17,7 @@
 package services
 
 import cats.data.EitherT
-import com.google.inject.Singleton
 import connectors.AddressLookupConnector
-import jakarta.inject.Inject
 import models.{Mode, UserAnswers}
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.{JourneyInitResponse, JourneyResultAddressModel}
@@ -30,6 +28,7 @@ import play.api.Logger
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
