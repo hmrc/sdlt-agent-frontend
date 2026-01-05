@@ -23,7 +23,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.UnauthorisedOrgView
 
-import javax.inject.Inject
 
 @Singleton
 class UnauthorisedOrganisationAffinityController @Inject() (

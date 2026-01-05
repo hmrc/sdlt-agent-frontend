@@ -22,10 +22,10 @@ import controllers.routes.JourneyRecoveryController
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import play.api.Logging
-import jakarta.inject.Singleton
+
 import pages.manageAgents.{AgentNamePage, AgentOverviewPage, StornPage}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

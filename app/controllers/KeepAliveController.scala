@@ -17,12 +17,11 @@
 package controllers
 
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import com.google.inject.Singleton
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

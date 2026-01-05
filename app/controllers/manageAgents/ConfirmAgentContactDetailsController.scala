@@ -29,6 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.LoggerUtil.{logError, logInfo}
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
@@ -54,7 +55,7 @@ class ConfirmAgentContactDetailsController @Inject()(
       case Some(name) => Right(name)
       case None =>
         Left {
-          logger.error("Couldn't find agent in user answers")
+          logError("Couldn't find agent in user answers")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
@@ -86,7 +87,7 @@ class ConfirmAgentContactDetailsController @Inject()(
                 Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
 
               case ConfirmAgentContactDetails.Option2 =>
-                logger.info(s"[ConfirmAgentContactDetailsController][onSubmit] No agent contact details option selected")
+                logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] No agent contact details option selected")
                 Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
             }
           )

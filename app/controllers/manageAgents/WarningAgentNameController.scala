@@ -18,7 +18,6 @@ package controllers.manageAgents
 
 import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
-import jakarta.inject.Singleton
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentAddressPage, AgentNamePage, AgentReferenceNumberPage}
@@ -29,7 +28,7 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.WarningAgentNameView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
