@@ -23,7 +23,7 @@ import play.api.Logging
 import play.api.mvc.Results.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -47,6 +47,8 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
+    val sdltEnrolmentKeys: Seq[String] = Seq("IR-SDLT-ORG", "IR-SDLT-AGENT")
+
     val defaultPredicate: Predicate = AuthProviders(GovernmentGateway)
 
     authorised(defaultPredicate)
@@ -57,8 +59,8 @@ class AuthenticatedIdentifierAction @Inject()(
           Retrievals.credentialRole
       ) {
         //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) =>
-          hasSdltOrgEnrolment(enrolments)
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation | Agent) ~ Some(User) =>
+          hasSdltOrgEnrolment(enrolments, sdltEnrolmentKeys)
             .map { storn =>
               block(IdentifierRequest(request, internalId, storn))
             }
@@ -79,13 +81,16 @@ class AuthenticatedIdentifierAction @Inject()(
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-
-  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
-    enrolments.find(_.key == "IR-SDLT-ORG") match {
+  
+  private val  enrolmentStornExtractor:Enrolment => Option[String] = (enrolment: Enrolment) =>
+    enrolment.identifiers.
+      find(id => id.key == "STORN")
+      .map(_.value)
+  
+  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment], sdltEnrolmentKeys: Seq[String]): Option[String] =
+    enrolments.find(e => sdltEnrolmentKeys.contains(e.key)) match {
       case Some(enrolment) =>
-        val storn = enrolment.identifiers.find(id => id.key == "STORN").map(_.value)
-        val isActivated = enrolment.isActivated
-        (storn, isActivated) match {
+        (enrolmentStornExtractor(enrolment), enrolment.isActivated) match {
           case (Some(storn), true) =>
             Some(storn)
           case _ =>
