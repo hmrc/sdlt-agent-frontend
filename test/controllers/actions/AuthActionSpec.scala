@@ -246,11 +246,11 @@ class AuthActionSpec extends SpecBase {
             val controller = new Harness(authAction)
             val result = controller.onPageLoad()(FakeRequest())
             status(result) mustBe SEE_OTHER
-//            redirectLocation(
-//              result
-//            ).value mustBe controllers.manage.routes.UnauthorisedOrganisationAffinityController
-//              .onPageLoad()
-//              .url
+            redirectLocation(
+              result
+            ).value mustBe controllers.routes.AccessDeniedController
+              .onPageLoad()
+              .url
           }
         }
       }
@@ -268,9 +268,11 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-//          redirectLocation(
-//            result
-//          ).value mustBe controllers.manage.routes.UnauthorisedIndividualAffinityController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustBe controllers.routes.UnauthorisedIndividualAffinityController
+            .onPageLoad()
+            .url
         }
       }
     }
@@ -287,9 +289,10 @@ class AuthActionSpec extends SpecBase {
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          //redirectLocation(result).value mustBe controllers.manage.routes.UnauthorisedWrongRoleController
-          //  .onPageLoad()
-          //  .url
+          redirectLocation(result).value mustBe controllers
+            .routes.UnauthorisedIndividualAffinityController
+            .onPageLoad()
+            .url
         }
       }
     }
@@ -364,11 +367,11 @@ class AuthActionSpec extends SpecBase {
               val controller = new Harness(authAction)
               val result = controller.onPageLoad()(FakeRequest())
               status(result) mustBe SEE_OTHER
-//              redirectLocation(
-//                result
-//              ).value mustBe controllers.manage.routes.UnauthorisedOrganisationAffinityController
-//                .onPageLoad()
-//                .url
+              redirectLocation(
+                result
+              ).value mustBe controllers.routes.AccessDeniedController
+                .onPageLoad()
+                .url
             }
           }
         }
