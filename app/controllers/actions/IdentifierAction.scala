@@ -47,8 +47,6 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    val sdltEnrolmentKeys: Seq[String] = Seq("IR-SDLT-ORG", "IR-SDLT-AGENT")
-
     val defaultPredicate: Predicate = AuthProviders(GovernmentGateway)
 
     authorised(defaultPredicate)
@@ -59,21 +57,27 @@ class AuthenticatedIdentifierAction @Inject()(
           Retrievals.credentialRole
       ) {
         //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation | Agent) ~ Some(User) =>
-          hasSdltOrgEnrolment(enrolments, sdltEnrolmentKeys)
-            .map { storn =>
-              block(IdentifierRequest(request, internalId, storn))
-            }
-            .getOrElse(
-              Future.successful(
-                Redirect(routes.AccessDeniedController.onPageLoad()))
-            )
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) if enrolments.exists(_.key == orgEnrolment) =>
+          hanldeValidEnrolments(block)(request, internalId, enrolments)
+
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) if enrolments.exists(_.key == agentEnrolment) =>
+          hanldeValidEnrolments(block)(request, internalId, enrolments)
+
+        case Some(_) ~ _ ~ Some(Organisation | Agent) ~ Some(Assistant) =>
+          logger.error("[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt")
+          Future.successful(
+            Redirect(controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+          )
 
         case Some(_) ~ _ ~ Some(Individual) ~ _ =>
-          logger.info("AuthenticatedIdentifierAction - Individual login attempt")
+          logger.error("[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt")
           Future.successful(
             Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
           )
+        case _ =>
+          logger.error("[AuthenticatedIdentifierAction][unauthorised] - authentication failure")
+          Future.successful(
+            Redirect(routes.AccessDeniedController.onPageLoad()))
       } recover {
       case _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
@@ -81,14 +85,30 @@ class AuthenticatedIdentifierAction @Inject()(
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
+
+  private def hanldeValidEnrolments[A](block:IdentifierRequest[A] => Future[Result])
+                                      (request:Request[A], internalId: String, enrollments:Set[Enrolment]) = {
+    hasSdltOrgEnrolment(enrollments)
+      .map { storn =>
+        block(IdentifierRequest(request, internalId, storn))
+      }
+      .getOrElse(
+        Future.successful(
+          Redirect(routes.AccessDeniedController.onPageLoad())
+        )
+      )
+  }
   
   private val  enrolmentStornExtractor:Enrolment => Option[String] = (enrolment: Enrolment) =>
     enrolment.identifiers.
       find(id => id.key == "STORN")
       .map(_.value)
+
+  private val orgEnrolment: String = "IR-SDLT-ORG"
+  private val agentEnrolment: String = "IR-SDLT-AGENT"
   
-  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment], sdltEnrolmentKeys: Seq[String]): Option[String] =
-    enrolments.find(e => sdltEnrolmentKeys.contains(e.key)) match {
+  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
+    enrolments.find(e => Set(orgEnrolment,agentEnrolment ).contains(e.key)) match {
       case Some(enrolment) =>
         (enrolmentStornExtractor(enrolment), enrolment.isActivated) match {
           case (Some(storn), true) =>
