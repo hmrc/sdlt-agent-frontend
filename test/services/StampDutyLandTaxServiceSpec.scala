@@ -253,18 +253,37 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
       verifyNoMoreInteractions(connector)
     }
 
-    "return false when the agent name does not exist" in {
-      val (service, connector) = newService()
+    "return false" should {
+      "when the agent name does not exist" in {
+        val (service, connector) = newService()
 
-      when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payload))
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
 
-      val result = service.isDuplicate(storn, "Nonexistent Agent").futureValue
+        val result = service.isDuplicate(storn, "Nonexistent Agent").futureValue
 
-      result mustBe false
+        result mustBe false
 
-      verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
-      verifyNoMoreInteractions(connector)
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
+      "when the inputted agent name(`Smith & Co`) partly matches agentName(`Smith & Co Solicitors`)" in {
+        val (service, connector) = newService()
+
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
+
+        val result = service.isDuplicate(storn, "Smith & Co").futureValue
+
+        result mustBe false
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
     }
+
+
+
   }
 }
