@@ -62,5 +62,7 @@ class StampDutyLandTaxService @Inject() (
                  (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
-      .map(_.agents.exists(_.name.contains(name)))
+      .map(_.agents.exists(_.name.trim.equalsIgnoreCase(name.trim)))
+  
+  
 }

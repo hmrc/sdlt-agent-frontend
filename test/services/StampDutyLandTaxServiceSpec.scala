@@ -239,32 +239,82 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   }
 
   "isDuplicate" should {
-    "return true when the agent name already exists and there is a duplicate" in {
-      val (service, connector) = newService()
-      
-      when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payload))
+    "return true" should {
+      "when the new agentName already exists and there is a duplicate" in {
+        val (service, connector) = newService()
 
-      val result = service.isDuplicate(storn, "Smith & Co Solicitors").futureValue
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
 
-      result mustBe true
+        val result = service.isDuplicate(storn, "Smith & Co Solicitors").futureValue
 
-      verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
-      verifyNoMoreInteractions(connector)
+        result mustBe true
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
+      "when the new agentName is UpperCase with matching spaces (`SMITH & CO SOLICITORS`) as existing agentName (`Smith & Co Solicitors`)" in {
+        val (service, connector) = newService()
+
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
+
+        val result = service.isDuplicate(storn, "SMITH & CO SOLICITORS").futureValue
+
+        result mustBe true
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
     }
 
-    "return false when the agent name does not exist" in {
-      val (service, connector) = newService()
+    "return false" should {
+      "when the new agentName does not exist" in {
+        val (service, connector) = newService()
 
-      when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(payload))
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
 
-      val result = service.isDuplicate(storn, "Nonexistent Agent").futureValue
+        val result = service.isDuplicate(storn, "Nonexistent Agent").futureValue
 
-      result mustBe false
+        result mustBe false
 
-      verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
-      verifyNoMoreInteractions(connector)
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
+      "when the new agentName(`Smith & Co`) partly matches existing agentName(`Smith & Co Solicitors`)" in {
+        val (service, connector) = newService()
+
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
+
+        val result = service.isDuplicate(storn, "Smith & Co").futureValue
+
+        result mustBe false
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
+      "when the new agentName is UpperCase with no matching number of spaces (`   SMITH & COSOLICITORS     `) with existing agentName(`Smith & Co Solicitors`)" in {
+        val (service, connector) = newService()
+
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
+
+        val result = service.isDuplicate(storn, "   SMITH & COSOLICITORS     ").futureValue
+
+        result mustBe false
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
     }
+
+
+
   }
 }
