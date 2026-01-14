@@ -267,20 +267,6 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
         verifyNoMoreInteractions(connector)
       }
-
-      "when the new agentName is UpperCase with no matching number of spaces (`   SMITH & COSOLICITORS     `) with existing agentName(`Smith & Co Solicitors`)" in {
-        val (service, connector) = newService()
-
-        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
-          .thenReturn(Future.successful(payload))
-
-        val result = service.isDuplicate(storn, "   SMITH & COSOLICITORS     ").futureValue
-
-        result mustBe true
-
-        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
-        verifyNoMoreInteractions(connector)
-      }
     }
 
     "return false" should {
@@ -311,6 +297,21 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
         verifyNoMoreInteractions(connector)
       }
+
+      "when the new agentName is UpperCase with no matching number of spaces (`   SMITH & COSOLICITORS     `) with existing agentName(`Smith & Co Solicitors`)" in {
+        val (service, connector) = newService()
+
+        when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+          .thenReturn(Future.successful(payload))
+
+        val result = service.isDuplicate(storn, "   SMITH & COSOLICITORS     ").futureValue
+
+        result mustBe false
+
+        verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+        verifyNoMoreInteractions(connector)
+      }
+
     }
 
 
