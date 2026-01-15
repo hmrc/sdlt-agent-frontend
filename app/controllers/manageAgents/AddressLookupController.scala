@@ -48,20 +48,20 @@ class AddressLookupController @Inject()(
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
-        logDebug(s"[AddressLookupController] - Journey initiated: ${addressLookupLocation}")
+        logDebug(s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
-        logError("[AddressLookupController] - Failed::Location not provided")
+        logError("[AddressLookupController][onPageLoad] - Failed::Location not provided")
         Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
-        logError(s"[AddressLookupController] - Failed to Init journey: $ex")
+        logError(s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex")
         Redirect(SystemErrorController.onPageLoad())
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
 
-    Logger("application").debug(s"[AddressLookupController] - UA: ${request.userAnswers}")
+    Logger("application").debug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)
@@ -70,13 +70,16 @@ class AddressLookupController @Inject()(
     } yield journeyOutcome
   }.value.map {
     case Right(updatedAnswer) if mode == NormalMode =>
-      logInfo(s"[AddressLookupController] - address extracted and saved")
+      logInfo(s"[AddressLookupController][onSubmit] - address extracted and saved")
       Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
-      logInfo(s"[AddressLookupController] - edit::address extracted and saved")
+      logInfo(s"[AddressLookupController][onSubmit] - edit::address extracted and saved")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
+    case Right(_) =>
+      Logger("application").info(s"[AddressLookupController][onSubmit] - Invalid mode: $mode")
+      Redirect(SystemErrorController.onPageLoad())
     case Left(ex) =>
-      logError(s"[AddressLookupController] - failed to extract address: ${ex}")
+      logError(s"[AddressLookupController][onSubmit] - failed to extract address: ${ex}")
       Redirect(SystemErrorController.onPageLoad())
     }
   }
