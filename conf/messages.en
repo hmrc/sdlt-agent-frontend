@@ -43,7 +43,7 @@ index.title = sdlt-agent-frontend
 index.heading = sdlt-agent-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
 
-manageAgents.caption = Agent Details
+manageAgents.caption = Agent details
 
 manageAgents.agentName.checkYourAnswersLabel = Agent name
 manageAgents.agentName.change.hidden = 
@@ -93,9 +93,9 @@ manageAgents.confirmAgentContactDetails.hint = We’ll only use these details to
 
 manageAgents.agentContactDetails.title = Agent’s contact details – Agent details
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?
-manageAgents.agentContactDetails.question1 = What is {0}’s phone number?
-manageAgents.agentContactDetails.question2 = What is {0}’s email address?
-manageAgents.agentContactDetails.hint = We''ll only use this to send a receipt
+manageAgents.agentContactDetails.question1 = Agent phone number
+manageAgents.agentContactDetails.question2 = Agent email address
+manageAgents.agentContactDetails.hint = For international numbers include the country code, like 0049 for Germany (+49 on mobile)
 manageAgents.agentContactDetails.error.phoneRequired = Enter {0}’s phone number
 manageAgents.agentContactDetails.error.phoneLength = {0}’s phone number must be 14 characters or less
 manageAgents.agentContactDetails.error.phoneInvalid = {0}’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
