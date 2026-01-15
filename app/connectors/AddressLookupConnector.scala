@@ -52,7 +52,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private def setJourneyOptions(mode: Mode)(implicit rh: RequestHeader): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl(mode)),
-      "signOutHref" -> JsString(appConfig.signOutUrl),
+      "signOutHref" -> JsString(appConfig.exitSurveyUrl),
       "ukMode" -> JsBoolean(true),
       // TODO: we expect Welsh translation to be disabled / not working as expected
       "disableTranslations" -> JsBoolean(true),
