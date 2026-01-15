@@ -48,7 +48,7 @@
         @govukInput(
             InputViewModel(
                 field = form("phone"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question1", agentName))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.label1"))
             ).withAutocomplete("tel")
             .withInputType("tel")
             .withWidth(Full)
@@ -58,7 +58,7 @@
         @govukInput(
             InputViewModel(
                 field = form("email"),
-                label = LabelViewModel(messages("manageAgents.agentContactDetails.question2", agentName))
+                label = LabelViewModel(messages("manageAgents.agentContactDetails.label2"))
             ).withAutocomplete("email")
             .withInputType("email")
             .withWidth(Full)
