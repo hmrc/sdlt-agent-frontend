@@ -27,13 +27,12 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.{logError, logInfo}
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class ConfirmAgentContactDetailsController @Inject()(
@@ -43,11 +42,10 @@ class ConfirmAgentContactDetailsController @Inject()(
                                        requireData: DataRequiredAction,
                                        stornRequiredAction: StornRequiredAction,
                                        formProvider: ConfirmAgentContactDetailsFormProvider,
-                                       stampDutyLandTaxService: StampDutyLandTaxService,
                                        navigator: Navigator,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: ConfirmAgentContactDetailsView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                     ) extends FrontendBaseController with I18nSupport with Logging {
 
 
   private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =

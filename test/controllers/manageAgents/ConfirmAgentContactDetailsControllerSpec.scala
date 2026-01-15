@@ -75,8 +75,6 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConfirmAgentContactDetailsView]
-
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }

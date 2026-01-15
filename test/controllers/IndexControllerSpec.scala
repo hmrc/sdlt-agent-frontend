@@ -25,7 +25,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
-import controllers.routes._
 
 import scala.concurrent.Future
 

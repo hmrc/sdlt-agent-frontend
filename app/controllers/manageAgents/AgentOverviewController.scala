@@ -24,7 +24,6 @@ import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
-import controllers.routes.JourneyRecoveryController
 import play.api.Logging
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import controllers.manageAgents.routes.*

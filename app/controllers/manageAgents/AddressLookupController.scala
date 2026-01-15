@@ -22,7 +22,7 @@ import controllers.routes.{JourneyRecoveryController, SystemErrorController}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentReferenceNumberPage, ConfirmAgentContactDetailsPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, ConfirmAgentContactDetailsPage}
 import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
