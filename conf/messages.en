@@ -91,7 +91,7 @@ manageAgents.confirmAgentContactDetails.title = Do you want to add contact detai
 manageAgents.confirmAgentContactDetails.heading = Do you want to add contact details for {0}?
 manageAgents.confirmAgentContactDetails.hint = We’ll only use these details to contact {0} about this return
 
-manageAgents.agentContactDetails.title = Manage agents - what are the agent’s contact details
+manageAgents.agentContactDetails.title = What are the agent’s contact details? - Manage agents
 manageAgents.agentContactDetails.heading = What are {0}’s contact details?
 manageAgents.agentContactDetails.label1 = Agent phone number
 manageAgents.agentContactDetails.label2 = Agent email address
