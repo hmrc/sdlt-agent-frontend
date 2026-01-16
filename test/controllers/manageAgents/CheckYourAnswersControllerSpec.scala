@@ -19,7 +19,6 @@ package controllers.manageAgents
 import controllers.routes
 import models.{NormalMode, UserAnswers}
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
-import play.api.libs.json.Json
 import services.StampDutyLandTaxService
 import utils.mangeAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
@@ -29,11 +28,10 @@ import base.SpecBase
 import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
 import navigation.Navigator
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.mvc.Results.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository

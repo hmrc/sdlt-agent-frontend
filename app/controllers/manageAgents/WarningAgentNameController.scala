@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNamePage, AgentReferenceNumberPage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

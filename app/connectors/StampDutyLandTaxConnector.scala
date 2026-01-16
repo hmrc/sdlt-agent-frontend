@@ -23,7 +23,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.LoggerUtil.logError
 
@@ -47,9 +47,6 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
     url"$base/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
   private val updateAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/update/predefined-agent"
-
-  private val removeAgentDetailsUrl: (String, String) => URL = (storn, agentRef) =>
-    url"$base/stamp-duty-land-tax/manage-agents/agent-details/remove?storn=$storn&agentReferenceNumber=$agentRef"
 
   def getSdltOrganisation(storn: String)
                          (implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =

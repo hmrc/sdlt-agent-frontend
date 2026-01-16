@@ -18,9 +18,8 @@ package controllers.manageAgents
 
 import base.SpecBase
 import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
-import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Application

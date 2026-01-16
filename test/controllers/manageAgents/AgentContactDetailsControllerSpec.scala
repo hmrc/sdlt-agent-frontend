@@ -20,7 +20,6 @@ import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
 import pages.manageAgents.AgentNamePage
 import models.NormalMode
-import models.manageAgents.AgentContactDetails
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
