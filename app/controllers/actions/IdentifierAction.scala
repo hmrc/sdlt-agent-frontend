@@ -106,12 +106,12 @@ class AuthenticatedIdentifierAction @Inject()(
 
   private val orgEnrolment: String = "IR-SDLT-ORG"
   private val agentEnrolment: String = "IR-SDLT-AGENT"
-  
+
   private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
     enrolments.find(e => Set(orgEnrolment,agentEnrolment ).contains(e.key)) match {
       case Some(enrolment) =>
-        (enrolmentStornExtractor(enrolment), enrolment.isActivated) match {
-          case (Some(storn), true) =>
+        (enrolmentStornExtractor(enrolment), enrolment.state.toLowerCase()) match {
+          case (Some(storn), "activated" | "notyetactivated") =>
             Some(storn)
           case _ =>
             logger.error("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
