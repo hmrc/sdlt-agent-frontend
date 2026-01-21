@@ -26,8 +26,7 @@ object DateTimeFormats {
   private val dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
   private val localisedDateTimeFormatters = Map(
-    "en" -> dateTimeFormatter,
-    "cy" -> dateTimeFormatter.withLocale(new Locale("cy"))
+    "en" -> dateTimeFormatter
   )
 
   def dateTimeFormat()(implicit lang: Lang): DateTimeFormatter = {
