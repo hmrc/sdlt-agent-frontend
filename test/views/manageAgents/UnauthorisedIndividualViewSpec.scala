@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.manageAgents
 
 import base.SpecBase
 import config.FrontendAppConfig
@@ -25,7 +25,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import views.html.UnauthorisedIndividualView
+import views.html.manageAgents.UnauthorisedIndividualView
 
 class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
 

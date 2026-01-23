@@ -29,7 +29,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 import views.html.manageAgents.WarningAgentNameView
 
 import scala.concurrent.Future

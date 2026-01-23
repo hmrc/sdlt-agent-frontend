@@ -20,7 +20,7 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import services.StampDutyLandTaxService
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView

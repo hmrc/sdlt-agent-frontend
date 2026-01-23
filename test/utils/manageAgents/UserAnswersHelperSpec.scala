@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils.mangeAgents
+package utils.manageAgents
 
 import base.SpecBase
 import models.UserAnswers

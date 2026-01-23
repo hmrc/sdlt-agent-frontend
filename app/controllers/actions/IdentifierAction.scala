@@ -72,7 +72,7 @@ class AuthenticatedIdentifierAction @Inject()(
         case Some(_) ~ _ ~ Some(Individual) ~ _ =>
           logger.error("[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt")
           Future.successful(
-            Redirect(controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad())
+            Redirect(controllers.manageAgents.routes.UnauthorisedIndividualAffinityController.onPageLoad())
           )
         case _ =>
           logger.error("[AuthenticatedIdentifierAction][unauthorised] - authentication failure")
