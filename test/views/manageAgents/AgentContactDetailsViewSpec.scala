@@ -20,7 +20,6 @@ import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.NormalMode
 import org.jsoup.nodes.Document
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -30,7 +29,7 @@ import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
 import views.html.manageAgents.AgentContactDetailsView
 
-class AgentContactDetailsViewSpec extends SpecBase with Matchers with ViewAssertions with GuiceOneAppPerSuite {
+class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
 
   "AgentContactDetailsView" - {
 

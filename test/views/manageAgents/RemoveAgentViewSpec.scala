@@ -19,7 +19,6 @@ package views.manageAgents
 import base.SpecBase
 import forms.manageAgents.RemoveAgentFormProvider
 import org.jsoup.nodes.Document
-import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
@@ -29,7 +28,7 @@ import play.twirl.api.Html
 import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
 import views.html.manageAgents.RemoveAgentView
 
-class RemoveAgentViewSpec extends SpecBase with Matchers with ViewAssertions with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with GuiceOneAppPerSuite {
 
   "RemoveAgentView" - {
 
