@@ -18,6 +18,7 @@ package views.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.RemoveAgentFormProvider
+import models.responses.organisation.CreatedAgent
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -25,10 +26,12 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import utils.PaginationHelper
 import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
 import views.html.manageAgents.{AgentOverviewView, RemoveAgentView}
 
-class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with PaginationHelper with GuiceOneAppPerSuite {
 
   "AgentOverviewView" - {
 
@@ -46,7 +49,43 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
       hasBackLink(doc)
     }
 
-    // TODO: Tests for zero agents, agents with pagination, flashes, warnings
+    "must render the correct html elements when there are no agents" in new Setup {
+      val html: Html = view(None, None, None, redirect)
+      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+
+      displaysCorrectInfoText(doc, false)
+      displaysNoAgentsListedText(doc)
+      paginationDoesNotExist(doc)
+    }
+
+    "must render the correct html elements when there are more than 0 but less than 11 agents" in new Setup {
+      private val sevenAgents = getAgentList(7)
+      private val agentSummary = generateAgentSummary(1, sevenAgents)
+
+      val html: Html = view(agentSummary, None, None, redirect)
+      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+
+      displaysCorrectInfoText(doc, true)
+      displaysSummaryListWithCorrectRowsAndValues(doc, sevenAgents)
+      paginationDoesNotExist(doc)
+    }
+
+    "must render the correct html elements when there are 11 or more agents" in new Setup {
+      private val twentyTwoAgents = getAgentList(22)
+      private val agentSummary = generateAgentSummary(1, twentyTwoAgents)
+      private val pagination = generatePagination(1, 3)
+      private val paginationText = getPaginationInfoText(1, twentyTwoAgents)
+
+      val html: Html = view(agentSummary, pagination, paginationText, redirect)
+      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+
+      displaysCorrectInfoText(doc, true)
+      displaysCorrectPaginationInfoText(doc, twentyTwoAgents.size)
+      displaysSummaryListWithCorrectRowsAndValues(doc, twentyTwoAgents)
+      paginationExistsAndDisplaysCorrectly(doc)
+    }
+
+    // TODO: flashes, warnings
   }
 
   trait Setup {
@@ -58,5 +97,49 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
 
   private def hasAddAgentLink(doc: Document)(implicit messages: Messages) = {
     doc.select("a.govuk-button").text mustBe messages("manageAgents.agentDetails.addAgentButtonText")
+  }
+
+  private def displaysCorrectInfoText(doc: Document, agentsExist: Boolean)(implicit messages: Messages) = {
+    if (agentsExist) {
+      doc.select("p.govuk-body").get(0).text mustBe messages("manageAgents.agentOverview.nonZeroAgents.info.text")
+    } else {
+      doc.select("p.govuk-body").get(0).text mustBe messages("manageAgents.agentOverview.noAgents.info.text")
+    }
+  }
+
+  private def displaysNoAgentsListedText(doc: Document)(implicit messages: Messages) = {
+    doc.select("p.govuk-body").get(1).text mustBe messages("manageAgents.agentOverview.noAgents.text")
+  }
+
+  private def displaysCorrectPaginationInfoText(doc: Document, numOfAgents: Int)(implicit messages: Messages) = {
+    doc.select("p.govuk-body").get(1).text mustBe s"Showing 1 to 10 of $numOfAgents records"
+  }
+
+  private def displaysSummaryListWithCorrectRowsAndValues(doc:Document, agents: List[CreatedAgent]) = {
+    doc.select(".govuk-summary-list").size() mustBe 1
+
+    val rows = doc.select(".govuk-summary-list__row")
+    val expectedRows = if(agents.size > 10) 10 else agents.size
+    rows.size() mustBe expectedRows
+
+    val firstAgent = agents.head
+
+    doc.select(".govuk-summary-list__key").text() must include(firstAgent.name)
+    doc.select(".govuk-summary-list__value").text() must include(firstAgent.getAddressWithHouseNumberLegacy)
+    doc.select(".govuk-summary-list__actions-list-item").text() must include("Change")
+    doc.select(".govuk-summary-list__actions-list-item").text() must include("Remove")
+  }
+
+  private def paginationDoesNotExist(doc: Document) = {
+    doc.select(".govuk-pagination").isEmpty mustBe true
+  }
+
+  private def paginationExistsAndDisplaysCorrectly(doc: Document) = {
+    doc.select(".govuk-pagination").isEmpty mustBe false
+
+    doc.select(".govuk-pagination__link").get(0).text mustBe "1"
+    doc.select(".govuk-pagination__link").get(1).text mustBe "2"
+    doc.select(".govuk-pagination__link").get(2).text mustBe "3"
+    doc.select(".govuk-pagination__link").get(3).text mustBe "Next"
   }
 }
