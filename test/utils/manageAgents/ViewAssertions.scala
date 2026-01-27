@@ -27,11 +27,7 @@ trait ViewAssertions {
     doc.title() must include(messages(title, args: _*))
   }
 
-  protected def displaysCorrectHeading(
-                                                  doc: Document,
-                                                  heading: String,
-                                                  args: Seq[Any] = Seq.empty
-                                                )(implicit messages: Messages): Assertion = {
+  protected def displaysCorrectHeading(doc: Document, heading: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
     doc.select("h1.govuk-heading-l").text mustBe messages(heading, args: _*)
   }
   
@@ -65,11 +61,7 @@ trait ViewAssertions {
     doc.select("a.govuk-back-link").size() mustBe 1
   }
 
-  protected def displaysErrorSummary(
-                                      doc: Document,
-                                      errorKeys: Seq[String],
-                                      args: Seq[Any] = Seq.empty,
-                                    )(implicit messages: Messages): Unit = {
+  protected def displaysErrorSummary(doc: Document, errorKeys: Seq[String], args: Seq[Any] = Seq.empty)(implicit messages: Messages): Unit = {
     val errorSummary = doc.select(".govuk-error-summary")
     errorSummary.size mustBe 1
     
