@@ -35,14 +35,15 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with Guic
   "AgentContactDetailsView" - {
 
     "must render the page with correct html elements" in new Setup {
-      val html: Html = view(form, NormalMode, "testAgentName")
+      val html: Html = view(form, NormalMode, testAgentName)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentContactDetails.title")
-      displaysCorrectHeading(doc, "manageAgents.agentContactDetails.heading", Seq("testAgentName"))
+      displaysCorrectHeading(doc, "manageAgents.agentContactDetails.heading", Seq(testAgentName))
       displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("manageAgents.agentContactDetails.label1", "manageAgents.agentContactDetails.label2"))
       hasCorrectNumOfItems(doc, "input", 2)
+      displaysCorrectHint(doc, "manageAgents.agentContactDetails.hint")
       hasSubmitButton(doc, "site.continue")
       hasBackLink(doc)
     }
@@ -56,7 +57,7 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with Guic
         .withError("email", "manageAgents.agentContactDetails.error.emailInvalid")
         .withError("email", "manageAgents.agentContactDetails.error.emailInvalidFormat")
 
-      val html: Html = view(errorForm, NormalMode, "testAgentName")
+      val html: Html = view(errorForm, NormalMode, testAgentName)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
@@ -79,6 +80,7 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with Guic
     implicit val request: Request[?]  = FakeRequest()
     implicit val messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: AgentContactDetailsView = app.injector.instanceOf[AgentContactDetailsView]
+    val testAgentName = "Haborview Estates"
   }
 }
 

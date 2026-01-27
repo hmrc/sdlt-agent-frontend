@@ -53,6 +53,10 @@ trait ViewAssertions {
     doc.select(item).size mustBe num
   }
 
+  protected def displaysCorrectHint(doc: Document, hint: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
+    doc.select(".govuk-hint").text mustBe messages(hint, args: _*)
+  }
+
   protected def hasSubmitButton(doc: Document, text: String)(implicit messages: Messages): Assertion = {
     doc.select("button[type=submit]").text mustBe messages(text)
   }
