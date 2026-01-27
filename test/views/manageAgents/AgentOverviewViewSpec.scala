@@ -17,19 +17,17 @@
 package views.manageAgents
 
 import base.SpecBase
-import forms.manageAgents.RemoveAgentFormProvider
 import models.responses.organisation.CreatedAgent
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 import utils.PaginationHelper
 import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
-import views.html.manageAgents.{AgentOverviewView, RemoveAgentView}
+import views.html.manageAgents.AgentOverviewView
 
 class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with PaginationHelper with GuiceOneAppPerSuite {
 
@@ -85,7 +83,41 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
       paginationExistsAndDisplaysCorrectly(doc)
     }
 
-    // TODO: flashes, warnings
+    "must render the page with success flashes" in new Setup {
+      private val requestWithFlash =
+        FakeRequest()
+          .withFlash("agentUpdated" -> messages("manageAgents.agentDetails.updateAgent.notification", "testName"))
+          .withFlash("agentRemoved" -> messages("manageAgents.agentDetails.removeAgent.notification", "testName"))
+          .withFlash("agentCreated" -> messages("manageAgents.agentDetails.submitAgent.notification", "testName"))
+
+      val html: Html = view(None, None, None, redirect)(requestWithFlash, messages)
+      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+
+      displaysFlashes(
+        doc,
+        Seq(
+          "manageAgents.agentDetails.updateAgent.notification",
+          "manageAgents.agentDetails.removeAgent.notification",
+          "manageAgents.agentDetails.submitAgent.notification"
+        )
+      )
+    }
+
+    "must render the page with error flash" in new Setup {
+      private val requestWithFlash =
+        FakeRequest()
+          .withFlash("agentsLimitReached" -> messages("manageAgents.agentDetails.limitReached"))
+
+      val html: Html = view(None, None, None, redirect)(requestWithFlash, messages)
+      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+
+      displaysErrorSummary(
+        doc,
+        Seq(
+          "manageAgents.agentDetails.limitReached"
+        )
+      )
+    }
   }
 
   trait Setup {
@@ -137,9 +169,18 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
   private def paginationExistsAndDisplaysCorrectly(doc: Document) = {
     doc.select(".govuk-pagination").isEmpty mustBe false
 
-    doc.select(".govuk-pagination__link").get(0).text mustBe "1"
-    doc.select(".govuk-pagination__link").get(1).text mustBe "2"
-    doc.select(".govuk-pagination__link").get(2).text mustBe "3"
-    doc.select(".govuk-pagination__link").get(3).text mustBe "Next"
+    val paginationLinks = doc.select(".govuk-pagination__link").map(_.text.trim)
+
+    paginationLinks must contain allOf ("1", "2", "3", "Next")
+  }
+
+  private def displaysFlashes(doc: Document, flashKeys: Seq[String])(implicit messages: Messages): Unit = {
+    val flashes = doc.select(".govuk-notification-banner")
+
+    doc.select("h2.govuk-notification-banner__title").text must include("Success")
+
+    flashKeys.foreach { key =>
+      flashes.text must include(messages(flashKeys, "testName"))
+    }
   }
 }

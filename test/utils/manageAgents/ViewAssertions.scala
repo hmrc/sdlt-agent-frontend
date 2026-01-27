@@ -62,13 +62,15 @@ trait ViewAssertions {
   protected def displaysErrorSummary(
                                       doc: Document,
                                       errorKeys: Seq[String],
-                                      args: Seq[Any] = Seq.empty
+                                      args: Seq[Any] = Seq.empty,
                                     )(implicit messages: Messages): Unit = {
     val errorSummary = doc.select(".govuk-error-summary")
     errorSummary.size mustBe 1
+    
+    doc.select(".govuk-error-summary__title").text mustBe messages("error.summary.title")
 
     errorKeys.foreach { key =>
-      errorSummary.text() must include(messages(key))
+      errorSummary.text() must include(messages(key, args: _*))
     }
   }
 }

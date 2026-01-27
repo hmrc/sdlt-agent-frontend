@@ -50,7 +50,7 @@ class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetails
 
     "must display error messages when form has errors" in new Setup {
       val errorForm: Form[?] = form
-        .withError("value", "manageAgents.removeAgent.error.required")
+        .withError("value", "manageAgents.removeAgent.error.required", testAgentDetails.name)
 
       val html: Html = view(errorForm, postAction, testAgentDetails)
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
