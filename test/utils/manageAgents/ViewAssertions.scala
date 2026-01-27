@@ -27,13 +27,15 @@ trait ViewAssertions {
     doc.title() must include(messages(title, args: _*))
   }
 
-  protected def displaysCorrectHeadingAndCaption(
+  protected def displaysCorrectHeading(
                                                   doc: Document,
                                                   heading: String,
-                                                  caption: String,
                                                   args: Seq[Any] = Seq.empty
                                                 )(implicit messages: Messages): Assertion = {
     doc.select("h1.govuk-heading-l").text mustBe messages(heading, args: _*)
+  }
+  
+  protected def displaysCorrectCaption(doc: Document, caption: String)(implicit messages: Messages): Assertion = {
     doc.select("p.govuk-caption-l").text mustBe s"This section is ${messages(caption)}"
   }
 

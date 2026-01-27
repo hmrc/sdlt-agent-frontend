@@ -18,6 +18,7 @@ package views.manageAgents
 
 import base.SpecBase
 import models.responses.organisation.CreatedAgent
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
@@ -35,21 +36,18 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
 
     "must render the page with correct core html elements" in new Setup {
       val html: Html = view(None, None, None, redirect)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentOverview.title")
-      displaysCorrectHeadingAndCaption(
-        doc,
-        "manageAgents.agentDetails.heading",
-        "manageAgents.caption",
-      )
+      displaysCorrectHeading(doc, "manageAgents.agentDetails.heading")
+      displaysCorrectCaption(doc, "manageAgents.caption")
       hasAddAgentLink(doc)
       hasBackLink(doc)
     }
 
     "must render the correct html elements when there are no agents" in new Setup {
       val html: Html = view(None, None, None, redirect)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, false)
       displaysNoAgentsListedText(doc)
@@ -61,7 +59,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
       private val agentSummary = generateAgentSummary(1, sevenAgents)
 
       val html: Html = view(agentSummary, None, None, redirect)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, true)
       displaysSummaryListWithCorrectRowsAndValues(doc, sevenAgents)
@@ -75,7 +73,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
       private val paginationText = getPaginationInfoText(1, twentyTwoAgents)
 
       val html: Html = view(agentSummary, pagination, paginationText, redirect)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, true)
       displaysCorrectPaginationInfoText(doc, twentyTwoAgents.size)
@@ -91,7 +89,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
           .withFlash("agentCreated" -> messages("manageAgents.agentDetails.submitAgent.notification", "testName"))
 
       val html: Html = view(None, None, None, redirect)(requestWithFlash, messages)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysFlashes(
         doc,

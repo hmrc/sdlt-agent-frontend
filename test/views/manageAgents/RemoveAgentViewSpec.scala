@@ -18,6 +18,7 @@ package views.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.RemoveAgentFormProvider
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -34,14 +35,11 @@ class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetails
 
     "must render the page with correct html elements" in new Setup {
       val html: Html = view(form, postAction, testAgentDetails)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.removeAgent.title")
-      displaysCorrectHeadingAndCaption(
-        doc,
-        "manageAgents.removeAgent.heading",
-        "manageAgents.caption",
-        Seq(testAgentDetails.name))
+      displaysCorrectHeading(doc, "manageAgents.removeAgent.heading", Seq(testAgentDetails.name))
+      displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasCorrectNumOfItems(doc, ".govuk-radios__item", 2)
       hasSubmitButton(doc, "site.saveAndContinue")
@@ -53,7 +51,7 @@ class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetails
         .withError("value", "manageAgents.removeAgent.error.required", testAgentDetails.name)
 
       val html: Html = view(errorForm, postAction, testAgentDetails)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
         doc,

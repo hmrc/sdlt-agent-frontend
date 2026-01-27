@@ -19,6 +19,7 @@ package views.manageAgents
 import base.SpecBase
 import forms.manageAgents.AgentNameFormProvider
 import models.NormalMode
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -35,14 +36,11 @@ class AgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPer
 
     "must render the page with correct html elements" in new Setup {
       val html: Html = view(form, NormalMode)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentName.title")
-      displaysCorrectHeadingAndCaption(
-        doc,
-        "manageAgents.agentName.heading",
-        "manageAgents.caption",
-      )
+      displaysCorrectHeading(doc, "manageAgents.agentName.heading")
+      displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("manageAgents.agentName.tip"))
       hasCorrectNumOfItems(doc, "input", 1)
       hasSubmitButton(doc, "site.continue")
@@ -56,7 +54,7 @@ class AgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPer
         .withError("value", "manageAgents.agentName.error.length")
 
       val html: Html = view(errorForm, NormalMode)
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
         doc,

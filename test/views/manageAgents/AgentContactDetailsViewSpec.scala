@@ -19,6 +19,7 @@ package views.manageAgents
 import base.SpecBase
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.NormalMode
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.Form
@@ -35,15 +36,11 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with Guic
 
     "must render the page with correct html elements" in new Setup {
       val html: Html = view(form, NormalMode, "testAgentName")
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentContactDetails.title")
-      displaysCorrectHeadingAndCaption(
-        doc,
-        "manageAgents.agentContactDetails.heading",
-        "manageAgents.caption",
-        Seq("testAgentName")
-      )
+      displaysCorrectHeading(doc, "manageAgents.agentContactDetails.heading", Seq("testAgentName"))
+      displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("manageAgents.agentContactDetails.label1", "manageAgents.agentContactDetails.label2"))
       hasCorrectNumOfItems(doc, "input", 2)
       hasSubmitButton(doc, "site.continue")
@@ -60,7 +57,7 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewAssertions with Guic
         .withError("email", "manageAgents.agentContactDetails.error.emailInvalidFormat")
 
       val html: Html = view(errorForm, NormalMode, "testAgentName")
-      val doc: Document = org.jsoup.Jsoup.parse(html.toString())
+      val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
         doc,
