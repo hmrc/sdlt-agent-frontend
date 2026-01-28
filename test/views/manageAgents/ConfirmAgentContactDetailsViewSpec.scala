@@ -20,7 +20,6 @@ import base.SpecBase
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -30,7 +29,7 @@ import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
-class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
+class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewAssertions {
 
   "ConfirmAgentContactDetailsView" - {
 
