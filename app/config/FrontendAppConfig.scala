@@ -17,7 +17,6 @@
 package config
 
 import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
 import javax.inject.{Inject, Singleton}
@@ -62,4 +61,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val addressLookupProtocol: String = configuration.get[String]("address-lookup-frontend.protocol")
   val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
   val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
+  val signOutUrlForAddressLookupFrontend = s"$host/stamp-duty-land-tax-agent${controllers.auth.routes.AuthController.signOut().url}"
 }
