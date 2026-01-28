@@ -36,7 +36,7 @@ import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.Messages
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 

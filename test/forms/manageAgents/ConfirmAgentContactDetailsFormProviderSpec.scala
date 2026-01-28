@@ -21,7 +21,7 @@ import models.manageAgents.ConfirmAgentContactDetails
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 
 class ConfirmAgentContactDetailsFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {
 

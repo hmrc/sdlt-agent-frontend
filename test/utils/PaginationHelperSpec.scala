@@ -23,7 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import controllers.manageAgents.routes
 import models.responses.organisation.CreatedAgent
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 
 class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTestUtil {
 

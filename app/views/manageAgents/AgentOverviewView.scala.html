@@ -43,13 +43,13 @@
     ) {
 
         @request.flash.get("agentUpdated").map { agentName =>
-            @successNotificationBanner("manageAgents.updateAgent.notification", agentName)
+            @successNotificationBanner("manageAgents.agentDetails.updateAgent.notification", agentName)
         }
         @request.flash.get("agentRemoved").map { agentName =>
             @successNotificationBanner("manageAgents.agentDetails.removeAgent.notification", agentName)
         }
         @request.flash.get("agentCreated").map { agentName =>
-            @successNotificationBanner("manageAgents.submitAgent.notification", agentName)
+            @successNotificationBanner("manageAgents.agentDetails.submitAgent.notification", agentName)
         }
 
         @request.flash.get("agentsLimitReached").map { _ =>

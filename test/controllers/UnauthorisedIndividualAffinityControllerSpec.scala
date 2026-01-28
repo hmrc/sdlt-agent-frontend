@@ -22,7 +22,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HttpVerbs.GET
-import views.html.UnauthorisedIndividualView
+import views.html.manageAgents.UnauthorisedIndividualView
 
 class UnauthorisedIndividualAffinityControllerSpec extends SpecBase with MockitoSugar {
 
@@ -34,7 +34,7 @@ class UnauthorisedIndividualAffinityControllerSpec extends SpecBase with Mockito
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
-        val request = FakeRequest(GET, controllers.routes.UnauthorisedIndividualAffinityController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.manageAgents.routes.UnauthorisedIndividualAffinityController.onPageLoad().url)
 
         val result = route(application, request).value
 

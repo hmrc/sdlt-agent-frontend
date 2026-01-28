@@ -128,12 +128,11 @@ manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
 manageAgents.agentDetails.limitReached              = You have reached the limit of 25 agents. To add a new agent, you must delete one
 manageAgents.agentDetails.removeAgent.notification  = You have removed {0}
+manageAgents.agentDetails.submitAgent.notification  = You have added {0}
+manageAgents.agentDetails.updateAgent.notification  = You have updated {0}
 
 manageAgents.unauthorised.org.title                 = Sorry, you’re unable to use this service
 manageAgents.unauthorised.org.heading               = Sorry, you’re unable to use this service
-
-manageAgents.submitAgent.notification               = You have added {0}
-manageAgents.updateAgent.notification               = You have updated {0}
 
 manageAgents.addressLookup.header.title             = Stamp Taxes Online
 manageAgents.addressLookup.select.heading           = Choose {0}’s address

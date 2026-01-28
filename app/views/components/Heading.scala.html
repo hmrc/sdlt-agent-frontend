@@ -25,13 +25,13 @@
 )
 
 @headingClasses = @{
-    toClasses("govuk-heading-xl", "hmrc-page-heading", classes.getOrElse(""))
+    toClasses("govuk-heading-l", "hmrc-page-heading", classes.getOrElse(""))
 }
 
 <h1 class="@headingClasses">
     @heading
     @caption.map { caption =>
-        <span class="hmrc-caption govuk-caption-xl">
+        <span class="hmrc-caption govuk-caption-l">
             @caption
         </span>
     }

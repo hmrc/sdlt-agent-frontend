@@ -18,8 +18,8 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
-
-GET         /unauthorised/individual                     controllers.UnauthorisedIndividualAffinityController.onPageLoad()
+GET         /unauthorised/individual                     controllers.manageAgents.UnauthorisedIndividualAffinityController.onPageLoad()
+GET         /agent-details/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
 
 GET         /agent-details/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
 GET         /agent-details/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
@@ -51,7 +51,5 @@ POST        /create/predefined-agent                     controllers.manageAgent
 
 GET         /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad(agentReferenceNumber: String)
 POST        /agent-details/remove-agent                  controllers.manageAgents.RemoveAgentController.onSubmit(agentReferenceNumber: String)
-
-GET         /agent-details/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
 
 GET        /system-error/there-is-a-problem              controllers.SystemErrorController.onPageLoad()

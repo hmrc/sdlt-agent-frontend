@@ -24,7 +24,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.StampDutyLandTaxService
-import utils.mangeAgents.AgentDetailsTestUtil
+import utils.manageAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 

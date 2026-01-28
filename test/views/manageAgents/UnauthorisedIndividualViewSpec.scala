@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views
+package views.manageAgents
 
 import base.SpecBase
 import config.FrontendAppConfig
@@ -25,7 +25,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import views.html.UnauthorisedIndividualView
+import views.html.manageAgents.UnauthorisedIndividualView
 
 class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
 
@@ -34,7 +34,7 @@ class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite w
       val html = view()
       val doc = parseHtml(html)
 
-      val heading = doc.select("h1.govuk-heading-xl")
+      val heading = doc.select("h1.govuk-heading-l")
 
       heading.size() mustBe 1
       heading.text() mustBe messages("unauthorised.individual.heading")
