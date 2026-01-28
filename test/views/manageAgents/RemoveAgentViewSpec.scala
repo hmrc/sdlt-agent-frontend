@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import base.SpecBase
 import forms.manageAgents.RemoveAgentFormProvider
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Call, Request}
@@ -29,7 +29,7 @@ import play.twirl.api.Html
 import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
 import views.html.manageAgents.RemoveAgentView
 
-class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil {
 
   "RemoveAgentView" - {
 
@@ -62,6 +62,7 @@ class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetails
   }
 
   trait Setup {
+    val app: Application                      = applicationBuilder().build()
     val formProvider                          = new RemoveAgentFormProvider()
     val form: Form[?]                         = formProvider(testAgentDetails)
     val postAction: Call                      = controllers.manageAgents.routes.RemoveAgentController.onSubmit("123")

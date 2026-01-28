@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import forms.manageAgents.AgentNameFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Request
@@ -30,7 +30,7 @@ import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
 import views.html.manageAgents.WarningAgentNameView
 
-class WarningAgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
+class WarningAgentNameViewSpec extends SpecBase with ViewAssertions {
 
   "WarningAgentNameView" - {
 
@@ -69,11 +69,12 @@ class WarningAgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOn
   }
 
   trait Setup {
+    val app: Application             = applicationBuilder().build()
     val formProvider                 = new AgentNameFormProvider()
     val form: Form[?]                = formProvider()
     implicit val request: Request[?] = FakeRequest()
     implicit val messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: WarningAgentNameView          = app.injector.instanceOf[WarningAgentNameView]
+    val view: WarningAgentNameView   = app.injector.instanceOf[WarningAgentNameView]
   }
 
   private def displaysCorrectWarning(doc: Document, warningText: String)(implicit messages: Messages) = {

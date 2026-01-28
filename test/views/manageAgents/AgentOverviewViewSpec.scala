@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import base.SpecBase
 import models.responses.organisation.CreatedAgent
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
@@ -30,7 +30,7 @@ import utils.PaginationHelper
 import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
 import views.html.manageAgents.AgentOverviewView
 
-class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with PaginationHelper with GuiceOneAppPerSuite {
+class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with PaginationHelper {
 
   "AgentOverviewView" - {
 
@@ -119,7 +119,8 @@ class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetai
   }
 
   trait Setup {
-    val redirect: Call = controllers.manageAgents.routes.StartAddAgentController.onPageLoad()
+    val app: Application             = applicationBuilder().build()
+    val redirect: Call               = controllers.manageAgents.routes.StartAddAgentController.onPageLoad()
     implicit def request: Request[?] = FakeRequest()
     implicit def messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: AgentOverviewView      = app.injector.instanceOf[AgentOverviewView]

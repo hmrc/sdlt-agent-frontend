@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import forms.manageAgents.AgentNameFormProvider
 import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Request
@@ -30,7 +30,7 @@ import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
 import views.html.manageAgents.AgentNameView
 
-class AgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
+class AgentNameViewSpec extends SpecBase with ViewAssertions {
 
   "AgentNameView" - {
 
@@ -68,6 +68,7 @@ class AgentNameViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPer
   }
 
   trait Setup {
+    val app: Application             = applicationBuilder().build()
     val formProvider                 = new AgentNameFormProvider()
     val form: Form[?]                = formProvider()
     implicit val request: Request[?] = FakeRequest()

@@ -36,7 +36,7 @@ class SystemErrorViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockito
       val html = view()
       val doc = parseHtml(html)
 
-      val heading = doc.select("h1.govuk-heading-xl")
+      val heading = doc.select("h1.govuk-heading-l")
 
       heading.size() mustBe 1
       heading.text() mustBe messages("systemError.heading")

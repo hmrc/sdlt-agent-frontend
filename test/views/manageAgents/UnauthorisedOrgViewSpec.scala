@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
@@ -28,7 +28,7 @@ import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
 import views.html.manageAgents.UnauthorisedOrgView
 
-class UnauthorisedOrgViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
+class UnauthorisedOrgViewSpec extends SpecBase with ViewAssertions {
 
   "UnauthorisedOrgView" - {
 
@@ -42,10 +42,13 @@ class UnauthorisedOrgViewSpec extends SpecBase with ViewAssertions with GuiceOne
   }
 
   trait Setup {
-    implicit val request: Request[?] = FakeRequest()
-    implicit val messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+    val app: Application                                   = applicationBuilder().build()
+    implicit val request: Request[?]                       = FakeRequest()
+    implicit val messages: Messages                        = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi])
     implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-    val view: UnauthorisedOrgView    = app.injector.instanceOf[UnauthorisedOrgView]
+    val view: UnauthorisedOrgView                          = app.injector.instanceOf[UnauthorisedOrgView]
   }
 }
 

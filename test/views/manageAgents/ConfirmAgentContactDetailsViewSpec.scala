@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
 package views.manageAgents
 
 import base.SpecBase
-import forms.manageAgents.{AgentContactDetailsFormProvider, ConfirmAgentContactDetailsFormProvider}
-import models.NormalMode
+import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import utils.manageAgents.ViewAssertions
-import views.html.manageAgents.{AgentContactDetailsView, ConfirmAgentContactDetailsView}
+import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewAssertions with GuiceOneAppPerSuite {
 
@@ -65,12 +65,13 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewAssertions wi
   }
 
   trait Setup {
-    val formProvider                  = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[?]                 = formProvider("agentName")
-    implicit def request: Request[?]  = FakeRequest()
-    implicit def messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+    val app: Application                     = applicationBuilder().build()
+    val formProvider                         = new ConfirmAgentContactDetailsFormProvider()
+    val form: Form[?]                        = formProvider("agentName")
+    implicit def request: Request[?]         = FakeRequest()
+    implicit def messages: Messages          = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: ConfirmAgentContactDetailsView = app.injector.instanceOf[ConfirmAgentContactDetailsView]
-    val testAgentName = "Haborview Estates"
+    val testAgentName                        = "Haborview Estates"
   }
 }
 
