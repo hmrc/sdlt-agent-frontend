@@ -34,8 +34,8 @@ case class CreatedAgent(
                          agentResourceReference: String
                        ) {
 
-  def getAddressWithHouseNumberLegacy: String =
-    houseNumber.fold(address1)(hn => s"$hn $address1")
+  def getAddressLine1AndAddressLine2:String =
+    address2.fold(address1)(value => s"$address1 $value")
 }
 
 object CreatedAgent {

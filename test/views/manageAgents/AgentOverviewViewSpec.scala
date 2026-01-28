@@ -156,7 +156,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     val firstAgent = agents.head
 
     doc.select(".govuk-summary-list__key").text() must include(firstAgent.name)
-    doc.select(".govuk-summary-list__value").text() must include(firstAgent.getAddressWithHouseNumberLegacy)
+    doc.select(".govuk-summary-list__value").text() must include(firstAgent.getAddressLine1AndAddressLine2)
     doc.select(".govuk-summary-list__actions-list-item").text() must include("Change")
     doc.select(".govuk-summary-list__actions-list-item").text() must include("Remove")
   }
