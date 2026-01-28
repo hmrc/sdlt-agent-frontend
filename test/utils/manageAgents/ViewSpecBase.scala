@@ -21,54 +21,58 @@ import org.scalatest.Assertion
 import org.scalatest.matchers.must.Matchers.{include, must, mustBe}
 import play.api.i18n.Messages
 
-trait ViewAssertions {
+trait ViewSpecBase {
 
   protected def displaysCorrectTitle(doc: Document, title: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
     doc.title() must include(messages(title, args: _*))
   }
 
-  protected def displaysCorrectHeading(doc: Document, heading: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
-    doc.select("h1.govuk-heading-l").text mustBe messages(heading, args: _*)
+  protected def displaysCorrectHeading(doc: Document, messageKey: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
+    val heading = doc.select("h1.govuk-heading-l")
+    heading.size() mustBe 1
+    heading.text mustBe messages(messageKey, args: _*)
   }
   
-  protected def displaysCorrectCaption(doc: Document, caption: String)(implicit messages: Messages): Assertion = {
-    doc.select("p.govuk-caption-l").text mustBe s"This section is ${messages(caption)}"
+  protected def displaysCorrectCaption(doc: Document, messageKey: String)(implicit messages: Messages): Assertion = {
+    val caption = doc.select("p.govuk-caption-l")
+    caption.size() mustBe 1
+    caption.text mustBe s"This section is ${messages(messageKey)}"
   }
 
-  protected def displaysCorrectLabels(doc: Document, labels: Seq[String])(implicit messages: Messages): Assertion = {
-    val expectedLabels = doc.select("label")
-    
-    labels.foreach { key =>
-      expectedLabels.text must include(messages(key))
+  protected def displaysCorrectLabels(doc: Document, messageKeys: Seq[String])(implicit messages: Messages): Assertion = {
+    val labels = doc.select("label")
+
+    messageKeys.foreach { key =>
+      labels.text must include(messages(key))
     }
-    
-    expectedLabels.size mustBe labels.size
+
+    labels.size mustBe messageKeys.size
   }
 
   protected def hasCorrectNumOfItems(doc: Document, item: String, num: Int)(implicit messages: Messages): Assertion = {
     doc.select(item).size mustBe num
   }
 
-  protected def displaysCorrectHint(doc: Document, hint: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
-    doc.select(".govuk-hint").text mustBe messages(hint, args: _*)
+  protected def displaysCorrectHint(doc: Document, messageKey: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
+    doc.select(".govuk-hint").text mustBe messages(messageKey, args: _*)
   }
 
-  protected def hasSubmitButton(doc: Document, text: String)(implicit messages: Messages): Assertion = {
-    doc.select("button[type=submit]").text mustBe messages(text)
+  protected def hasSubmitButton(doc: Document, messageKey: String)(implicit messages: Messages): Assertion = {
+    doc.select("button[type=submit]").text mustBe messages(messageKey)
   }
 
-  protected def hasBackLink(doc: Document)(implicit messages: Messages): Assertion = {
+  protected def hasBackLink(doc: Document): Assertion = {
     doc.select("a.govuk-back-link").size() mustBe 1
   }
 
-  protected def displaysErrorSummary(doc: Document, errorKeys: Seq[String], args: Seq[Any] = Seq.empty)(implicit messages: Messages): Unit = {
+  protected def displaysErrorSummary(doc: Document, errorKeys: Seq[String], args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
     val errorSummary = doc.select(".govuk-error-summary")
-    errorSummary.size mustBe 1
-    
     doc.select(".govuk-error-summary__title").text mustBe messages("error.summary.title")
 
     errorKeys.foreach { key =>
       errorSummary.text() must include(messages(key, args: _*))
     }
+
+    errorSummary.size mustBe 1
   }
 }

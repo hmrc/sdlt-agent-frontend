@@ -27,10 +27,10 @@ import play.api.test.FakeRequest
 import play.twirl.api.Html
 import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 import utils.PaginationHelper
-import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
+import utils.manageAgents.{AgentDetailsTestUtil, ViewSpecBase}
 import views.html.manageAgents.AgentOverviewView
 
-class AgentOverviewViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil with PaginationHelper {
+class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTestUtil with PaginationHelper {
 
   "AgentOverviewView" - {
 

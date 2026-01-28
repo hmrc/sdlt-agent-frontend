@@ -26,10 +26,10 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import utils.manageAgents.{AgentDetailsTestUtil, ViewAssertions}
+import utils.manageAgents.{AgentDetailsTestUtil, ViewSpecBase}
 import views.html.manageAgents.RemoveAgentView
 
-class RemoveAgentViewSpec extends SpecBase with ViewAssertions with AgentDetailsTestUtil {
+class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTestUtil {
 
   "RemoveAgentView" - {
 

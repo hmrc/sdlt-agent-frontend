@@ -27,10 +27,10 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import utils.manageAgents.ViewAssertions
+import utils.manageAgents.ViewSpecBase
 import views.html.manageAgents.WarningAgentNameView
 
-class WarningAgentNameViewSpec extends SpecBase with ViewAssertions {
+class WarningAgentNameViewSpec extends SpecBase with ViewSpecBase {
 
   "WarningAgentNameView" - {
 

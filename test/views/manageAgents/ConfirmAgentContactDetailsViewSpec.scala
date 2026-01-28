@@ -26,10 +26,10 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import utils.manageAgents.ViewAssertions
+import utils.manageAgents.ViewSpecBase
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
-class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewAssertions {
+class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
 
   "ConfirmAgentContactDetailsView" - {
 

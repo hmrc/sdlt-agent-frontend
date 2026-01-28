@@ -25,10 +25,10 @@ import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import utils.manageAgents.ViewAssertions
+import utils.manageAgents.ViewSpecBase
 import views.html.manageAgents.UnauthorisedOrgView
 
-class UnauthorisedOrgViewSpec extends SpecBase with ViewAssertions {
+class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
 
   "UnauthorisedOrgView" - {
 
