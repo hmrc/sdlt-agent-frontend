@@ -19,12 +19,14 @@ package views
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import views.html.AccessDeniedView
 
 class AccessDeniedViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
@@ -37,7 +39,7 @@ class AccessDeniedViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockit
     implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     implicit lazy val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
 
-    def parseHtml(html: Html) = Jsoup.parse(html.toString)
+    def parseHtml(html: Html): Document = Jsoup.parse(html.toString)
 
     val view: AccessDeniedView = app.injector.instanceOf[AccessDeniedView]
   }
@@ -45,10 +47,10 @@ class AccessDeniedViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockit
   "AccessDeniedViewSpec" - {
 
     "render the page with correct title and heading" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
 
-      val heading = doc.select("h1.govuk-heading-l")
+      val heading: Elements = doc.select("h1.govuk-heading-l")
 
       heading.size() mustBe 1
       heading.text() mustBe messages("accessDenied.heading")
@@ -56,10 +58,10 @@ class AccessDeniedViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockit
     }
 
     "render the page with paragraphs" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
 
-      val paragraphs = doc.select("p.govuk-body")
+      val paragraphs: Elements = doc.select("p.govuk-body")
 
       paragraphs.size() mustBe 2
       paragraphs.text() must include(messages("accessDenied.p1"))
@@ -67,9 +69,9 @@ class AccessDeniedViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockit
     }
 
     "render the page with url link" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
-      val link = doc.select("p.govuk-body a.govuk-link").attr("href")
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
+      val link: String = doc.select("p.govuk-body a.govuk-link").attr("href")
       link mustBe appConfig.govUKUrl
     }
 

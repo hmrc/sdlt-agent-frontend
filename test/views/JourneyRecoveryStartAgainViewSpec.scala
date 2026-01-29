@@ -19,12 +19,14 @@ package views
 import base.SpecBase
 import config.FrontendAppConfig
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import views.html.JourneyRecoveryStartAgainView
 
 class JourneyRecoveryStartAgainViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
@@ -37,7 +39,7 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with GuiceOneAppPerSuit
     implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
     implicit lazy val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
 
-    def parseHtml(html: Html) = Jsoup.parse(html.toString)
+    def parseHtml(html: Html): Document = Jsoup.parse(html.toString)
 
     val view: JourneyRecoveryStartAgainView = app.injector.instanceOf[JourneyRecoveryStartAgainView]
   }
@@ -45,10 +47,10 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with GuiceOneAppPerSuit
   "JourneyRecoveryStartAgainView" - {
 
     "render the page with correct title and heading" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
 
-      val heading = doc.select("h1.govuk-heading-xl")
+      val heading: Elements = doc.select("h1.govuk-heading-xl")
 
       heading.size() mustBe 1
       heading.text() mustBe messages("journeyRecovery.startAgain.heading")
@@ -56,10 +58,10 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with GuiceOneAppPerSuit
     }
 
     "render the page with paragraphs" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
 
-      val paragraphs = doc.select("p.govuk-body")
+      val paragraphs: Elements = doc.select("p.govuk-body")
 
       paragraphs.size() mustBe 2
       paragraphs.text() must include(messages("journeyRecovery.startAgain.guidance"))
@@ -67,9 +69,9 @@ class JourneyRecoveryStartAgainViewSpec extends SpecBase with GuiceOneAppPerSuit
     }
 
     "render the page with url link" in new Setup {
-      val html = view()
-      val doc = parseHtml(html)
-      val link = doc.select("p.govuk-body a.govuk-link").attr("href")
+      val html: HtmlFormat.Appendable = view()
+      val doc: Document = parseHtml(html)
+      val link: String = doc.select("p.govuk-body a.govuk-link").attr("href")
       link mustBe ""
     }
 
