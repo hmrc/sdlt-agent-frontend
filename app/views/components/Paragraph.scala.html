@@ -14,15 +14,17 @@
  * limitations under the License.
  *@
 
+@import utils.EmptyString.emptyString
+ 
 @this()
 
 @(
         message: String,
-        bold: Boolean = false,
-        extraClasses: String = ""
+        isBold: Boolean = false,
+        extraClasses: String = emptyString
 )(implicit messages: Messages)
 
-<p class="govuk-body @extraClasses @if(bold) {govuk-!-font-weight-bold}">
+<p class="govuk-body @extraClasses @if(isBold){govuk-!-font-weight-bold}">
     @{
         Html(messages(message))
     }
