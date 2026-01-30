@@ -26,15 +26,15 @@
 
 @()(implicit request: RequestHeader, messages: Messages)
 
-    @layout(
-        pageTitle = titleNoForm(messages("unauthorised.individual.title")),
-        showBackLink = false,
-        showSignOut = false
-    ) {
-        @hmrcPageHeading(PageHeading(
-            text           = messages("unauthorised.individual.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
+@layout(
+    pageTitle = titleNoForm(messages("unauthorised.individual.title")),
+    showBackLink = false,
+    showSignOut = false
+) {
+    @hmrcPageHeading(PageHeading(
+        text           = messages("unauthorised.individual.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-        @paragraph(messages("unauthorised.individual.paragraph1"))
-    }
+    @paragraph(messages("unauthorised.individual.paragraph1"))
+}

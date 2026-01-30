@@ -27,22 +27,22 @@
 
 @()(implicit request: RequestHeader, appConfig: FrontendAppConfig, messages: Messages)
 
-    @layout(
-        pageTitle = titleNoForm(messages("pageNotFound.title")),
-        showSignOut = false
-    ) {
-        @hmrcPageHeading(PageHeading(
-            text           = messages("pageNotFound.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
+@layout(
+    pageTitle = titleNoForm(messages("pageNotFound.title")),
+    showSignOut = false
+) {
+    @hmrcPageHeading(PageHeading(
+        text           = messages("pageNotFound.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-        @paragraph(messages("pageNotFound.p1"))
-        @paragraph(messages("pageNotFound.p2"))
-        @link(
-            "pageNotFound.link",
-            appConfig.hmrcOnlineServiceDeskUrl,
-            prefixTextKey = "pageNotFound.p3",
-            suffixTextKey = "pageNotFound.p4",
-            extraClasses = "govuk-!-margin-bottom-9"
-        )
-    }
+    @paragraph(messages("pageNotFound.p1"))
+    @paragraph(messages("pageNotFound.p2"))
+    @link(
+        "pageNotFound.link",
+        appConfig.hmrcOnlineServiceDeskUrl,
+        prefixTextKey = "pageNotFound.p3",
+        suffixTextKey = "pageNotFound.p4",
+        extraClasses = "govuk-!-margin-bottom-9"
+    )
+}

@@ -26,20 +26,20 @@
 
 @()(implicit request: RequestHeader,  appConfig: FrontendAppConfig, messages: Messages)
 
-    @layout(
-        pageTitle = titleNoForm(messages("systemError.title")),
-        showSignOut = false
-    ) {
+@layout(
+    pageTitle = titleNoForm(messages("systemError.title")),
+    showSignOut = false
+) {
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("systemError.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
+    @hmrcPageHeading(PageHeading(
+        text           = messages("systemError.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-        @link(
-            "systemError.link",
-            appConfig.hmrcOnlineServiceDeskUrl,
-            prefixTextKey = "systemError.paragraph1",
-            linkFullStop = true
-        )
-    }
+    @link(
+        "systemError.link",
+        appConfig.hmrcOnlineServiceDeskUrl,
+        prefixTextKey = "systemError.paragraph1",
+        linkFullStop = true
+    )
+}

@@ -25,15 +25,15 @@
 
 @()(implicit request: Request[_], appConfig: FrontendAppConfig, messages: Messages)
 
-    @layout(
-        pageTitle = titleNoForm(messages("manageAgents.unauthorised.org.title")),
-        showBackLink = false,
-        timeout = false
-    ) {
+@layout(
+    pageTitle = titleNoForm(messages("manageAgents.unauthorised.org.title")),
+    showBackLink = false,
+    timeout = false
+) {
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.unauthorised.org.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
+    @hmrcPageHeading(PageHeading(
+        text           = messages("manageAgents.unauthorised.org.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-    }
+}
