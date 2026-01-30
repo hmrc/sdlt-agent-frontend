@@ -8,6 +8,18 @@ lazy val appName: String = "sdlt-agent-frontend"
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.5"
 
+ThisBuild / semanticdbEnabled := true
+
+commands += Command.command("build") { state =>
+  "clean" ::
+    "compile" ::
+    "test" ::
+    "scalafixAll" ::
+    "scalafmtAll" ::
+    "scalafmtSbt" ::
+    state
+}
+
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
