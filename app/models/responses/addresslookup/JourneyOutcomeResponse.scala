@@ -16,16 +16,18 @@
 
 package models.responses.addresslookup
 
-import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.http.Status.NOT_FOUND
+import play.api.http.Status.OK
 import play.api.libs.json.JsSuccess
 import uk.gov.hmrc.http.HttpReads
 
-
 object JourneyOutcomeResponse {
 
-  type AddressLookupJourneyOutcome = Either[JourneyResultFailure, Option[JourneyResultAddressModel]]
+  type AddressLookupJourneyOutcome =
+    Either[JourneyResultFailure, Option[JourneyResultAddressModel]]
 
-  implicit def getAddressLookupDetailsHttpReads: HttpReads[AddressLookupJourneyOutcome] = HttpReads { (_, _, response) =>
+  implicit def getAddressLookupDetailsHttpReads
+      : HttpReads[AddressLookupJourneyOutcome] = HttpReads { (_, _, response) =>
     response.status match {
       case OK =>
         response.json.validate[JourneyResultAddressModel] match {
@@ -45,6 +47,7 @@ object JourneyOutcomeResponse {
 
   private case object InvalidJson extends JourneyResultFailure
 
-  case class UnexpectedGetStatusFailure(status: Int) extends JourneyResultFailure
+  case class UnexpectedGetStatusFailure(status: Int)
+      extends JourneyResultFailure
 
 }

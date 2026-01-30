@@ -20,15 +20,28 @@ import generators.CreatePredefinedAgentRequestGenerator
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsError, Json, JsonValidationError, __}
+import play.api.libs.json.JsError
+import play.api.libs.json.Json
+import play.api.libs.json.JsonValidationError
+import play.api.libs.json.__
 
-class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with CreatePredefinedAgentRequestGenerator {
+class CreatePredefinedAgentRequestSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with CreatePredefinedAgentRequestGenerator {
 
   "CreatePredefinedAgentRequest" - {
     "must serialise into json from agentDetails" in {
       val testSorn: String = "STN001"
-      forAll(nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString, nonEmptyString) {
-        (agentName, addressLine1, addressLine2, addressLine3, addressLine4) => {
+      forAll(
+        nonEmptyString,
+        nonEmptyString,
+        nonEmptyString,
+        nonEmptyString,
+        nonEmptyString
+      ) { (agentName, addressLine1, addressLine2, addressLine3, addressLine4) =>
+        {
           val createPredefinedAgentRequest = CreatePredefinedAgentRequest(
             storn = testSorn,
             agentName = agentName,
@@ -40,8 +53,7 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
             phone = Some("98765432"),
             email = Some("tyson31@gmail.com")
           )
-          Json.toJson(createPredefinedAgentRequest) mustEqual Json.parse(
-            s"""
+          Json.toJson(createPredefinedAgentRequest) mustEqual Json.parse(s"""
                |{
                |"storn": "$testSorn",
                |"agentName":"$agentName",
@@ -58,8 +70,8 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
       }
     }
     "must serialise into json when only agentName and storn is given" in {
-      forAll(nonEmptyString, nonEmptyString) {
-        (storn, agentName) => {
+      forAll(nonEmptyString, nonEmptyString) { (storn, agentName) =>
+        {
           val createPredefinedAgentRequest = CreatePredefinedAgentRequest(
             storn = storn,
             agentName = agentName,
@@ -71,8 +83,7 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
             phone = None,
             email = None
           )
-          Json.toJson(createPredefinedAgentRequest) mustEqual Json.parse(
-            s"""
+          Json.toJson(createPredefinedAgentRequest) mustEqual Json.parse(s"""
                |{
                |"storn": "$storn",
                |"agentName":"$agentName"
@@ -84,8 +95,8 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
 
     "must deserialize from mongo" - {
       "when agent name and storn are given" in {
-        forAll(nonEmptyString, nonEmptyString) {
-          (storn, agentName) => {
+        forAll(nonEmptyString, nonEmptyString) { (storn, agentName) =>
+          {
             val createPredefinedAgentRequest = CreatePredefinedAgentRequest(
               storn = storn,
               agentName = agentName,
@@ -98,8 +109,7 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
               email = Some("testexample@email.com")
             )
             Json
-              .parse(
-                s"""
+              .parse(s"""
                    |{
                    |"storn": "$storn",
                    |"agentName":"$agentName",
@@ -117,7 +127,9 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
                    |}
                    |}
                    |""".stripMargin)
-              .as[CreatePredefinedAgentRequest] mustBe createPredefinedAgentRequest
+              .as[
+                CreatePredefinedAgentRequest
+              ] mustBe createPredefinedAgentRequest
 
           }
         }
@@ -126,8 +138,7 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
     }
     "must fail to deserialize from mongo" - {
       "when agentName is not given" in {
-        val jsonWithMissingAgentName = Json.parse(
-          s"""
+        val jsonWithMissingAgentName = Json.parse(s"""
              |{
              |"storn":"STN001",
              |"agentAddress":{
@@ -145,16 +156,17 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
              |}
              |""".stripMargin)
 
-
-        val result = jsonWithMissingAgentName.validate[CreatePredefinedAgentRequest]
-        result mustEqual JsError(Seq(
-          __ \ "agentName" -> Seq(JsonValidationError("error.path.missing"))
-        ))
+        val result =
+          jsonWithMissingAgentName.validate[CreatePredefinedAgentRequest]
+        result mustEqual JsError(
+          Seq(
+            __ \ "agentName" -> Seq(JsonValidationError("error.path.missing"))
+          )
+        )
 
       }
       "when storn  is not given" in {
-        val jsonWithMissingStorn = Json.parse(
-          s"""
+        val jsonWithMissingStorn = Json.parse(s"""
              |{
              |"agentName": "mark",
              |"agentAddress":{
@@ -172,16 +184,16 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
              |}
              |""".stripMargin)
 
-
         val result = jsonWithMissingStorn.validate[CreatePredefinedAgentRequest]
-        result mustEqual JsError(Seq(
-          __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
-        ))
+        result mustEqual JsError(
+          Seq(
+            __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
+          )
+        )
 
       }
       "when storn and agentName  are not given" in {
-        val jsonWithMissingStornAndAgentName = Json.parse(
-          s"""
+        val jsonWithMissingStornAndAgentName = Json.parse(s"""
              |{
              |"agentAddress":{
              | "address":{
@@ -198,12 +210,14 @@ class CreatePredefinedAgentRequestSpec extends AnyFreeSpec with Matchers with Sc
              |}
              |""".stripMargin)
 
-
-        val result = jsonWithMissingStornAndAgentName.validate[CreatePredefinedAgentRequest]
-        result mustEqual JsError(Seq(
-          __ \ "agentName" -> Seq(JsonValidationError("error.path.missing")),
-          __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
-        ))
+        val result = jsonWithMissingStornAndAgentName
+          .validate[CreatePredefinedAgentRequest]
+        result mustEqual JsError(
+          Seq(
+            __ \ "agentName" -> Seq(JsonValidationError("error.path.missing")),
+            __ \ "storn" -> Seq(JsonValidationError("error.path.missing"))
+          )
+        )
 
       }
     }

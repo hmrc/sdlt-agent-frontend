@@ -16,9 +16,9 @@
 
 package forms.behaviours
 
-import play.api.data.Form
 import forms.FormSpec
 import models._
+import play.api.data.Form
 
 trait FormBehaviours extends FormSpec {
 
@@ -60,7 +60,10 @@ trait FormBehaviours extends FormSpec {
     }
   }
 
-  def formWithConditionallyMandatoryField(booleanField: String, field: String) = {
+  def formWithConditionallyMandatoryField(
+      booleanField: String,
+      field: String
+  ) = {
     s"bind when $booleanField is false and $field is omitted" in {
       val data = validData + (booleanField -> "false") - field
       val boundForm = form.bind(data)

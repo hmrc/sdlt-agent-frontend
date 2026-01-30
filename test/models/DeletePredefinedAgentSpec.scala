@@ -20,7 +20,8 @@ import models.requests.DeletePredefinedAgentRequest
 import models.responses.DeletePredefinedAgentResponse
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.JsSuccess
+import play.api.libs.json.Json
 
 class DeletePredefinedAgentSpec extends AnyWordSpec with Matchers {
 
@@ -40,7 +41,7 @@ class DeletePredefinedAgentSpec extends AnyWordSpec with Matchers {
 
     "deserialize from JSON correctly" in {
       val json = Json.obj(
-        "storn"                -> "STN001",
+        "storn" -> "STN001",
         "agentReferenceNumber" -> "ARN001"
       )
 

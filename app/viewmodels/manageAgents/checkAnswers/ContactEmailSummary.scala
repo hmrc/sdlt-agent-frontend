@@ -16,17 +16,20 @@
 
 package viewmodels.manageAgents.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.CheckMode
+import models.UserAnswers
 import pages.manageAgents.AgentContactDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
 
 object ContactEmailSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
     val maybeEmail: Option[String] =
       answers.get(AgentContactDetailsPage).flatMap(_.email)
 
@@ -42,14 +45,16 @@ object ContactEmailSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AgentContactDetailsController
+              .onPageLoad(CheckMode)
+              .url
           )
-            .withVisuallyHiddenText(messages(s"manageAgents.contactEmail.change.hidden"))
+            .withVisuallyHiddenText(
+              messages(s"manageAgents.contactEmail.change.hidden")
+            )
             .withAttribute("id" -> "change-agent-contact-details")
         )
       )
     )
   }
 }
-
-

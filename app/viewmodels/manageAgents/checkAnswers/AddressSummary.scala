@@ -16,26 +16,29 @@
 
 package viewmodels.manageAgents.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.CheckMode
+import models.UserAnswers
 import pages.manageAgents.AgentAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
 
 object AddressSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentAddressPage).map { answer =>
 
       val postcode = answer.address.postcode.toSeq
 
-        val formattedLines = (answer.address.lines ++ postcode)
-          .filter(_.nonEmpty)
-          .map(HtmlFormat.escape)
-          .mkString("<br>")
+      val formattedLines = (answer.address.lines ++ postcode)
+        .filter(_.nonEmpty)
+        .map(HtmlFormat.escape)
+        .mkString("<br>")
 
       SummaryListRowViewModel(
         key = "manageAgents.address.checkYourAnswersLabel",
@@ -43,9 +46,13 @@ object AddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AddressLookupController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AddressLookupController
+              .onPageLoad(CheckMode)
+              .url
           )
-            .withVisuallyHiddenText(messages("manageAgents.address.change.hidden"))
+            .withVisuallyHiddenText(
+              messages("manageAgents.address.change.hidden")
+            )
             .withAttribute("id" -> "change-agent-address")
         )
       )

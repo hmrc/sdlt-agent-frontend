@@ -24,31 +24,46 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.AgentNamePage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.I18nSupport
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import scala.concurrent.Future
 
-class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport {
-  val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
+class ConfirmAgentContactDetailsControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with I18nSupport {
+  val application = applicationBuilder(userAnswers =
+    Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)
+  ).build()
 
-  def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
+  def noOnwardRoute =
+    Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
 
-  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/agent-contact-details")
+  def yesOnwardRoute = Call(
+    "GET",
+    "/stamp-duty-land-tax-agent/agent-details/agent-contact-details"
+  )
 
   val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = messagesApi.preferred(FakeRequest())
 
-  lazy val confirmAgentContactDetailsRoute = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
+  lazy val confirmAgentContactDetailsRoute =
+    controllers.manageAgents.routes.ConfirmAgentContactDetailsController
+      .onPageLoad()
+      .url
 
   private val agentName = "null"
   val formProvider = new ConfirmAgentContactDetailsFormProvider()
-  private val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)(messages)
+  private val form: Form[ConfirmAgentContactDetails] =
+    formProvider(agentName)(messages)
 
   "ConfirmAgentContactDetailsController" - {
 
@@ -59,16 +74,21 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConfirmAgentContactDetailsView]
+        val view =
+          application.injector.instanceOf[ConfirmAgentContactDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, agentName)(request, messages).toString
+        contentAsString(result) mustEqual view(form, agentName)(
+          request,
+          messages
+        ).toString
       }
     }
 
-    "must redirect to the Journey Recovery page for a GET when agent details are not found" in  {
+    "must redirect to the Journey Recovery page for a GET when agent details are not found" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, confirmAgentContactDetailsRoute)
@@ -76,7 +96,11 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.JourneyRecoveryController
+          .onPageLoad()
+          .url
       }
     }
 
@@ -84,12 +108,16 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       val mockSessionRepo = mock[SessionRepository]
       when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)
+      )
         .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
         .build()
 
       val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+        .withFormUrlEncodedBody(
+          ("value", ConfirmAgentContactDetails.values.head.toString)
+        )
 
       val result = route(application, request).value
 
@@ -102,12 +130,16 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       val mockSessionRepo = mock[SessionRepository]
       when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+      val application = applicationBuilder(userAnswers =
+        Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)
+      )
         .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
         .build()
 
       val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+        .withFormUrlEncodedBody(
+          ("value", ConfirmAgentContactDetails.values.last.toString)
+        )
 
       val result = route(application, request).value
 
@@ -115,8 +147,6 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       redirectLocation(result).value mustEqual noOnwardRoute.url
 
     }
-
-
 
   }
 

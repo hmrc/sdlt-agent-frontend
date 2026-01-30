@@ -16,39 +16,49 @@
 
 package controllers.manageAgents
 
-import controllers.actions.*
+import controllers.actions._
 import forms.manageAgents.AgentContactDetailsFormProvider
 import models.Mode
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.AgentCheckYourAnswersPage
+import pages.manageAgents.AgentContactDetailsPage
+import pages.manageAgents.AgentNamePage
+import play.api.i18n.I18nSupport
 import play.api.i18n.Lang.logger
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.AgentContactDetailsView
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class AgentContactDetailsController @Inject()(
-                                               override val messagesApi: MessagesApi,
-                                               sessionRepository: SessionRepository,
-                                               navigator: Navigator,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               requireData: DataRequiredAction,
-                                               formProvider: AgentContactDetailsFormProvider,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               view: AgentContactDetailsView
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class AgentContactDetailsController @Inject() (
+    override val messagesApi: MessagesApi,
+    sessionRepository: SessionRepository,
+    navigator: Navigator,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    formProvider: AgentContactDetailsFormProvider,
+    val controllerComponents: MessagesControllerComponents,
+    view: AgentContactDetailsView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-
-  private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =
+  private def getAgentName(implicit
+      request: DataRequest[AnyContent]
+  ): Either[Result, String] =
     request.userAnswers.get(AgentNamePage) match {
       case Some(name) => Right(name)
       case None =>
@@ -57,36 +67,44 @@ class AgentContactDetailsController @Inject()(
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }
-  
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
 
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
       getAgentName match {
         case Left(redirect) => redirect
         case Right(agentName) =>
           val form = formProvider(agentName)
-          val preparedForm = request.userAnswers.get(AgentContactDetailsPage)
+          val preparedForm = request.userAnswers
+            .get(AgentContactDetailsPage)
             .fold(form)(form.fill)
           Ok(view(preparedForm, mode, agentName))
       }
-  }
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       getAgentName match {
         case Left(redirect) => Future.successful(redirect)
         case Right(agentName) =>
           val form = formProvider(agentName)
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, mode, agentName))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentContactDetailsPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers))
-          )
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, mode, agentName))
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(
+                    request.userAnswers.set(AgentContactDetailsPage, value)
+                  )
+                  _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator
+                    .nextPage(AgentCheckYourAnswersPage, mode, updatedAnswers)
+                )
+            )
       }
-  }
+    }
 }

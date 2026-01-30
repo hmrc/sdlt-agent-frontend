@@ -39,9 +39,19 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentContactDetails.title")
-      displaysCorrectHeading(doc, "manageAgents.agentContactDetails.heading", Seq(testAgentName))
+      displaysCorrectHeading(
+        doc,
+        "manageAgents.agentContactDetails.heading",
+        Seq(testAgentName)
+      )
       displaysCorrectCaption(doc, "manageAgents.caption")
-      displaysCorrectLabels(doc, Seq("manageAgents.agentContactDetails.label1", "manageAgents.agentContactDetails.label2"))
+      displaysCorrectLabels(
+        doc,
+        Seq(
+          "manageAgents.agentContactDetails.label1",
+          "manageAgents.agentContactDetails.label2"
+        )
+      )
       hasCorrectNumOfItems(doc, "input", 2)
       displaysCorrectHint(doc, "manageAgents.agentContactDetails.hint")
       hasSubmitButton(doc, "site.continue")
@@ -50,12 +60,30 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
 
     "must display error messages when form has errors" in new Setup {
       val errorForm: Form[?] = form
-        .withError("phone", "manageAgents.agentContactDetails.error.phoneLength")
-        .withError("phone", "manageAgents.agentContactDetails.error.phoneInvalid")
-        .withError("phone", "manageAgents.agentContactDetails.error.phoneInvalidFormat")
-        .withError("email", "manageAgents.agentContactDetails.error.emailLength")
-        .withError("email", "manageAgents.agentContactDetails.error.emailInvalid")
-        .withError("email", "manageAgents.agentContactDetails.error.emailInvalidFormat")
+        .withError(
+          "phone",
+          "manageAgents.agentContactDetails.error.phoneLength"
+        )
+        .withError(
+          "phone",
+          "manageAgents.agentContactDetails.error.phoneInvalid"
+        )
+        .withError(
+          "phone",
+          "manageAgents.agentContactDetails.error.phoneInvalidFormat"
+        )
+        .withError(
+          "email",
+          "manageAgents.agentContactDetails.error.emailLength"
+        )
+        .withError(
+          "email",
+          "manageAgents.agentContactDetails.error.emailInvalid"
+        )
+        .withError(
+          "email",
+          "manageAgents.agentContactDetails.error.emailInvalidFormat"
+        )
 
       val html: Html = view(errorForm, NormalMode, testAgentName)
       val doc: Document = Jsoup.parse(html.toString())
@@ -75,13 +103,16 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
   }
 
   trait Setup {
-    val app: Application              = applicationBuilder().build()
-    val formProvider                  = new AgentContactDetailsFormProvider()
-    val form: Form[?]                 = formProvider("agent name")
-    implicit val request: Request[?]  = FakeRequest()
-    implicit val messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: AgentContactDetailsView = app.injector.instanceOf[AgentContactDetailsView]
-    val testAgentName                 = "Haborview Estates"
+    val app: Application = applicationBuilder().build()
+    val formProvider = new AgentContactDetailsFormProvider()
+    val form: Form[?] = formProvider("agent name")
+    implicit val request: Request[?] = FakeRequest()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: AgentContactDetailsView =
+      app.injector.instanceOf[AgentContactDetailsView]
+    val testAgentName = "Haborview Estates"
   }
 }
-

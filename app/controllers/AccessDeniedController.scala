@@ -16,18 +16,22 @@
 
 package controllers
 import config.FrontendAppConfig
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.AccessDeniedView
 
+import javax.inject.Inject
+
 class AccessDeniedController @Inject() (
-                                         override val messagesApi: MessagesApi,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: AccessDeniedView
-                                       )(implicit appConfig: FrontendAppConfig)
-  extends FrontendBaseController
+    override val messagesApi: MessagesApi,
+    val controllerComponents: MessagesControllerComponents,
+    view: AccessDeniedView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>

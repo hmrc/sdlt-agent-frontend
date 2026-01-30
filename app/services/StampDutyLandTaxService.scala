@@ -17,52 +17,66 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import models.requests.CreatePredefinedAgentRequest
 import models.requests.DeletePredefinedAgentRequest
+import models.requests.UpdatePredefinedAgent
+import models.responses.CreatePredefinedAgentResponse
+import models.responses.DeletePredefinedAgentResponse
+import models.responses.UpdatePredefinedAgentResponse
 import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class StampDutyLandTaxService @Inject() (
-  stampDutyLandTaxConnector: StampDutyLandTaxConnector
+    stampDutyLandTaxConnector: StampDutyLandTaxConnector
 )(implicit ec: ExecutionContext) {
-  
-  def getAgentDetails(storn: String, agentReferenceNumber: String)
-                     (implicit headerCarrier: HeaderCarrier): Future[Option[CreatedAgent]] =
+
+  def getAgentDetails(storn: String, agentReferenceNumber: String)(implicit
+      headerCarrier: HeaderCarrier
+  ): Future[Option[CreatedAgent]] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
-      .map(_.agents.find(_.agentResourceReference.contains(agentReferenceNumber)))
+      .map(
+        _.agents.find(_.agentResourceReference.contains(agentReferenceNumber))
+      )
 
-  def getAllAgentDetails(storn: String)
-                        (implicit headerCarrier: HeaderCarrier): Future[Seq[CreatedAgent]] =
+  def getAllAgentDetails(
+      storn: String
+  )(implicit headerCarrier: HeaderCarrier): Future[Seq[CreatedAgent]] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents)
-    
-  def submitAgentDetails(agentDetails: CreatePredefinedAgentRequest)
-                        (implicit headerCarrier: HeaderCarrier): Future[CreatePredefinedAgentResponse] =
+
+  def submitAgentDetails(agentDetails: CreatePredefinedAgentRequest)(implicit
+      headerCarrier: HeaderCarrier
+  ): Future[CreatePredefinedAgentResponse] =
     stampDutyLandTaxConnector
       .submitAgentDetails(agentDetails)
 
-  def updateAgentDetails(agentDetails: UpdatePredefinedAgent)
-                        (implicit headerCarrier: HeaderCarrier): Future[UpdatePredefinedAgentResponse] =
+  def updateAgentDetails(agentDetails: UpdatePredefinedAgent)(implicit
+      headerCarrier: HeaderCarrier
+  ): Future[UpdatePredefinedAgentResponse] =
     stampDutyLandTaxConnector
       .updateAgentDetails(agentDetails)
 
-  def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
-                           (implicit headerCarrier: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
+  def deletePredefinedAgent(
+      deletePredefinedAgentRequest: DeletePredefinedAgentRequest
+  )(implicit
+      headerCarrier: HeaderCarrier
+  ): Future[DeletePredefinedAgentResponse] =
     stampDutyLandTaxConnector
       .deletePredefinedAgent(deletePredefinedAgentRequest)
 
-  def isDuplicate(storn: String, name: String)
-                 (implicit headerCarrier: HeaderCarrier): Future[Boolean] =
+  def isDuplicate(storn: String, name: String)(implicit
+      headerCarrier: HeaderCarrier
+  ): Future[Boolean] =
     stampDutyLandTaxConnector
       .getSdltOrganisation(storn)
       .map(_.agents.exists(_.name.trim.equalsIgnoreCase(name.trim)))
-  
-  
+
 }

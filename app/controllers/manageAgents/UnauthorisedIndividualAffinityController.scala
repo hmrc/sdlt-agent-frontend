@@ -17,22 +17,26 @@
 package controllers.manageAgents
 
 import config.FrontendAppConfig
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.UnauthorisedIndividualView
 
 import javax.inject.Inject
 
-class UnauthorisedIndividualAffinityController @Inject()(
-                                                          override val messagesApi: MessagesApi,
-                                                          val controllerComponents: MessagesControllerComponents,
-                                                          view: UnauthorisedIndividualView
-                                                        )(implicit config: FrontendAppConfig) extends FrontendBaseController
-  with I18nSupport {
+class UnauthorisedIndividualAffinityController @Inject() (
+    override val messagesApi: MessagesApi,
+    val controllerComponents: MessagesControllerComponents,
+    view: UnauthorisedIndividualView
+)(implicit config: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = Action {
-    implicit request => {
+  def onPageLoad(): Action[AnyContent] = Action { implicit request =>
+    {
       Ok(view())
     }
   }

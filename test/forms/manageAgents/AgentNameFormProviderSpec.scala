@@ -21,12 +21,16 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
 
-class AgentNameFormProviderSpec extends StringFieldBehaviours with GuiceOneServerPerSuite {
+class AgentNameFormProviderSpec
+    extends StringFieldBehaviours
+    with GuiceOneServerPerSuite {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   val form: Form[String] = new AgentNameFormProvider()()
-
 
   "AgentNameFormProvider" - {
 
@@ -45,19 +49,25 @@ class AgentNameFormProviderSpec extends StringFieldBehaviours with GuiceOneServe
 
     "must reject invalid characters" in {
       val result = form.bind(Map("value" -> "Agent#"))
-      result.errors.map(_.message) must contain ("manageAgents.agentName.error.invalid")
+      result.errors.map(_.message) must contain(
+        "manageAgents.agentName.error.invalid"
+      )
     }
 
     "must reject empty value " in {
       val result = form.bind(Map("value" -> ""))
-      result.errors.map(_.message) must contain("manageAgents.agentName.error.required")
+      result.errors.map(_.message) must contain(
+        "manageAgents.agentName.error.required"
+      )
     }
 
     "must reject name longer than 28 characters" in {
-      val result = form.bind(Map("value" -> "International Agency Services Ltd 123456"))
-      result.errors.map(_.message) must contain("manageAgents.agentName.error.length")
+      val result =
+        form.bind(Map("value" -> "International Agency Services Ltd 123456"))
+      result.errors.map(_.message) must contain(
+        "manageAgents.agentName.error.length"
+      )
     }
   }
-
 
 }

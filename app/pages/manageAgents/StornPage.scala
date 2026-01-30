@@ -17,7 +17,7 @@
 package pages.manageAgents
 
 import pages.QuestionPage
-import play.api.libs.json.*
+import play.api.libs.json._
 
 object StornPage extends QuestionPage[String] {
   override def path: JsPath = JsPath \ "storn"

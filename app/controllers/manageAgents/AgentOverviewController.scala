@@ -16,61 +16,85 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import services.StampDutyLandTaxService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.PaginationHelper
-import views.html.manageAgents.AgentOverviewView
-import play.api.Logging
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
-import controllers.manageAgents.routes.*
-import javax.inject.{Inject, Singleton}
+import controllers.actions.DataRequiredAction
+import controllers.actions.DataRetrievalAction
+import controllers.actions.IdentifierAction
+import controllers.actions.StornRequiredAction
+import controllers.manageAgents.routes._
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
+import play.api.Logging
+import play.api.i18n.I18nSupport
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.Call
+import play.api.mvc.MessagesControllerComponents
+import services.StampDutyLandTaxService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.PaginationHelper
+import views.html.manageAgents.AgentOverviewView
 
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AgentOverviewController @Inject()(
-                                        val controllerComponents: MessagesControllerComponents,
-                                        stampDutyLandTaxService: StampDutyLandTaxService,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        stornRequiredAction: StornRequiredAction,
-                                        navigator: Navigator,
-                                        view: AgentOverviewView
-                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
+class AgentOverviewController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    stampDutyLandTaxService: StampDutyLandTaxService,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    navigator: Navigator,
+    view: AgentOverviewView
+)(implicit executionContext: ExecutionContext)
+    extends FrontendBaseController
+    with PaginationHelper
+    with I18nSupport
+    with Logging {
 
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
 
-    val postAction: Call = StartAddAgentController.onPageLoad()
+        val postAction: Call = StartAddAgentController.onPageLoad()
 
-    stampDutyLandTaxService
-      .getAllAgentDetails(request.storn).map {
-        case Nil              => Ok(view(None, None, None, postAction))
-        case agentDetailsList =>
+        stampDutyLandTaxService
+          .getAllAgentDetails(request.storn)
+          .map {
+            case Nil => Ok(view(None, None, None, postAction))
+            case agentDetailsList =>
 
-          generateAgentSummary(paginationIndex, agentDetailsList)
-            .fold(
-              Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-            ) { summary =>
+              generateAgentSummary(paginationIndex, agentDetailsList)
+                .fold(
+                  Redirect(
+                    navigator.nextPage(
+                      AgentOverviewPage,
+                      NormalMode,
+                      request.userAnswers
+                    )
+                  )
+                ) { summary =>
 
-              val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
-              val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
-              val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
+                  val numberOfPages: Int = getNumberOfPages(agentDetailsList)
+                  val pagination: Option[Pagination] =
+                    generatePagination(paginationIndex, numberOfPages)
+                  val paginationText: Option[String] =
+                    getPaginationInfoText(paginationIndex, agentDetailsList)
 
-              Ok(view(Some(summary), pagination, paginationText, postAction))
-            }
-      } recover {
-        case ex =>
-          logger.error("[AgentOverviewController][onPageLoad] Unexpected failure", ex)
+                  Ok(
+                    view(Some(summary), pagination, paginationText, postAction)
+                  )
+                }
+          } recover { case ex =>
+          logger.error(
+            "[AgentOverviewController][onPageLoad] Unexpected failure",
+            ex
+          )
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
-    }
-  }
+        }
+      }
 }

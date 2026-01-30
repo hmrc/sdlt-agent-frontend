@@ -17,25 +17,31 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
+import models.UserAnswers
 import navigation.Navigator
-import pages.manageAgents.{AgentOverviewPage, StornPage}
+import pages.manageAgents.AgentOverviewPage
+import pages.manageAgents.StornPage
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 identify: IdentifierAction,
-                                 sessionRepository: SessionRepository,
-                                 navigator: Navigator
-                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class IndexController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    identify: IdentifierAction,
+    sessionRepository: SessionRepository,
+    navigator: Navigator
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
@@ -43,8 +49,12 @@ class IndexController @Inject()(
     val userAnswers = UserAnswers(id = request.userId)
 
     for {
-      updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-      _              <- sessionRepository.set(updatedAnswers)
-    } yield Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers))
+      updatedAnswers <- Future.fromTry(
+        userAnswers.set(StornPage, request.storn)
+      )
+      _ <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers)
+    )
   }
 }

@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 
 class PageNotFoundControllerSpec extends SpecBase {
 
@@ -31,11 +31,17 @@ class PageNotFoundControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-      when(mockAppConfig.hmrcOnlineServiceDeskUrl).thenReturn("https://www.gov.uk")
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      when(mockAppConfig.hmrcOnlineServiceDeskUrl).thenReturn(
+        "https://www.gov.uk"
+      )
 
       running(application) {
-        val request = FakeRequest(GET, controllers.routes.PageNotFoundController.onPageLoad().url)
+        val request = FakeRequest(
+          GET,
+          controllers.routes.PageNotFoundController.onPageLoad().url
+        )
 
         val result = route(application, request).value
 

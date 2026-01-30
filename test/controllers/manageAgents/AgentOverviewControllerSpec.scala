@@ -18,18 +18,21 @@ package controllers.manageAgents
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
+import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 import views.html.manageAgents.AgentOverviewView
 
 import scala.concurrent.Future
 
-class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
+class AgentOverviewControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with AgentDetailsTestUtil {
 
   private val service = mock[StampDutyLandTaxService]
 
@@ -54,17 +57,18 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         val view = application.injector.instanceOf[AgentOverviewView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
           view(
-            maybeSummaryList   = None,
-            pagination         = None,
+            maybeSummaryList = None,
+            pagination = None,
             paginationInfoText = None,
-            redirect           = controllers.manageAgents.routes.StartAddAgentController.onPageLoad()
+            redirect = controllers.manageAgents.routes.StartAddAgentController
+              .onPageLoad()
           )(request, messages(application)).toString
       }
     }
@@ -80,7 +84,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual OK
         val body = contentAsString(result)
@@ -108,7 +112,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 0))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual agentOverviewUrl(page = 1)
@@ -126,7 +130,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 99))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual agentOverviewUrl(page = 1)
@@ -147,9 +151,12 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
   }
 }
-
