@@ -30,20 +30,14 @@ class SuccessNotificationBannerSpec extends SpecBase with Matchers {
   "SuccessNotificationBanner" - {
 
     "must render the correct title" in new Setup {
-      val html: Html = successNotificationBanner(
-        bannerText,
-        agentName
-      )
+      val html: Html = successNotificationBanner(bannerText, agentName)
       val title: Element = getNotificationBanner(html).selectFirst(".govuk-notification-banner__title")
 
       title.text mustBe "Success"
     }
 
     "must render the correct heading" in new Setup {
-      val html: Html = successNotificationBanner(
-        bannerText,
-        agentName
-      )
+      val html: Html = successNotificationBanner(bannerText, agentName)
       val heading: Element = getNotificationBanner(html).selectFirst(".govuk-notification-banner__heading")
 
       heading.text mustBe messages("manageAgents.agentDetails.submitAgent.notification", agentName)

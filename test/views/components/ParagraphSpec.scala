@@ -29,26 +29,19 @@ class ParagraphSpec extends SpecBase with Matchers {
   "Paragraph" - {
 
     "must render the given text" in new Setup {
-      val html: Html = paragraph(
-        paragraphText
-      )
+      val html: Html = paragraph(paragraphText)
 
       getParagraph(html).text mustBe paragraphText
     }
 
     "must render only the default body class when no extra classes are supplied" in new Setup {
-      val html: Html = paragraph(
-        paragraphText
-      )
+      val html: Html = paragraph(paragraphText)
 
       getParagraph(html).className mustBe "govuk-body"
     }
 
     "must render default and extraClasses when supplied" in new Setup {
-      val html: Html = paragraph(
-        paragraphText,
-        extraClasses = extraClasses
-      )
+      val html: Html = paragraph(paragraphText, extraClasses = extraClasses)
 
       val classes: String = getParagraph(html).attr("class")
       classes must include("govuk-body")
@@ -57,10 +50,7 @@ class ParagraphSpec extends SpecBase with Matchers {
     }
 
     "must render default and bold class when isBold is true" in new Setup {
-      val html: Html = paragraph(
-        paragraphText,
-        isBold = true
-      )
+      val html: Html = paragraph(paragraphText, isBold = true)
 
       val classes: String = getParagraph(html).attr("class")
       classes must include("govuk-body")
