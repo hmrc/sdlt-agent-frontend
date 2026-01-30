@@ -18,32 +18,53 @@ package views.components
 
 import base.SpecBase
 import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import utils.EmptyString.emptyString
 import views.html.components.Paragraph
 
 class ParagraphSpec extends SpecBase with Matchers {
 
   "Paragraph" - {
 
-    "must render the correct text in the output HTML" in new Setup {
-      displaysCorrectParagraphText(paragraph, paragraphText)
+    "must render the given text" in new Setup {
+      val html: Html = paragraph(
+        paragraphText
+      )
+
+      getParagraph(html).text mustBe paragraphText
     }
 
-    "must render with default class when extraClasses are empty" in new Setup {
-      rendersClassesCorrectly(paragraph, paragraphText, extraClasses = emptyString)
+    "must render only the default body class when no extra classes are supplied" in new Setup {
+      val html: Html = paragraph(
+        paragraphText
+      )
+
+      getParagraph(html).className mustBe "govuk-body"
     }
 
-    "must render with default and extra classes when extraClasses are non-empty" in new Setup {
-      rendersClassesCorrectly(paragraph, paragraphText, extraClasses = extraClasses)
+    "must render default and extraClasses when supplied" in new Setup {
+      val html: Html = paragraph(
+        paragraphText,
+        extraClasses = extraClasses
+      )
+
+      val classes: String = getParagraph(html).attr("class")
+      classes must include("govuk-body")
+      classes must include("govuk-link--inverse")
+      classes must include("govuk-link--no-underline")
     }
 
-    "must render with default and bold class when isBold is true" in new Setup {
-      rendersClassesCorrectly(paragraph, paragraphText, boldClass)
+    "must render default and bold class when isBold is true" in new Setup {
+      val html: Html = paragraph(
+        paragraphText,
+        isBold = true
+      )
+
+      val classes: String = getParagraph(html).attr("class")
+      classes must include("govuk-body")
+      classes must include("govuk-!-font-weight-bold")
     }
   }
 
@@ -56,37 +77,7 @@ class ParagraphSpec extends SpecBase with Matchers {
     val boldClass = "govuk-!-font-weight-bold"
   }
 
-  private def getParagraphElement(html: Html): Elements = {
-    val doc = Jsoup.parse(html.toString())
-    doc.select("p")
-  }
-
-  private def displaysCorrectParagraphText(paragraph: Paragraph, paragraphText: String)(implicit messages: Messages) = {
-    val html: Html = paragraph(paragraphText)
-    val paragraphElement: Elements = getParagraphElement(html)
-
-    paragraphElement.size mustBe 1
-    paragraphElement.text mustBe paragraphText
-  }
-
-  private def rendersClassesCorrectly(
-                                       paragraph: Paragraph,
-                                       paragraphText: String,
-                                       extraClasses: String = emptyString,
-                                       boldClass: String = emptyString,
-                                     )(implicit messages: Messages) = {
-    val isBold = if(boldClass.isEmpty) false else true
-
-    val html: Html = paragraph(paragraphText, isBold, extraClasses = extraClasses)
-    val paragraphElement: Elements = getParagraphElement(html)
-    val classes: String = paragraphElement.attr("class")
-
-    classes.trim mustBe joinExpectedElements("govuk-body", boldClass, extraClasses)
-  }
-
-  private def joinExpectedElements(parts: String*): String = {
-    println(parts)
-    parts.filter(_.nonEmpty).mkString(" ")
-  }
+  private def getParagraph(html: Html) =
+    Jsoup.parse(html.toString()).selectFirst("p")
 
 }

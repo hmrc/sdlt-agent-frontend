@@ -18,7 +18,7 @@ package views.components
 
 import base.SpecBase
 import org.jsoup.Jsoup
-import org.jsoup.select.Elements
+import org.jsoup.nodes.Element
 import org.scalatest.matchers.must.Matchers
 import play.api.Application
 import play.api.i18n.Messages
@@ -29,49 +29,102 @@ import views.html.components.Link
 class LinkSpec extends SpecBase with Matchers {
 
   "Link" - {
-
-    "must render the correct link text in the output HTML with empty prefix/suffix" in new Setup {
-      displaysLinkTextCorrectly(link, linkText, linkUrl)
-    }
-
-    "must render the correct link text in the output HTML with prefix" in new Setup {
-      displaysLinkTextCorrectly(link, linkText, linkUrl, prefixText = prefixText)
-    }
-
-    "must render the correct link text in the output HTML with suffix" in new Setup {
-      displaysLinkTextCorrectly(link, linkText, linkUrl, suffixText = suffixText)
-    }
-
-    "must render the correct link text in the output HTML with prefix/suffix" in new Setup {
-      displaysLinkTextCorrectly(link, linkText, linkUrl, prefixText = prefixText, suffixText = suffixText)
-    }
-
-    "must render with default class when extraClasses are empty" in new Setup {
-      rendersClassesCorrectly(link, linkText, linkUrl, extraClasses = emptyString)
-    }
-
-    "must render with default and extra classes when extraClasses are non-empty" in new Setup {
-      rendersClassesCorrectly(link, linkText, linkUrl, extraClasses = extraClasses)
-    }
-
-    "must add target and rel when isNewTab is true" in new Setup {
-      val html: Html = link(linkText, linkUrl, isNewTab = true)
-      val linkElement: Elements = getLinkElement(html)
-
-      linkElement.select("a.govuk-link").attr("target") mustBe "_blank"
-      linkElement.select("a.govuk-link").attr("rel") mustBe "noreferrer noopener"
-    }
-
-    "must not add target and rel when isNewTab is false" in new Setup {
+    
+    "must render the link text inside an anchor" in new Setup {
       val html: Html = link(linkText, linkUrl)
-      val linkElement: Elements = getLinkElement(html)
 
-      linkElement.select("a.govuk-link").hasAttr("target") mustBe false
-      linkElement.select("a.govuk-link").hasAttr("rel") mustBe false
+      val a: Element = getParagraph(html).selectFirst("a.govuk-link")
+      a.text mustBe linkText
     }
 
-    "must render full stop when linkFullStop is true" in new Setup {
-      displaysLinkTextCorrectly(link, linkText, linkUrl, linkFullStop = true)
+    "must render the correct href attribute" in new Setup {
+      val html: Html = link(linkText, linkUrl)
+
+      val a: Element = getParagraph(html).selectFirst("a.govuk-link")
+      a.attr("href") mustBe linkUrl
+    }
+
+    "must render prefix text before the link when provided" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        prefixTextKey = prefixText
+      )
+
+      getParagraph(html).text must startWith(prefixText)
+    }
+
+    "must render suffix text after the link when provided" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        suffixTextKey = suffixText
+      )
+
+      getParagraph(html).text must endWith(suffixText)
+    }
+
+    "must not render prefix or suffix when they are empty" in new Setup {
+      val html: Html = link(linkText, linkUrl)
+
+      getParagraph(html).text mustBe linkText
+    }
+
+    "must append a full stop outside the link when enabled" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        linkFullStop = true
+      )
+
+      val p: Element = getParagraph(html)
+      val a: Element = p.selectFirst("a")
+
+      a.text mustBe linkText
+      p.text mustBe s"$linkText."
+    }
+
+    "must render only the default body class when no extra classes are supplied" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        extraClasses = emptyString
+      )
+
+      getParagraph(html).className mustBe "govuk-body"
+    }
+
+    "must render default and extra classes when supplied" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        extraClasses = extraClasses
+      )
+
+      val classes: String = getParagraph(html).attr("class")
+      classes must include("govuk-body")
+      classes must include("govuk-link--inverse")
+      classes must include("govuk-link--no-underline")
+    }
+
+    "must add target and rel attributes when isNewTab is true" in new Setup {
+      val html: Html = link(
+        linkText,
+        linkUrl,
+        isNewTab = true
+      )
+
+      val a: Element = getParagraph(html).selectFirst("a")
+      a.attr("target") mustBe "_blank"
+      a.attr("rel") mustBe "noreferrer noopener"
+    }
+
+    "must not add target or rel attributes when isNewTab is false" in new Setup {
+      val html: Html = link(linkText, linkUrl)
+
+      val a: Element = getParagraph(html).selectFirst("a")
+      a.hasAttr("target") mustBe false
+      a.hasAttr("rel") mustBe false
     }
   }
 
@@ -86,38 +139,6 @@ class LinkSpec extends SpecBase with Matchers {
     val extraClasses = "govuk-link--inverse govuk-link--no-underline"
   }
 
-  private def getLinkElement(html: Html): Elements = {
-    val doc = Jsoup.parse(html.toString())
-    doc.select("p")
-  }
-
-  private def displaysLinkTextCorrectly(
-                                     link: Link,
-                                     linkText: String,
-                                     linkUrl: String,
-                                     prefixText: String = emptyString,
-                                     suffixText: String = emptyString,
-                                     linkFullStop: Boolean = false
-                                   )(implicit messages: Messages) = {
-    val fullStop = if(linkFullStop) "." else emptyString
-
-    val html: Html = link(linkText, linkUrl, false, prefixText, suffixText, emptyString, linkFullStop)
-    val linkElement: Elements = getLinkElement(html)
-
-    linkElement.size mustBe 1
-    linkElement.text mustBe joinExpectedElements(prefixText, linkText, suffixText) + fullStop
-    linkElement.select("a.govuk-link").attr("href") mustBe linkUrl
-  }
-
-  private def rendersClassesCorrectly(link: Link, linkText: String, linkUrl: String, extraClasses: String)(implicit messages: Messages) = {
-    val html: Html = link(linkText, linkUrl, extraClasses = extraClasses)
-    val linkElement: Elements = getLinkElement(html)
-    val classes: String = linkElement.attr("class")
-
-    classes.trim mustBe joinExpectedElements("govuk-body", extraClasses)
-  }
-
-  private def joinExpectedElements(parts: String*): String =
-    parts.filter(_.nonEmpty).mkString(" ")
-
+  private def getParagraph(html: Html) =
+    Jsoup.parse(html.toString()).selectFirst("p")
 }
