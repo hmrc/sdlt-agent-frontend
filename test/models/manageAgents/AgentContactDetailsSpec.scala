@@ -45,7 +45,6 @@ class AgentContactDetailsSpec extends AnyWordSpec with Matchers {
           |}
           |""".stripMargin
 
-
       val json = Json.parse(jsonString)
       val contactDetails = json.as[AgentContactDetails]
 

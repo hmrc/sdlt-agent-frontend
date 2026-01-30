@@ -20,18 +20,18 @@ import base.SpecBase
 import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
-import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import models.responses.addresslookup.Address
+import models.responses.addresslookup.JourneyResultAddressModel
 import models.responses.organisation.CreatedAgent
-import org.mockito.Mockito.*
+import org.mockito.Mockito._
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.AgentAddressPage
+import pages.manageAgents.AgentContactDetailsPage
+import pages.manageAgents.AgentNamePage
 import utils.manageAgents.UserAnswersHelper
 
-class UserAnswersHelperSpec
-  extends SpecBase
-    with MockitoSugar
-    with TryValues {
+class UserAnswersHelperSpec extends SpecBase with MockitoSugar with TryValues {
 
   object Helper extends UserAnswersHelper
 
@@ -63,7 +63,6 @@ class UserAnswersHelperSpec
           agentResourceReference = testArn
         )
 
-
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
 
       val updated = Helper.updateUserAnswers(be).success.value
@@ -73,12 +72,15 @@ class UserAnswersHelperSpec
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.auditRef mustBe "" // helper hardcodes empty auditRef
       addr.address mustBe Address(
-        lines    = Seq("42 Queensway", "", "Birmingham", ""),
+        lines = Seq("42 Queensway", "", "Birmingham", ""),
         postcode = Some("B2 4ND")
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
+        AgentContactDetails(
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk")
+        )
     }
 
     "should populate Address when all address lines are present" in {
@@ -109,12 +111,16 @@ class UserAnswersHelperSpec
 
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.address mustBe Address(
-        lines    = Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
+        lines =
+          Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
         postcode = Some("NW1 6XE")
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
+        AgentContactDetails(
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk")
+        )
     }
   }
 }

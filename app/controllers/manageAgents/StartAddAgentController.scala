@@ -18,30 +18,37 @@ package controllers.manageAgents
 
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
+import models.UserAnswers
 import navigation.Navigator
+import pages.manageAgents.AgentNamePage
+import pages.manageAgents.AgentOverviewPage
+import pages.manageAgents.StornPage
 import play.api.Logging
-
-import pages.manageAgents.{AgentNamePage, AgentOverviewPage, StornPage}
-
-import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class StartAddAgentController @Inject()(
-                                     val controllerComponents: MessagesControllerComponents,
-                                     identify: IdentifierAction,
-                                     stampDutyLandTaxService: StampDutyLandTaxService,
-                                     sessionRepository: SessionRepository,
-                                     navigator: Navigator
-                                   )(implicit appConfig: FrontendAppConfig,
-                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class StartAddAgentController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    identify: IdentifierAction,
+    stampDutyLandTaxService: StampDutyLandTaxService,
+    sessionRepository: SessionRepository,
+    navigator: Navigator
+)(implicit appConfig: FrontendAppConfig, executionContext: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
@@ -54,10 +61,13 @@ class StartAddAgentController @Inject()(
           val userAnswers = UserAnswers(id = request.userId)
 
           for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-                         _ <- sessionRepository.set(updatedAnswers)
+            updatedAnswers <- Future.fromTry(
+              userAnswers.set(StornPage, request.storn)
+            )
+            _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(
-            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers))
+            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+          )
             .flashing("agentsLimitReached" -> "true")
 
         case _ =>
@@ -65,13 +75,19 @@ class StartAddAgentController @Inject()(
           val emptiedUserAnswers = UserAnswers(id = request.userId)
 
           for {
-            updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers))
-      } recover {
-      case ex =>
-        logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
-        Redirect(controllers.routes.SystemErrorController.onPageLoad())
+            updatedAnswers <- Future.fromTry(
+              emptiedUserAnswers.set(StornPage, request.storn)
+            )
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers)
+          )
+      } recover { case ex =>
+      logger.error(
+        "[StartAddAgentController][onPageLoad] Unexpected failure",
+        ex
+      )
+      Redirect(controllers.routes.SystemErrorController.onPageLoad())
     }
   }
 }

@@ -21,13 +21,19 @@ import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
+import play.api.i18n.Lang
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
+import play.api.i18n.MessagesImpl
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import views.html.manageAgents.UnauthorisedIndividualView
 
-class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
+class UnauthorisedIndividualViewSpec
+    extends SpecBase
+    with GuiceOneAppPerSuite
+    with MockitoSugar {
 
   "UnauthorisedIndividualView" - {
     "render the page with correct title and heading" in new Setup {
@@ -48,21 +54,27 @@ class UnauthorisedIndividualViewSpec extends SpecBase with GuiceOneAppPerSuite w
       val paragraphs = doc.select("p.govuk-body")
 
       paragraphs.size() mustBe 1
-      paragraphs.text() must include(messages("unauthorised.individual.paragraph1"))
+      paragraphs.text() must include(
+        messages("unauthorised.individual.paragraph1")
+      )
     }
 
     trait Setup {
 
-      implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-      implicit val appConfig: FrontendAppConfig = new FrontendAppConfig(app.configuration)
+      implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest()
+      implicit val appConfig: FrontendAppConfig =
+        new FrontendAppConfig(app.configuration)
 
-      implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-      implicit lazy val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
+      implicit lazy val messagesApi: MessagesApi =
+        app.injector.instanceOf[MessagesApi]
+      implicit lazy val messages: Messages =
+        MessagesImpl(Lang.defaultLang, messagesApi)
 
       def parseHtml(html: Html) = Jsoup.parse(html.toString)
 
-      val view: UnauthorisedIndividualView = app.injector.instanceOf[UnauthorisedIndividualView]
+      val view: UnauthorisedIndividualView =
+        app.injector.instanceOf[UnauthorisedIndividualView]
     }
   }
 }
-

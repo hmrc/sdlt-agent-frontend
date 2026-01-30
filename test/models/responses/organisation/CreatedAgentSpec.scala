@@ -21,21 +21,22 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class CreatedAgentSpec extends AnyWordSpec with Matchers {
 
-  def generateCreatedAgent(inputAddress2: Option[String]): CreatedAgent = CreatedAgent(
-    storn = "STNOO1",
-    agentId = Some("123"),
-    name = "John Doe",
-    houseNumber = None,
-    address1 = "4",
-    address2 = inputAddress2,
-    address3 = None,
-    address4 = None,
-    postcode = None,
-    phone = Some("0234567898"),
-    email = Some("test@email.com"),
-    dxAddress = None,
-    agentResourceReference = "56745"
-  )
+  def generateCreatedAgent(inputAddress2: Option[String]): CreatedAgent =
+    CreatedAgent(
+      storn = "STNOO1",
+      agentId = Some("123"),
+      name = "John Doe",
+      houseNumber = None,
+      address1 = "4",
+      address2 = inputAddress2,
+      address3 = None,
+      address4 = None,
+      postcode = None,
+      phone = Some("0234567898"),
+      email = Some("test@email.com"),
+      dxAddress = None,
+      agentResourceReference = "56745"
+    )
 
   "getAddressLine1AndAddressLine2 in CreatedAgent " should {
 
@@ -47,7 +48,8 @@ class CreatedAgentSpec extends AnyWordSpec with Matchers {
 
         val createdAgentWithAddressLine2 = generateCreatedAgent(Some(address2))
 
-        val combinedAddressLine1AndAddressLine2 = s"${createdAgentWithAddressLine2.address1} ${address2}"
+        val combinedAddressLine1AndAddressLine2 =
+          s"${createdAgentWithAddressLine2.address1} ${address2}"
 
         createdAgentWithAddressLine2.getAddressLine1AndAddressLine2 mustBe combinedAddressLine1AndAddressLine2
       }
@@ -56,7 +58,8 @@ class CreatedAgentSpec extends AnyWordSpec with Matchers {
 
         val createdAgentWithoutAddressLine2 = generateCreatedAgent(None)
 
-        val combinedAddressLine1AndAddressLine2 = s"${createdAgentWithoutAddressLine2.address1}"
+        val combinedAddressLine1AndAddressLine2 =
+          s"${createdAgentWithoutAddressLine2.address1}"
 
         createdAgentWithoutAddressLine2.getAddressLine1AndAddressLine2 mustBe combinedAddressLine1AndAddressLine2
       }

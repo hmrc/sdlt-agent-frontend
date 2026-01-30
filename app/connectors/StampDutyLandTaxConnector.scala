@@ -16,24 +16,33 @@
 
 package connectors
 
-import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
+import models.requests.CreatePredefinedAgentRequest
+import models.requests.DeletePredefinedAgentRequest
+import models.requests.UpdatePredefinedAgent
+import models.responses.CreatePredefinedAgentResponse
+import models.responses.DeletePredefinedAgentResponse
+import models.responses.UpdatePredefinedAgentResponse
 import models.responses.organisation.SdltOrganisationResponse
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HttpReads
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import utils.LoggerUtil.logError
 
 import java.net.URL
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
-                                          config: ServicesConfig)
-                                         (implicit ec: ExecutionContext) {
+class StampDutyLandTaxConnector @Inject() (
+    http: HttpClientV2,
+    config: ServicesConfig
+)(implicit ec: ExecutionContext) {
 
   private val base = config.baseUrl("stamp-duty-land-tax")
 
@@ -48,31 +57,36 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
   private val updateAgentDetailsUrl: URL =
     url"$base/stamp-duty-land-tax/manage-agents/update/predefined-agent"
 
-  def getSdltOrganisation(storn: String)
-                         (implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =
+  def getSdltOrganisation(
+      storn: String
+  )(implicit hc: HeaderCarrier): Future[SdltOrganisationResponse] =
     http
       .get(getSdltOrganisationUrl(storn))
       .execute[SdltOrganisationResponse]
-      .recover {
-        case e: Throwable =>
-          logError(s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
+      .recover { case e: Throwable =>
+        logError(
+          s"[StampDutyLandTaxConnector][getSdltOrganisation]: ${e.getMessage}"
+        )
+        throw new RuntimeException(e.getMessage)
       }
 
-  def submitAgentDetails(createPredefinedAgentRequest: CreatePredefinedAgentRequest)
-                        (implicit hc: HeaderCarrier): Future[CreatePredefinedAgentResponse] =
+  def submitAgentDetails(
+      createPredefinedAgentRequest: CreatePredefinedAgentRequest
+  )(implicit hc: HeaderCarrier): Future[CreatePredefinedAgentResponse] =
     http
       .post(submitAgentDetailsUrl)
       .withBody(Json.toJson(createPredefinedAgentRequest))
       .execute[CreatePredefinedAgentResponse]
-      .recover {
-        case e: Throwable =>
-          logError(s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
+      .recover { case e: Throwable =>
+        logError(
+          s"[StampDutyLandTaxConnector][submitAgentDetails]: ${e.getMessage}"
+        )
+        throw new RuntimeException(e.getMessage)
       }
 
-  def updateAgentDetails(UpdatePredefinedAgent: UpdatePredefinedAgent)
-                        (implicit hc: HeaderCarrier): Future[UpdatePredefinedAgentResponse] =
+  def updateAgentDetails(
+      UpdatePredefinedAgent: UpdatePredefinedAgent
+  )(implicit hc: HeaderCarrier): Future[UpdatePredefinedAgentResponse] =
     http
       .post(updateAgentDetailsUrl)
       .withBody(Json.toJson(UpdatePredefinedAgent))
@@ -83,15 +97,16 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
         case Left(error) =>
           Future.failed(error)
       }
-      .recover {
-        case e: Throwable =>
-          logError(s"[StampDutyLandTaxConnector][updatePredefinedAgent]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
+      .recover { case e: Throwable =>
+        logError(
+          s"[StampDutyLandTaxConnector][updatePredefinedAgent]: ${e.getMessage}"
+        )
+        throw new RuntimeException(e.getMessage)
       }
 
-
-  def deletePredefinedAgent(deletePredefinedAgentRequest: DeletePredefinedAgentRequest)
-                        (implicit hc: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
+  def deletePredefinedAgent(
+      deletePredefinedAgentRequest: DeletePredefinedAgentRequest
+  )(implicit hc: HeaderCarrier): Future[DeletePredefinedAgentResponse] =
     http
       .post(deletePredefinedAgentUrl)
       .withBody(Json.toJson(deletePredefinedAgentRequest))
@@ -102,9 +117,10 @@ class StampDutyLandTaxConnector @Inject()(http: HttpClientV2,
         case Left(error) =>
           Future.failed(error)
       }
-      .recover {
-        case e: Throwable =>
-          logError(s"[StampDutyLandTaxConnector][deletePredefinedAgent]: ${e.getMessage}")
-          throw new RuntimeException(e.getMessage)
+      .recover { case e: Throwable =>
+        logError(
+          s"[StampDutyLandTaxConnector][deletePredefinedAgent]: ${e.getMessage}"
+        )
+        throw new RuntimeException(e.getMessage)
       }
 }

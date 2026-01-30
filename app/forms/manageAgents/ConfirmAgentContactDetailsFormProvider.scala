@@ -25,8 +25,15 @@ import javax.inject.Inject
 
 class ConfirmAgentContactDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(agentName: String)(implicit messages: Messages): Form[ConfirmAgentContactDetails] =
+  def apply(
+      agentName: String
+  )(implicit messages: Messages): Form[ConfirmAgentContactDetails] =
     Form(
-      "value" -> enumerable[ConfirmAgentContactDetails]( messages("manageAgents.confirmAgentContactDetails.error.required", agentName))
+      "value" -> enumerable[ConfirmAgentContactDetails](
+        messages(
+          "manageAgents.confirmAgentContactDetails.error.required",
+          agentName
+        )
+      )
     )
 }

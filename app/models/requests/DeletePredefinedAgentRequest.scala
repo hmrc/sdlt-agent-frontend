@@ -16,13 +16,15 @@
 
 package models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 
 case class DeletePredefinedAgentRequest(
-                                         storn: String,
-                                         agentReferenceNumber: String
-                                       )
+    storn: String,
+    agentReferenceNumber: String
+)
 
 object DeletePredefinedAgentRequest {
-  implicit val format: OFormat[DeletePredefinedAgentRequest] = Json.format[DeletePredefinedAgentRequest]
+  implicit val format: OFormat[DeletePredefinedAgentRequest] =
+    Json.format[DeletePredefinedAgentRequest]
 }

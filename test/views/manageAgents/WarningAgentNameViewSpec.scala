@@ -69,16 +69,23 @@ class WarningAgentNameViewSpec extends SpecBase with ViewSpecBase {
   }
 
   trait Setup {
-    val app: Application             = applicationBuilder().build()
-    val formProvider                 = new AgentNameFormProvider()
-    val form: Form[?]                = formProvider()
+    val app: Application = applicationBuilder().build()
+    val formProvider = new AgentNameFormProvider()
+    val form: Form[?] = formProvider()
     implicit val request: Request[?] = FakeRequest()
-    implicit val messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: WarningAgentNameView   = app.injector.instanceOf[WarningAgentNameView]
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: WarningAgentNameView =
+      app.injector.instanceOf[WarningAgentNameView]
   }
 
-  private def displaysCorrectWarning(doc: Document, warningText: String)(implicit messages: Messages) = {
-    doc.select(".govuk-warning-text__text").text mustBe s"Warning ${messages(warningText)}"
+  private def displaysCorrectWarning(doc: Document, warningText: String)(
+      implicit messages: Messages
+  ) = {
+    doc
+      .select(".govuk-warning-text__text")
+      .text mustBe s"Warning ${messages(warningText)}"
   }
 }
-

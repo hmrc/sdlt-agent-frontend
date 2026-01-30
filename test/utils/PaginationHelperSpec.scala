@@ -16,37 +16,44 @@
 
 package utils
 
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import controllers.manageAgents.routes
 import models.responses.organisation.CreatedAgent
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.i18n.DefaultMessagesApi
+import play.api.i18n.Lang
+import play.api.i18n.Messages
+import play.api.i18n.MessagesImpl
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.PaginationLink
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.manageAgents.AgentDetailsTestUtil
 
-class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTestUtil {
+class PaginationHelperSpec
+    extends AnyWordSpec
+    with Matchers
+    with AgentDetailsTestUtil {
 
   object TestHelper extends PaginationHelper
 
   private val testAgentReferenceNumber: String = "ARN001"
-  
+
   private val messagesApi = new DefaultMessagesApi(
     Map(
       "en" -> Map(
         "manageAgents.agentDetails.summaryInfo.text" -> "Showing {0} to {1} of {2} records",
-        "pagination.previous"                        -> "Previous",
-        "pagination.next"                            -> "Next",
-        "site.change"                                -> "Change",
-        "site.remove"                                -> "Remove"
+        "pagination.previous" -> "Previous",
+        "pagination.next" -> "Next",
+        "site.change" -> "Change",
+        "site.remove" -> "Remove"
       )
     )
   )
 
-  implicit private val messages: Messages = MessagesImpl(Lang("en"), messagesApi)
+  implicit private val messages: Messages =
+    MessagesImpl(Lang("en"), messagesApi)
 
   private val twentyTwoAgents: Seq[CreatedAgent] = getAgentList(22)
-  private val nineAgents: Seq[CreatedAgent]      = getAgentList(9)
+  private val nineAgents: Seq[CreatedAgent] = getAgentList(9)
 
   "getNumberOfPages" should {
     "return 1 when up to 10 items" in {
@@ -70,13 +77,19 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
       TestHelper.getPaginationInfoText(-1, twentyTwoAgents) mustBe None
     }
     "return 'Showing 1 to 10 of 22 records' on page 1 for 22 items" in {
-      TestHelper.getPaginationInfoText(1, twentyTwoAgents) mustBe Some("Showing 1 to 10 of 22 records")
+      TestHelper.getPaginationInfoText(1, twentyTwoAgents) mustBe Some(
+        "Showing 1 to 10 of 22 records"
+      )
     }
     "return 'Showing 11 to 20 of 22 records' on page 2 for 22 items" in {
-      TestHelper.getPaginationInfoText(2, twentyTwoAgents) mustBe Some("Showing 11 to 20 of 22 records")
+      TestHelper.getPaginationInfoText(2, twentyTwoAgents) mustBe Some(
+        "Showing 11 to 20 of 22 records"
+      )
     }
     "return 'Showing 21 to 22 of 22 records' on page 3 for 22 items" in {
-      TestHelper.getPaginationInfoText(3, twentyTwoAgents) mustBe Some("Showing 21 to 22 of 22 records")
+      TestHelper.getPaginationInfoText(3, twentyTwoAgents) mustBe Some(
+        "Showing 21 to 22 of 22 records"
+      )
     }
     "return None for out-of-range page index" in {
       TestHelper.getPaginationInfoText(4, twentyTwoAgents) mustBe None
@@ -89,62 +102,83 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
       TestHelper.generateAgentSummary(4, twentyTwoAgents) mustBe None
     }
     "return a SummaryList with 10 rows on page 1 when there are 22 items" in {
-      val maybeSummary: Option[SummaryList] = TestHelper.generateAgentSummary(1, twentyTwoAgents)
+      val maybeSummary: Option[SummaryList] =
+        TestHelper.generateAgentSummary(1, twentyTwoAgents)
       val summary = maybeSummary.get
       summary.rows.size mustBe 10
-      summary.rows.head.key.content.asHtml.body must include ("Agent 1")
-      summary.rows.head.value.content.asHtml.body must include ("Address 1")
+      summary.rows.head.key.content.asHtml.body must include("Agent 1")
+      summary.rows.head.value.content.asHtml.body must include("Address 1")
       summary.rows.head.actions.get.items.size mustBe 2
       val hrefs = summary.rows.head.actions.get.items.map(_.href)
-      hrefs.exists(_.contains(routes.CheckYourAnswersController.onPageLoad(Some(testAgentReferenceNumber)).url.stripPrefix("/"))) mustBe true
-      hrefs.exists(_.contains(routes.RemoveAgentController.onPageLoad(testAgentReferenceNumber).url.stripPrefix("/"))) mustBe true
+      hrefs.exists(
+        _.contains(
+          routes.CheckYourAnswersController
+            .onPageLoad(Some(testAgentReferenceNumber))
+            .url
+            .stripPrefix("/")
+        )
+      ) mustBe true
+      hrefs.exists(
+        _.contains(
+          routes.RemoveAgentController
+            .onPageLoad(testAgentReferenceNumber)
+            .url
+            .stripPrefix("/")
+        )
+      ) mustBe true
     }
     "return a SummaryList with 2 rows on page 3 when there are 22 items" in {
       val summary = TestHelper.generateAgentSummary(3, twentyTwoAgents).get
       summary.rows.size mustBe 2
-      summary.rows.head.key.content.asHtml.body must include ("Agent 21")
-      summary.rows.last.key.content.asHtml.body must include ("Agent 22")
+      summary.rows.head.key.content.asHtml.body must include("Agent 21")
+      summary.rows.last.key.content.asHtml.body must include("Agent 22")
     }
   }
 
   "generatePagination" should {
     "return None when only one page" in {
-      val res = TestHelper.generatePagination(paginationIndex = 1, numberOfPages = 1)
+      val res =
+        TestHelper.generatePagination(paginationIndex = 1, numberOfPages = 1)
       res mustBe None
     }
     "return items and prev/next correctly for middle page" in {
-      val res = TestHelper.generatePagination(paginationIndex = 2, numberOfPages = 3).get
+      val res = TestHelper
+        .generatePagination(paginationIndex = 2, numberOfPages = 3)
+        .get
       val items = res.items.get
       items.length mustBe 3
       items(1).current mustBe Some(true)
 
       val prev = res.previous.get
       prev.text.get mustBe "Previous"
-      prev.href must include ("paginationIndex=1")
+      prev.href must include("paginationIndex=1")
 
       val next = res.next.get
       next.text.get mustBe "Next"
-      next.href must include ("paginationIndex=3")
+      next.href must include("paginationIndex=3")
     }
     "omit previous on first page and next on last page" in {
       val first = TestHelper.generatePagination(1, 3).get
       first.previous mustBe None
-      first.next.get.href must include ("paginationIndex=2")
+      first.next.get.href must include("paginationIndex=2")
 
       val last = TestHelper.generatePagination(3, 3).get
       last.next mustBe None
-      last.previous.get.href must include ("paginationIndex=2")
+      last.previous.get.href must include("paginationIndex=2")
     }
   }
 
   "generatePaginationItems" should {
     "produce one item per page with current flag set correctly" in {
-      val items = TestHelper.generatePaginationItems(paginationIndex = 2, numberOfPages = 3)
+      val items = TestHelper.generatePaginationItems(
+        paginationIndex = 2,
+        numberOfPages = 3
+      )
       items.map(_.number.get.mkString) mustBe Seq("1", "2", "3")
       items.map(_.current) mustBe Seq(Some(false), Some(true), Some(false))
-      items.head.href must include ("paginationIndex=1")
-      items(1).href   must include ("paginationIndex=2")
-      items(2).href   must include ("paginationIndex=3")
+      items.head.href must include("paginationIndex=1")
+      items(1).href must include("paginationIndex=2")
+      items(2).href must include("paginationIndex=3")
     }
   }
 
@@ -156,11 +190,11 @@ class PaginationHelperSpec extends AnyWordSpec with Matchers with AgentDetailsTe
     "return proper links on middle page" in {
       val prev: PaginationLink = TestHelper.generatePreviousLink(2, 3).get
       prev.text.get mustBe "Previous"
-      prev.href must include ("paginationIndex=1")
+      prev.href must include("paginationIndex=1")
 
       val next: PaginationLink = TestHelper.generateNextLink(2, 3).get
       next.text.get mustBe "Next"
-      next.href must include ("paginationIndex=3")
+      next.href must include("paginationIndex=3")
     }
   }
 }

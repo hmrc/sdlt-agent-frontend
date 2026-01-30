@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpVerbs.GET
 
 class SystemErrorControllerSpec extends SpecBase with MockitoSugar {
@@ -37,7 +37,8 @@ class SystemErrorControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn("https://www.gov.uk")
 
         running(app) {
-          val request = FakeRequest(GET, routes.SystemErrorController.onPageLoad().url)
+          val request =
+            FakeRequest(GET, routes.SystemErrorController.onPageLoad().url)
 
           val result = route(app, request).value
 

@@ -18,16 +18,20 @@ package controllers
 
 import config.FrontendAppConfig
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.PageNotFoundView
 
 import javax.inject.Inject
 
 class PageNotFoundController @Inject() (
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: PageNotFoundView
-                                       )(implicit appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
+    val controllerComponents: MessagesControllerComponents,
+    view: PageNotFoundView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())

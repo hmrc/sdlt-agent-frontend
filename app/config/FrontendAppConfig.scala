@@ -19,14 +19,15 @@ package config
 import play.api.Configuration
 import play.api.mvc.RequestHeader
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
-  val host: String    = configuration.get[String]("host")
+  val host: String = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
-  
+
   val maxNumberOfAgents: Int = configuration.get[Int]("max-number-of-agents")
 
   private val contactHost = configuration.get[String]("contact-frontend.host")
@@ -35,31 +36,40 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  private val contactUrl: String = configuration.get[Service]("contact-frontend").baseUrl
+  private val contactUrl: String =
+    configuration.get[Service]("contact-frontend").baseUrl
   def contactUrl(implicit request: RequestHeader): String =
     s"$contactUrl/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val loginUrl: String                      = configuration.get[String]("urls.login")
-  val loginContinueUrl: String              = configuration.get[String]("urls.loginContinue")
-  val signOutUrl: String                    = configuration.get[String]("urls.signOut")
-  lazy val govUKUrl: String                 = configuration.get[String]("urls.govUK")
-  lazy val hmrcOnlineServiceDeskUrl: String = configuration.get[String]("urls.hmrcOnlineServiceDesk")
+  val loginUrl: String = configuration.get[String]("urls.login")
+  val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
+  val signOutUrl: String = configuration.get[String]("urls.signOut")
+  lazy val govUKUrl: String = configuration.get[String]("urls.govUK")
+  lazy val hmrcOnlineServiceDeskUrl: String =
+    configuration.get[String]("urls.hmrcOnlineServiceDesk")
 
-  lazy val feedbackFrontend: String = configuration.get[String]("feedback-frontend.host")
-  val exitSurveyUrl: String             = s"$feedbackFrontend/feedback/stamp-duty-land-tax"
+  lazy val feedbackFrontend: String =
+    configuration.get[String]("feedback-frontend.host")
+  val exitSurveyUrl: String = s"$feedbackFrontend/feedback/stamp-duty-land-tax"
 
-  val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
+  val timeout: Int = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val sessionTimeOut: Long = configuration.get[Long]("session.timeoutSeconds")
-  
+
   // AddressLookup configuration
-  private val addressLookupPort: String = configuration.get[String]("address-lookup-frontend.port")
-  private val addressLookupHost: String = configuration.get[String]("address-lookup-frontend.host")
-  private val addressLookupProtocol: String = configuration.get[String]("address-lookup-frontend.protocol")
-  val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
-  val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
-  val signOutUrlForAddressLookupFrontend = s"$host/stamp-duty-land-tax-agent${controllers.auth.routes.AuthController.signOut().url}"
+  private val addressLookupPort: String =
+    configuration.get[String]("address-lookup-frontend.port")
+  private val addressLookupHost: String =
+    configuration.get[String]("address-lookup-frontend.host")
+  private val addressLookupProtocol: String =
+    configuration.get[String]("address-lookup-frontend.protocol")
+  val addressLookupBaseUrl: String =
+    s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
+  val addressLookupTimeoutUrl: String =
+    configuration.get[String]("address-lookup-frontend.timeoutUrl")
+  val signOutUrlForAddressLookupFrontend =
+    s"$host/stamp-duty-land-tax-agent${controllers.auth.routes.AuthController.signOut().url}"
 }

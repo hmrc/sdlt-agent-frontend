@@ -18,17 +18,20 @@ package controllers.manageAgents
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.*
+import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
+class StartAddAgentControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with AgentDetailsTestUtil {
 
   private val service = mock[StampDutyLandTaxService]
 
@@ -46,7 +49,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, postUrl)
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -65,7 +68,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, postUrl)
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
@@ -74,7 +77,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
         flash(result).get("agentsLimitReached") mustBe Some("true")
       }
     }
-    
+
     "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -86,10 +89,14 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, postUrl)
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
   }

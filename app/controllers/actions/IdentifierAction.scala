@@ -20,11 +20,13 @@ import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.Logging
-import play.api.mvc.Results.*
-import play.api.mvc.*
-import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
+import play.api.mvc.Results._
+import play.api.mvc._
+import uk.gov.hmrc.auth.core.AffinityGroup.Agent
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -32,20 +34,29 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
+trait IdentifierAction
+    extends ActionBuilder[IdentifierRequest, AnyContent]
+    with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(
-                                               override val authConnector: AuthConnector,
-                                               config: FrontendAppConfig,
-                                               val parser: BodyParsers.Default
-                                             )
-                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions with Logging {
+class AuthenticatedIdentifierAction @Inject() (
+    override val authConnector: AuthConnector,
+    config: FrontendAppConfig,
+    val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext)
+    extends IdentifierAction
+    with AuthorisedFunctions
+    with Logging {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](
+      request: Request[A],
+      block: IdentifierRequest[A] => Future[Result]
+  ): Future[Result] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     val defaultPredicate: Predicate = AuthProviders(GovernmentGateway)
 
@@ -56,38 +67,59 @@ class AuthenticatedIdentifierAction @Inject()(
           Retrievals.affinityGroup and
           Retrievals.credentialRole
       ) {
-        //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) if enrolments.exists(_.key == orgEnrolment) =>
+        // TODO: Add more cases to log and handle error response for missing items eg missing Organisation
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(
+              Organisation
+            ) ~ Some(User) if enrolments.exists(_.key == orgEnrolment) =>
           hanldeValidEnrolments(block)(request, internalId, enrolments)
 
-        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) if enrolments.exists(_.key == agentEnrolment) =>
+        case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(
+              User
+            ) if enrolments.exists(_.key == agentEnrolment) =>
           hanldeValidEnrolments(block)(request, internalId, enrolments)
 
         case Some(_) ~ _ ~ Some(Organisation | Agent) ~ Some(Assistant) =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt")
+          logger.error(
+            "[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt"
+          )
           Future.successful(
-            Redirect(controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
+            Redirect(
+              controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController
+                .onPageLoad()
+            )
           )
 
         case Some(_) ~ _ ~ Some(Individual) ~ _ =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt")
+          logger.error(
+            "[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt"
+          )
           Future.successful(
-            Redirect(controllers.manageAgents.routes.UnauthorisedIndividualAffinityController.onPageLoad())
+            Redirect(
+              controllers.manageAgents.routes.UnauthorisedIndividualAffinityController
+                .onPageLoad()
+            )
           )
         case _ =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - authentication failure")
+          logger.error(
+            "[AuthenticatedIdentifierAction][unauthorised] - authentication failure"
+          )
           Future.successful(
-            Redirect(routes.AccessDeniedController.onPageLoad()))
+            Redirect(routes.AccessDeniedController.onPageLoad())
+          )
       } recover {
       case _: NoActiveSession =>
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
+        Redirect(
+          config.loginUrl,
+          Map("continue" -> Seq(config.loginContinueUrl))
+        )
       case _: AuthorisationException =>
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
 
-  private def hanldeValidEnrolments[A](block:IdentifierRequest[A] => Future[Result])
-                                      (request:Request[A], internalId: String, enrollments:Set[Enrolment]) = {
+  private def hanldeValidEnrolments[A](
+      block: IdentifierRequest[A] => Future[Result]
+  )(request: Request[A], internalId: String, enrollments: Set[Enrolment]) = {
     hasSdltOrgEnrolment(enrollments)
       .map { storn =>
         block(IdentifierRequest(request, internalId, storn))
@@ -98,23 +130,33 @@ class AuthenticatedIdentifierAction @Inject()(
         )
       )
   }
-  
-  private val  enrolmentStornExtractor:Enrolment => Option[String] = (enrolment: Enrolment) =>
-    enrolment.identifiers.
-      find(id => id.key == "STORN")
-      .map(_.value)
+
+  private val enrolmentStornExtractor: Enrolment => Option[String] =
+    (enrolment: Enrolment) =>
+      enrolment.identifiers
+        .find(id => id.key == "STORN")
+        .map(_.value)
 
   private val orgEnrolment: String = "IR-SDLT-ORG"
   private val agentEnrolment: String = "IR-SDLT-AGENT"
 
-  private def hasSdltOrgEnrolment[A](enrolments: Set[Enrolment]): Option[String] =
-    enrolments.find(e => Set(orgEnrolment,agentEnrolment ).contains(e.key)) match {
+  private def hasSdltOrgEnrolment[A](
+      enrolments: Set[Enrolment]
+  ): Option[String] =
+    enrolments.find(e =>
+      Set(orgEnrolment, agentEnrolment).contains(e.key)
+    ) match {
       case Some(enrolment) =>
-        (enrolmentStornExtractor(enrolment), enrolment.state.toLowerCase()) match {
+        (
+          enrolmentStornExtractor(enrolment),
+          enrolment.state.toLowerCase()
+        ) match {
           case (Some(storn), "activated" | "notyetactivated") =>
             Some(storn)
           case _ =>
-            logger.error("EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments")
+            logger.error(
+              "EnrolmentAuthIdentifierAction - Unable to retrieve sdlt enrolments"
+            )
             None
         }
       case _ => None

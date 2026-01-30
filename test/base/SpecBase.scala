@@ -16,22 +16,26 @@
 
 package base
 
-import controllers.actions.*
+import controllers.actions._
 import models.UserAnswers
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.OptionValues
+import org.scalatest.TryValues
+import org.scalatest.concurrent.IntegrationPatience
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
 import pages.manageAgents.StornPage
 import play.api.Application
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 
 trait SpecBase
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with TryValues
     with OptionValues
@@ -50,7 +54,8 @@ trait SpecBase
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, stornData)
 
-  val emptyUserAnswersWithStorn: UserAnswers = emptyUserAnswers.set(StornPage, testStorn).success.value
+  val emptyUserAnswersWithStorn: UserAnswers =
+    emptyUserAnswers.set(StornPage, testStorn).success.value
 
   val testUserAnswers: JsObject = Json.obj(
     "agentName" -> "John",
@@ -112,23 +117,33 @@ trait SpecBase
     )
   )
 
-
   val populatedUserAnswers: UserAnswers =
-    emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswers)
-    
+    emptyUserAnswersWithStorn.copy(data =
+      emptyUserAnswersWithStorn.data ++ testUserAnswers
+    )
+
   val populatedUserAnswersWithArn: UserAnswers =
-    emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswersWithArn)
+    emptyUserAnswersWithStorn.copy(data =
+      emptyUserAnswersWithStorn.data ++ testUserAnswersWithArn
+    )
 
   val populatedUserAnswersWithoutAgentName: UserAnswers =
-    emptyUserAnswersWithStorn.copy(data = emptyUserAnswersWithStorn.data ++ testUserAnswersWithoutAgentName)
+    emptyUserAnswersWithStorn.copy(data =
+      emptyUserAnswersWithStorn.data ++ testUserAnswersWithoutAgentName
+    )
 
-  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  def messages(app: Application): Messages =
+    app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(
+      userAnswers: Option[UserAnswers] = None
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[DataRetrievalAction].toInstance(
+          new FakeDataRetrievalAction(userAnswers)
+        )
       )
 }

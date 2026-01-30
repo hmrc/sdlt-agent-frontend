@@ -42,13 +42,14 @@ class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
   }
 
   trait Setup {
-    val app: Application                                   = applicationBuilder().build()
-    implicit val request: Request[?]                       = FakeRequest()
-    implicit val messages: Messages                        = play.api.i18n.MessagesImpl(
+    val app: Application = applicationBuilder().build()
+    implicit val request: Request[?] = FakeRequest()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi])
-    implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-    val view: UnauthorisedOrgView                          = app.injector.instanceOf[UnauthorisedOrgView]
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    implicit lazy val applicationConfig: FrontendAppConfig =
+      app.injector.instanceOf[FrontendAppConfig]
+    val view: UnauthorisedOrgView = app.injector.instanceOf[UnauthorisedOrgView]
   }
 }
-

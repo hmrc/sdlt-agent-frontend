@@ -18,17 +18,23 @@ package models.manageAgents
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.i18n.Messages
-import play.api.libs.json.{JsError, JsString, Json}
+import play.api.libs.json.JsError
+import play.api.libs.json.JsString
+import play.api.libs.json.Json
+import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import play.api.test.Helpers.stubMessages
 
-class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class RemoveAgentSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues {
 
   "RemoveAgent" - {
 
@@ -36,21 +42,24 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = Gen.oneOf(RemoveAgent.values)
 
-      forAll(gen) {
-        removeAgent =>
-
-          JsString(removeAgent.toString).validate[RemoveAgent].asOpt.value mustEqual removeAgent
+      forAll(gen) { removeAgent =>
+        JsString(removeAgent.toString)
+          .validate[RemoveAgent]
+          .asOpt
+          .value mustEqual removeAgent
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!RemoveAgent.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!RemoveAgent.values
+        .map(_.toString)
+        .contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[RemoveAgent] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[RemoveAgent] mustEqual JsError(
+          "error.invalid"
+        )
       }
     }
 
@@ -58,10 +67,8 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = Gen.oneOf(RemoveAgent.values)
 
-      forAll(gen) {
-        removeAgent =>
-
-          Json.toJson(removeAgent) mustEqual JsString(removeAgent.toString)
+      forAll(gen) { removeAgent =>
+        Json.toJson(removeAgent) mustEqual JsString(removeAgent.toString)
       }
     }
     "options" - {
@@ -101,7 +108,10 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
         val radios = RemoveAgent.options
 
-        radios.map(_.value) mustEqual Seq(Some(RemoveAgent.Option1.toString), Some(RemoveAgent.Option2.toString))
+        radios.map(_.value) mustEqual Seq(
+          Some(RemoveAgent.Option1.toString),
+          Some(RemoveAgent.Option2.toString)
+        )
       }
     }
   }

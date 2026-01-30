@@ -16,12 +16,12 @@
 
 package models.manageAgents
 
+import models.Enumerable
+import models.WithName
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import viewmodels.govuk.radios.*
-import models.Enumerable
-import models.WithName
+import viewmodels.govuk.radios._
 
 sealed trait ConfirmAgentContactDetails
 
@@ -31,11 +31,12 @@ object ConfirmAgentContactDetails extends Enumerable.Implicits {
   case object Option2 extends WithName("false") with ConfirmAgentContactDetails
 
   val values: Seq[ConfirmAgentContactDetails] = Seq(
-    Option1, Option2
+    Option1,
+    Option2
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    values.zipWithIndex.map { case (value, index) =>
       RadioItem(
         content = Text(
           value match {
@@ -43,10 +44,10 @@ object ConfirmAgentContactDetails extends Enumerable.Implicits {
             case Option2 => messages("site.no")
           }
         ),
-        value   = Some(value.toString),
-        id      = Some(s"value_$index")
+        value = Some(value.toString),
+        id = Some(s"value_$index")
       )
-  }
+    }
 
   implicit val enumerable: Enumerable[ConfirmAgentContactDetails] =
     Enumerable(values.map(v => v.toString -> v): _*)

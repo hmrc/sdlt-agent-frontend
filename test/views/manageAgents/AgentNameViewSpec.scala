@@ -68,12 +68,14 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
   }
 
   trait Setup {
-    val app: Application             = applicationBuilder().build()
-    val formProvider                 = new AgentNameFormProvider()
-    val form: Form[?]                = formProvider()
+    val app: Application = applicationBuilder().build()
+    val formProvider = new AgentNameFormProvider()
+    val form: Form[?] = formProvider()
     implicit val request: Request[?] = FakeRequest()
-    implicit val messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: AgentNameView          = app.injector.instanceOf[AgentNameView]
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: AgentNameView = app.injector.instanceOf[AgentNameView]
   }
 }
-

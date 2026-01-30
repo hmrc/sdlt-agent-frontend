@@ -16,17 +16,18 @@
 
 package models.responses.addresslookup
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 
 case class Address(
-                    lines:    Seq[String],
-                    postcode: Option[String]
-                  )
+    lines: Seq[String],
+    postcode: Option[String]
+)
 
 case class AddressModel(
-                                 auditRef: String,
-                                 address: Address
-                               )
+    auditRef: String,
+    address: Address
+)
 
 object Address {
   implicit val format: OFormat[Address] = Json.format[Address]
@@ -39,5 +40,6 @@ object AddressModel {
 case class JourneyResultAddressModel(auditRef: String, address: Address)
 
 object JourneyResultAddressModel {
-  implicit val format: OFormat[JourneyResultAddressModel] = Json.format[JourneyResultAddressModel]
+  implicit val format: OFormat[JourneyResultAddressModel] =
+    Json.format[JourneyResultAddressModel]
 }

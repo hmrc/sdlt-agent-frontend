@@ -17,71 +17,129 @@
 package controllers.manageAgents
 
 import cats.data.EitherT
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import controllers.routes.{JourneyRecoveryController, SystemErrorController}
+import controllers.actions.DataRequiredAction
+import controllers.actions.DataRetrievalAction
+import controllers.actions.IdentifierAction
+import controllers.actions.StornRequiredAction
+import controllers.routes.JourneyRecoveryController
+import controllers.routes.SystemErrorController
+import models.CheckMode
+import models.Mode
+import models.NormalMode
+import models.UserAnswers
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, ConfirmAgentContactDetailsPage}
+import pages.manageAgents.AgentCheckYourAnswersPage
+import pages.manageAgents.ConfirmAgentContactDetailsPage
 import play.api.Logger
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.LoggerUtil.{logDebug, logError, logInfo}
+import utils.LoggerUtil.logDebug
+import utils.LoggerUtil.logError
+import utils.LoggerUtil.logInfo
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.util.Try
 
 @Singleton
-class AddressLookupController @Inject()(
-                                         val controllerComponents: MessagesControllerComponents,
-                                         val addressLookupService: AddressLookupService,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         stornRequiredAction: StornRequiredAction,
-                                         navigator: Navigator
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class AddressLookupController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    val addressLookupService: AddressLookupService,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    navigator: Navigator
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
-      case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
-        logDebug(s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}")
-        Redirect(addressLookupLocation)
-      case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
-        logError("[AddressLookupController][onPageLoad] - Failed::Location not provided")
-        Redirect(JourneyRecoveryController.onPageLoad())
-      case Left(ex) =>
-        logError(s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex")
-        Redirect(SystemErrorController.onPageLoad())
-    }
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        addressLookupService
+          .initJourney(request.userAnswers, request.storn, mode)
+          .map {
+            case Right(
+                  JourneyInitSuccessResponse(Some(addressLookupLocation))
+                ) =>
+              logDebug(
+                s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}"
+              )
+              Redirect(addressLookupLocation)
+            case Right(
+                  models.responses.addresslookup.JourneyInitResponse
+                    .JourneyInitSuccessResponse(None)
+                ) =>
+              logError(
+                "[AddressLookupController][onPageLoad] - Failed::Location not provided"
+              )
+              Redirect(JourneyRecoveryController.onPageLoad())
+            case Left(ex) =>
+              logError(
+                s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex"
+              )
+              Redirect(SystemErrorController.onPageLoad())
+          }
+      }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        {
 
-    Logger("application").debug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
-    for {
-      id <- EitherT(Future.successful(Try {
-        request.queryString.get("id").get(0)
-      }.toEither))
-      journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userAnswers))
-    } yield journeyOutcome
-  }.value.map {
-    case Right(updatedAnswer) if mode == NormalMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - address extracted and saved")
-      Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
-    case Right(updatedAnswer) if mode == CheckMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - edit::address extracted and saved")
-      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
-    case Right(_) =>
-      Logger("application").info(s"[AddressLookupController][onSubmit] - Invalid mode: $mode")
-      Redirect(SystemErrorController.onPageLoad())
-    case Left(ex) =>
-      logError(s"[AddressLookupController][onSubmit] - failed to extract address: ${ex}")
-      Redirect(SystemErrorController.onPageLoad())
-    }
-  }
+          Logger("application").debug(
+            s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}"
+          )
+          for {
+            id <- EitherT(Future.successful(Try {
+              request.queryString.get("id").get(0)
+            }.toEither))
+            journeyOutcome <- EitherT(
+              addressLookupService.getJourneyOutcome(id, request.userAnswers)
+            )
+          } yield journeyOutcome
+        }.value.map {
+          case Right(updatedAnswer) if mode == NormalMode =>
+            logInfo(
+              s"[AddressLookupController][onSubmit] - address extracted and saved"
+            )
+            Redirect(
+              navigator.nextPage(
+                ConfirmAgentContactDetailsPage,
+                NormalMode,
+                updatedAnswer
+              )
+            )
+          case Right(updatedAnswer) if mode == CheckMode =>
+            logInfo(
+              s"[AddressLookupController][onSubmit] - edit::address extracted and saved"
+            )
+            Redirect(
+              navigator.nextPage(
+                AgentCheckYourAnswersPage,
+                CheckMode,
+                updatedAnswer
+              )
+            )
+          case Right(_) =>
+            Logger("application").info(
+              s"[AddressLookupController][onSubmit] - Invalid mode: $mode"
+            )
+            Redirect(SystemErrorController.onPageLoad())
+          case Left(ex) =>
+            logError(
+              s"[AddressLookupController][onSubmit] - failed to extract address: ${ex}"
+            )
+            Redirect(SystemErrorController.onPageLoad())
+        }
+      }
 
 }

@@ -24,4 +24,3 @@ trait CreatePredefinedAgentRequestGenerator {
     Gen.nonEmptyListOf[Char](Gen.alphaNumChar).map(_.mkString)
 
 }
-

@@ -21,46 +21,54 @@ import jakarta.inject.Singleton
 import models.Mode
 import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
-import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.libs.json.*
+import play.api.Logger
+import play.api.i18n.Lang
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
+import play.api.libs.json._
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.Logger
-import play.api.mvc.RequestHeader
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
-                                        http: HttpClientV2,
-                                        val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
+class AddressLookupConnector @Inject() (
+    val appConfig: FrontendAppConfig,
+    http: HttpClientV2,
+    val messagesApi: MessagesApi
+)(implicit ec: ExecutionContext) {
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
-  val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
-  val addressLookupOutcomeUrl: String => String = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
+  val addressLookupInitializeUrl: String = s"$baseUrl/api/v2/init"
+  val addressLookupOutcomeUrl: String => String = (id: String) =>
+    s"$baseUrl/api/v2/confirmed?id=$id"
 
   private val sessionTimeout: Long = appConfig.sessionTimeOut
-  private val addressLookupTimeoutUrl: String = appConfig.addressLookupTimeoutUrl
+  private val addressLookupTimeoutUrl: String =
+    appConfig.addressLookupTimeoutUrl
 
-  private val langResourcePrefix : String = "manageAgents.addressLookup"
+  private val langResourcePrefix: String = "manageAgents.addressLookup"
 
-  private val continueUrl = (mode: Mode) => appConfig.host +
-    controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
+  private val continueUrl = (mode: Mode) =>
+    appConfig.host +
+      controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
-  private def setJourneyOptions(mode: Mode)(implicit rh: RequestHeader): Seq[(String, JsValue)] = {
+  private def setJourneyOptions(
+      mode: Mode
+  )(implicit rh: RequestHeader): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl(mode)),
       "signOutHref" -> JsString(appConfig.signOutUrlForAddressLookupFrontend),
       "ukMode" -> JsBoolean(true),
       // TODO: we expect Welsh translation to be disabled / not working as expected
       "disableTranslations" -> JsBoolean(true),
-
       "showPhaseBanner" -> JsBoolean(true),
       "alphaPhase" -> JsBoolean(true),
-
       "includeHMRCBranding" -> JsBoolean(true),
-
       "selectPageConfig" -> JsObject(
         Seq(
           "proposalListLimit" -> JsNumber(30),
@@ -72,7 +80,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "showChangeLink" -> JsBoolean(true),
           "showSubHeadingAndInfo" -> JsBoolean(false),
           "showSearchAgainLink" -> JsBoolean(false),
-          "showConfirmChangeText" -> JsBoolean(false),
+          "showConfirmChangeText" -> JsBoolean(false)
         )
       ),
       "manualAddressEntryConfig" -> JsObject(
@@ -99,19 +107,25 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     )
   }
 
-  private def setLabels(agentName: Option[String], lang : Lang)
-                       (implicit messages: Messages): Seq[(String, JsObject)] = {
+  private def setLabels(agentName: Option[String], lang: Lang)(implicit
+      messages: Messages
+  ): Seq[(String, JsObject)] = {
     Seq(
       "appLevelLabels" -> JsObject(
         Seq(
-          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title"))
+          "navTitle" -> JsString(
+            messagesApi.preferred(Seq(lang))(
+              s"$langResourcePrefix.header.title"
+            )
+          )
         )
       ),
       "selectPageLabels" -> JsObject(
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.select.heading", agentName.getOrElse("")
+              s"$langResourcePrefix.select.heading",
+              agentName.getOrElse("")
             )
           )
         )
@@ -120,7 +134,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.lookup.heading", agentName.getOrElse("")
+              s"$langResourcePrefix.lookup.heading",
+              agentName.getOrElse("")
             )
           )
         )
@@ -129,14 +144,16 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         Seq(
           "heading" -> JsString(
             messages(
-              s"$langResourcePrefix.confirm.heading", agentName.getOrElse("")
+              s"$langResourcePrefix.confirm.heading",
+              agentName.getOrElse("")
             )
           ),
           "changeLinkText" -> JsString(
             messages(
-              s"$langResourcePrefix.confirm.changeLinkText", agentName.getOrElse("")
+              s"$langResourcePrefix.confirm.changeLinkText",
+              agentName.getOrElse("")
             )
-          ),
+          )
         )
       ),
       "editPageLabels" -> JsObject(
@@ -144,7 +161,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "heading" ->
             JsString(
               messages(
-                s"$langResourcePrefix.edit.heading", agentName.getOrElse("")
+                s"$langResourcePrefix.edit.heading",
+                agentName.getOrElse("")
               )
             )
         )
@@ -152,8 +170,10 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     )
   }
 
-  private def buildConfig(agentName: Option[String], mode: Mode)
-      (implicit messages: Messages, rh: RequestHeader): JsValue = {
+  private def buildConfig(agentName: Option[String], mode: Mode)(implicit
+      messages: Messages,
+      rh: RequestHeader
+  ): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -163,7 +183,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "labels" -> JsObject(
           Seq(
             "en" -> JsObject(
-              setLabels(agentName, Lang("en") )
+              setLabels(agentName, Lang("en"))
             )
           )
         )
@@ -172,21 +192,32 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   // Step 1: Journey start/init
-  def initJourney(agentName: Option[String], mode: Mode)
-                 (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
+  def initJourney(agentName: Option[String], mode: Mode)(implicit
+      hc: HeaderCarrier,
+      messages: Messages,
+      rh: RequestHeader
+  ): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
-    Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
-    http.post(url"$addressLookupInitializeUrl")
+    Logger("application").debug(
+      s"[AddressLookupConnector] - body: ${Json.stringify(payload)}"
+    )
+    http
+      .post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]
   }
 
   // Step 2: Extract journey result/outcome
-  def getJourneyOutcome(id: String)
-                       (implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
-    Logger("application").info(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
-    http.get(url"${addressLookupOutcomeUrl(id)}").execute[AddressLookupJourneyOutcome]
+  def getJourneyOutcome(
+      id: String
+  )(implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
+    Logger("application").info(
+      s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}"
+    )
+    http
+      .get(url"${addressLookupOutcomeUrl(id)}")
+      .execute[AddressLookupJourneyOutcome]
   }
 
 }

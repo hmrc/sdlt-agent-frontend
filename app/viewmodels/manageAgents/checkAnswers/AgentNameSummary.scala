@@ -16,17 +16,20 @@
 
 package viewmodels.manageAgents.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.CheckMode
+import models.UserAnswers
 import pages.manageAgents.AgentNamePage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.summarylist.*
-import viewmodels.implicits.*
+import viewmodels.govuk.summarylist._
+import viewmodels.implicits._
 
 object AgentNameSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "manageAgents.agentName.checkYourAnswersLabel",
@@ -34,14 +37,16 @@ object AgentNameSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AgentNameController
+              .onPageLoad(CheckMode)
+              .url
           )
-            .withVisuallyHiddenText(messages("manageAgents.agentName.change.hidden"))
+            .withVisuallyHiddenText(
+              messages("manageAgents.agentName.change.hidden")
+            )
             .withAttribute("id" -> "change-agent-name")
         )
       )
     }
   }
 }
-
-

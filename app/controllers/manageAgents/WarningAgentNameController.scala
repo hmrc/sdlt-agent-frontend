@@ -16,58 +16,73 @@
 
 package controllers.manageAgents
 
-import controllers.actions.*
+import controllers.actions._
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNamePage}
+import pages.manageAgents.AgentAddressPage
+import pages.manageAgents.AgentNamePage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.WarningAgentNameView
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class WarningAgentNameController@Inject()(
-                                    override val messagesApi: MessagesApi,
-                                    val controllerComponents: MessagesControllerComponents,
-                                    sessionRepository: SessionRepository,
-                                    identify: IdentifierAction,
-                                    getData: DataRetrievalAction,
-                                    requireData: DataRequiredAction,
-                                    stornRequired: StornRequiredAction,
-                                    formProvider: AgentNameFormProvider,
-                                    view: WarningAgentNameView,
-                                    navigator: Navigator
-                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class WarningAgentNameController @Inject() (
+    override val messagesApi: MessagesApi,
+    val controllerComponents: MessagesControllerComponents,
+    sessionRepository: SessionRepository,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequired: StornRequiredAction,
+    formProvider: AgentNameFormProvider,
+    view: WarningAgentNameView,
+    navigator: Navigator
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   lazy val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired) { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequired) {
+      implicit request =>
 
-    val preparedForm = request.userAnswers.get(AgentNamePage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+        val preparedForm = request.userAnswers.get(AgentNamePage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = ( identify andThen getData andThen requireData andThen stornRequired).async { implicit request =>
-
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
-      )
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequired).async {
+      implicit request =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, mode))),
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.set(AgentNamePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(AgentAddressPage, mode, updatedAnswers)
+              )
+          )
+    }
 }

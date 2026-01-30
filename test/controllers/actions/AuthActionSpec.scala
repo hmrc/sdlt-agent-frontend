@@ -25,19 +25,26 @@ import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.Application
 import play.api.inject.bind
-import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.BodyParsers
+import play.api.mvc.Results
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
-import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
+import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup.Agent
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
+import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.util.UUID
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AuthActionSpec extends SpecBase {
 
@@ -53,8 +60,10 @@ class AuthActionSpec extends SpecBase {
       .overrides(bind[AuthConnector].toInstance(mockAuthConnector))
       .build()
 
-    val bodyParsers:BodyParsers.Default = application.injector.instanceOf[BodyParsers.Default]
-    val appConfig:FrontendAppConfig = application.injector.instanceOf[FrontendAppConfig]
+    val bodyParsers: BodyParsers.Default =
+      application.injector.instanceOf[BodyParsers.Default]
+    val appConfig: FrontendAppConfig =
+      application.injector.instanceOf[FrontendAppConfig]
 
     val orgActiveEnrolment: Enrolment = Enrolment(
       "IR-SDLT-ORG",
@@ -109,7 +118,8 @@ class AuthActionSpec extends SpecBase {
 
     val emptyEnrolment: Enrolments = Enrolments(Set.empty)
 
-    type RetrievalsType = Option[String] ~ Enrolments ~ Option[AffinityGroup] ~ Option[CredentialRole]
+    type RetrievalsType = Option[String] ~ Enrolments ~ Option[AffinityGroup] ~
+      Option[CredentialRole]
 
   }
   class Harness(authAction: IdentifierAction) {
@@ -126,9 +136,13 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new MissingBearerToken),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
@@ -146,9 +160,13 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new BearerTokenExpired),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
@@ -166,14 +184,20 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new InsufficientEnrolments), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new InsufficientEnrolments),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustBe routes.UnauthorisedController
+            .onPageLoad()
+            .url
         }
       }
     }
@@ -186,14 +210,20 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new InsufficientConfidenceLevel), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new InsufficientConfidenceLevel),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustBe routes.UnauthorisedController
+            .onPageLoad()
+            .url
         }
       }
     }
@@ -206,14 +236,20 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAuthProvider), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new UnsupportedAuthProvider),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustBe routes.UnauthorisedController
+            .onPageLoad()
+            .url
         }
       }
     }
@@ -226,14 +262,20 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedAffinityGroup), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new UnsupportedAffinityGroup),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result) mustBe Some(
+            routes.UnauthorisedController.onPageLoad().url
+          )
         }
       }
     }
@@ -246,14 +288,20 @@ class AuthActionSpec extends SpecBase {
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new UnsupportedCredentialRole), appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeFailingAuthConnector(new UnsupportedCredentialRole),
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result) mustBe Some(
+            routes.UnauthorisedController.onPageLoad().url
+          )
         }
       }
     }
@@ -262,12 +310,21 @@ class AuthActionSpec extends SpecBase {
       "must allow into the service: activated enrollment" - {
         "when the user has active IR-SDLT-AGENT enrolment with the correct activated identifiers" in new Fixture {
           val enrollments: Enrolments = Enrolments(Set(agentActiveEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Agent) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Agent) ~ Some(User)
+              )
             )
-          running(application){
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+          running(application) {
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -278,13 +335,23 @@ class AuthActionSpec extends SpecBase {
       }
       "must allow into the service: NotYetActivated enrollment" - {
         "when the user has active IR-SDLT-AGENT enrolment " in new Fixture {
-          val enrollments: Enrolments = Enrolments(Set(agentNotYetActiveEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          val enrollments: Enrolments =
+            Enrolments(Set(agentNotYetActiveEnrolment))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Agent) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Agent) ~ Some(User)
+              )
             )
           running(application) {
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -296,12 +363,21 @@ class AuthActionSpec extends SpecBase {
       "must redirect to access denied screen " - {
         "when the user has inactive IR-SDLT-AGENT enrolment " in new Fixture {
           val enrollments: Enrolments = Enrolments(Set(agentInActiveEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Agent) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Agent) ~ Some(User)
+              )
             )
           running(application) {
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -322,12 +398,21 @@ class AuthActionSpec extends SpecBase {
       "must allow into the service: with Activated enrollment" - {
         "when the user has active IR-SLDT-ORG enrolment with the correct activated identifiers" in new Fixture {
           val enrollments: Enrolments = Enrolments(Set(orgActiveEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User)
+              )
             )
           running(application) {
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -339,13 +424,23 @@ class AuthActionSpec extends SpecBase {
 
       "must allow into the service: with NotYetActive enrollment" - {
         "when the user has active IR-SLDT-ORG enrolment with the correct activated identifiers" in new Fixture {
-          val enrollments: Enrolments = Enrolments(Set(orgNotYetActivatedEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          val enrollments: Enrolments =
+            Enrolments(Set(orgNotYetActivatedEnrolment))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User)
+              )
             )
           running(application) {
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -355,15 +450,24 @@ class AuthActionSpec extends SpecBase {
         }
       }
 
-      "must redirect to access denied screen"- {
+      "must redirect to access denied screen" - {
         "when the user has inactive IR-SDLT-AGENT enrolment with the correct activated identifiers" in new Fixture {
           val enrollments: Enrolments = Enrolments(Set(orgInActiveEnrolment))
-          when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+          when(
+            mockAuthConnector
+              .authorise[RetrievalsType](any(), any())(any(), any())
+          )
             .thenReturn(
-              Future.successful(Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User))
+              Future.successful(
+                Some(id) ~ enrollments ~ Some(Organisation) ~ Some(User)
+              )
             )
           running(application) {
-            val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+            val authAction = new AuthenticatedIdentifierAction(
+              mockAuthConnector,
+              appConfig,
+              bodyParsers
+            )
             val controller = new Harness(authAction)
 
             val result = controller.onPageLoad()(FakeRequest())
@@ -379,14 +483,23 @@ class AuthActionSpec extends SpecBase {
       }
     }
 
-    "the user is logged in as an INDIVIDUAL" -{
+    "the user is logged in as an INDIVIDUAL" - {
       "must redirect to Unauthorised access screen" in new Fixture {
-        when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+        when(
+          mockAuthConnector
+            .authorise[RetrievalsType](any(), any())(any(), any())
+        )
           .thenReturn(
-            Future.successful(Some(id) ~ emptyEnrolment ~ Some(Individual) ~ Some(User))
+            Future.successful(
+              Some(id) ~ emptyEnrolment ~ Some(Individual) ~ Some(User)
+            )
           )
         running(application) {
-          val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            mockAuthConnector,
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(FakeRequest())
@@ -401,14 +514,23 @@ class AuthActionSpec extends SpecBase {
       }
     }
 
-    "the user is logged in as an ORGANISATION assistant" -{
+    "the user is logged in as an ORGANISATION assistant" - {
       "must redirect to wrong role screen" in new Fixture {
-        when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+        when(
+          mockAuthConnector
+            .authorise[RetrievalsType](any(), any())(any(), any())
+        )
           .thenReturn(
-            Future.successful(Some(id) ~ emptyEnrolment ~ Some(Organisation) ~ Some(Assistant))
+            Future.successful(
+              Some(id) ~ emptyEnrolment ~ Some(Organisation) ~ Some(Assistant)
+            )
           )
         running(application) {
-          val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            mockAuthConnector,
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(FakeRequest())
@@ -425,12 +547,19 @@ class AuthActionSpec extends SpecBase {
 
     "Unable to retrieve internal id or affinity group" - {
       "fail and redirect to Unauthorised access screen" in new Fixture {
-        when(mockAuthConnector.authorise[RetrievalsType](any(), any())(any(), any()))
+        when(
+          mockAuthConnector
+            .authorise[RetrievalsType](any(), any())(any(), any())
+        )
           .thenReturn(
             Future.successful(None ~ emptyEnrolment ~ None ~ None)
           )
         running(application) {
-          val authAction = new AuthenticatedIdentifierAction(mockAuthConnector, appConfig, bodyParsers)
+          val authAction = new AuthenticatedIdentifierAction(
+            mockAuthConnector,
+            appConfig,
+            bodyParsers
+          )
           val controller = new Harness(authAction)
 
           val result = controller.onPageLoad()(FakeRequest())
@@ -447,9 +576,13 @@ class AuthActionSpec extends SpecBase {
   }
 }
 
-class FakeFailingAuthConnector @Inject()(exceptionToReturn: Throwable) extends AuthConnector {
+class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable)
+    extends AuthConnector {
   val serviceUrl: String = ""
 
-  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
+  override def authorise[A](
+      predicate: Predicate,
+      retrieval: Retrieval[A]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
     Future.failed(exceptionToReturn)
 }

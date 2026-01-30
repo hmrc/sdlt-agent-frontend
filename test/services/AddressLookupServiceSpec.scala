@@ -17,39 +17,49 @@
 package services
 
 import connectors.AddressLookupConnector
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
-import models.responses.addresslookup.{Address, JourneyResultAddressModel}
-import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitFailureResponse, JourneyInitSuccessResponse}
+import models.CheckMode
+import models.Mode
+import models.NormalMode
+import models.UserAnswers
+import models.responses.addresslookup.Address
+import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
+import models.responses.addresslookup.JourneyInitResponse.JourneyInitFailureResponse
+import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
+import models.responses.addresslookup.JourneyResultAddressModel
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.argThat
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito._
+import org.scalactic.TripleEquals._
+import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.http.HeaderCarrier
-import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
-import org.scalatest.EitherValues
 import pages.manageAgents.AgentAddressPage
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.i18n.Messages
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessages
 import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.test.Helpers.stubMessages
-import org.scalactic.TripleEquals.*
-import play.api.mvc.RequestHeader
-import play.api.test.FakeRequest
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-
-class AddressLookupServiceSpec extends AnyWordSpec
-  with ScalaFutures
-  with Matchers
-  with EitherValues {
+class AddressLookupServiceSpec
+    extends AnyWordSpec
+    with ScalaFutures
+    with Matchers
+    with EitherValues {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val messages: Messages = stubMessages()
-  implicit val ex: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ex: ExecutionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
   implicit val request: RequestHeader = FakeRequest("GET", "/dummy-url")
 
   trait Fixture {
@@ -58,9 +68,12 @@ class AddressLookupServiceSpec extends AnyWordSpec
     val userId: String = "userId"
     val userAnswer = UserAnswers(userId)
 
-    val connector: AddressLookupConnector = mock(classOf[AddressLookupConnector])
+    val connector: AddressLookupConnector = mock(
+      classOf[AddressLookupConnector]
+    )
     val sessionRepository: SessionRepository = mock(classOf[SessionRepository])
-    val service: AddressLookupService = new AddressLookupService(connector, sessionRepository)
+    val service: AddressLookupService =
+      new AddressLookupService(connector, sessionRepository)
 
     val instant: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
 
@@ -134,7 +147,8 @@ class AddressLookupServiceSpec extends AnyWordSpec
     "return UserAnswer on success" in new Fixture {
 
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressPage, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails)
+        .toOption
         .get
         .copy(lastUpdated = instant)
 
@@ -144,26 +158,35 @@ class AddressLookupServiceSpec extends AnyWordSpec
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
         .thenReturn(Future.successful(Right(Some(expectedAddressDetails))))
 
-      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
+      val result: Either[Throwable, UserAnswers] =
+        service.getJourneyOutcome(id, userAnswer).futureValue
       result mustBe a[Either[Throwable, UserAnswers]]
 
       // align result to the same timeStamp in lastUpdate field
       val resultValue: UserAnswers = result.value.copy(lastUpdated = instant)
       resultValue must equal(updatedAnswers)
 
-      verify(connector, times(1)).getJourneyOutcome(eqTo(id))(any[HeaderCarrier])
+      verify(connector, times(1)).getJourneyOutcome(eqTo(id))(
+        any[HeaderCarrier]
+      )
       verify(sessionRepository, times(1)).set(any())
     }
 
     "return AddressLookupConnector error" in new Fixture {
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressPage, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails)
+        .toOption
         .get
 
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))))
+        .thenReturn(
+          Future.successful(
+            Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))
+          )
+        )
 
-      val result: Either[Throwable, UserAnswers] = service.getJourneyOutcome(id, userAnswer).futureValue
+      val result: Either[Throwable, UserAnswers] =
+        service.getJourneyOutcome(id, userAnswer).futureValue
       result must equal(Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR)))
 
       verify(sessionRepository, times(0)).set(eqTo(updatedAnswers))
@@ -173,12 +196,17 @@ class AddressLookupServiceSpec extends AnyWordSpec
     "return SessionRepository error" in new Fixture {
 
       val updatedAnswers: UserAnswers = UserAnswers(id = userId)
-        .set(AgentAddressPage, expectedAddressDetails).toOption
+        .set(AgentAddressPage, expectedAddressDetails)
+        .toOption
         .get
         .copy(lastUpdated = instant)
 
       when(sessionRepository.set(eqTo(updatedAnswers)))
-        .thenThrow(new RuntimeException("Failed connect to MongoDb | Or save user session"))
+        .thenThrow(
+          new RuntimeException(
+            "Failed connect to MongoDb | Or save user session"
+          )
+        )
 
       when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
         .thenReturn(Future.successful(Right(Some(expectedAddressDetails))))
@@ -190,9 +218,11 @@ class AddressLookupServiceSpec extends AnyWordSpec
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
 
       // User custom equality / override last updated
-      verify(sessionRepository, times(1)).set( argThat(captureUserAnswer =>
-        captureUserAnswer.copy(lastUpdated = instant) === updatedAnswers
-      ) )
+      verify(sessionRepository, times(1)).set(
+        argThat(captureUserAnswer =>
+          captureUserAnswer.copy(lastUpdated = instant) === updatedAnswers
+        )
+      )
     }
 
     "failed to save AddressDetails as None extracted" in new Fixture {

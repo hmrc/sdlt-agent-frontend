@@ -37,10 +37,22 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
       val html: Html = view(form, testAgentName)
       val doc: Document = Jsoup.parse(html.toString())
 
-      displaysCorrectTitle(doc, "manageAgents.confirmAgentContactDetails.title", Seq(testAgentName))
-      displaysCorrectHeading(doc, "manageAgents.confirmAgentContactDetails.heading", Seq(testAgentName))
+      displaysCorrectTitle(
+        doc,
+        "manageAgents.confirmAgentContactDetails.title",
+        Seq(testAgentName)
+      )
+      displaysCorrectHeading(
+        doc,
+        "manageAgents.confirmAgentContactDetails.heading",
+        Seq(testAgentName)
+      )
       displaysCorrectCaption(doc, "manageAgents.caption")
-      displaysCorrectHint(doc, "manageAgents.confirmAgentContactDetails.hint", Seq(testAgentName))
+      displaysCorrectHint(
+        doc,
+        "manageAgents.confirmAgentContactDetails.hint",
+        Seq(testAgentName)
+      )
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasCorrectNumOfItems(doc, ".govuk-radios__item", 2)
       hasSubmitButton(doc, "site.saveAndContinue")
@@ -49,7 +61,10 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
 
     "must display error messages when form has errors" in new Setup {
       val errorForm: Form[?] = form
-        .withError("value", "manageAgents.confirmAgentContactDetails.error.required")
+        .withError(
+          "value",
+          "manageAgents.confirmAgentContactDetails.error.required"
+        )
 
       val html: Html = view(errorForm, testAgentName)
       val doc: Document = Jsoup.parse(html.toString())
@@ -57,20 +72,23 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
       displaysErrorSummary(
         doc,
         Seq(
-          "manageAgents.confirmAgentContactDetails.error.required",
+          "manageAgents.confirmAgentContactDetails.error.required"
         )
       )
     }
   }
 
   trait Setup {
-    val app: Application                     = applicationBuilder().build()
-    val formProvider                         = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[?]                        = formProvider("agentName")
-    implicit def request: Request[?]         = FakeRequest()
-    implicit def messages: Messages          = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: ConfirmAgentContactDetailsView = app.injector.instanceOf[ConfirmAgentContactDetailsView]
-    val testAgentName                        = "Haborview Estates"
+    val app: Application = applicationBuilder().build()
+    val formProvider = new ConfirmAgentContactDetailsFormProvider()
+    val form: Form[?] = formProvider("agentName")
+    implicit def request: Request[?] = FakeRequest()
+    implicit def messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: ConfirmAgentContactDetailsView =
+      app.injector.instanceOf[ConfirmAgentContactDetailsView]
+    val testAgentName = "Haborview Estates"
   }
 }
-

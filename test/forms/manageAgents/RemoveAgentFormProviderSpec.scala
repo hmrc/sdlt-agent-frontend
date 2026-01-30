@@ -16,30 +16,39 @@
 
 package forms.manageAgents
 
-import forms.behaviours.{OptionFieldBehaviours, StringFieldBehaviours}
+import forms.behaviours.OptionFieldBehaviours
+import forms.behaviours.StringFieldBehaviours
 import models.manageAgents.RemoveAgent
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
 import utils.manageAgents.AgentDetailsTestUtil
 
-class RemoveAgentFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class RemoveAgentFormProviderSpec
+    extends OptionFieldBehaviours
+    with StringFieldBehaviours
+    with AgentDetailsTestUtil
+    with GuiceOneAppPerSuite {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
-  val formProvider =  new RemoveAgentFormProvider
-
+  val formProvider = new RemoveAgentFormProvider
 
   val form = formProvider(testAgentDetails)
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = messages("manageAgents.removeAgent.error.required", testAgentDetails.name)
+    val requiredKey =
+      messages("manageAgents.removeAgent.error.required", testAgentDetails.name)
 
     behave like optionsField[RemoveAgent](
       form,
       fieldName,
-      validValues  = RemoveAgent.values,
+      validValues = RemoveAgent.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

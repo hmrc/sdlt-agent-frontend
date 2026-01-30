@@ -20,28 +20,35 @@ import forms.FormSpec
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.data.{Form, FormError}
+import play.api.data.Form
+import play.api.data.FormError
 
-trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
+trait FieldBehaviours
+    extends FormSpec
+    with ScalaCheckPropertyChecks
+    with Generators {
 
-  def fieldThatBindsValidData(form: Form[_],
-                              fieldName: String,
-                              validDataGenerator: Gen[String]): Unit = {
+  def fieldThatBindsValidData(
+      form: Form[_],
+      fieldName: String,
+      validDataGenerator: Gen[String]
+  ): Unit = {
 
     "bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") {
-        (dataItem: String) =>
-          val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
-          result.value.value mustBe dataItem
-          result.errors mustBe empty
+      forAll(validDataGenerator -> "validDataItem") { (dataItem: String) =>
+        val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+        result.value.value mustBe dataItem
+        result.errors mustBe empty
       }
     }
   }
 
-  def mandatoryField(form: Form[_],
-                     fieldName: String,
-                     requiredError: FormError): Unit = {
+  def mandatoryField(
+      form: Form[_],
+      fieldName: String,
+      requiredError: FormError
+  ): Unit = {
 
     "not bind when key is not present at all" in {
 
@@ -56,7 +63,12 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     }
   }
 
-  def invalidField(form: Form[?], fieldName: String, requiredError: FormError, invalidData: String): Unit = {
+  def invalidField(
+      form: Form[?],
+      fieldName: String,
+      requiredError: FormError,
+      invalidData: String
+  ): Unit = {
 
     "not bind invalid values" in {
 
@@ -65,17 +77,18 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     }
   }
 
-  def lengthValidation(form: Form[_],
-                            fieldName: String,
-                            maxLength: Int,
-                            lengthError: FormError): Unit = {
+  def lengthValidation(
+      form: Form[_],
+      fieldName: String,
+      maxLength: Int,
+      lengthError: FormError
+  ): Unit = {
 
     s"not bind strings longer than $maxLength characters" in {
 
-      forAll(stringsLongerThan(maxLength) -> "longString") {
-        (string: String) =>
-          val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-          result.errors must contain(lengthError)
+      forAll(stringsLongerThan(maxLength) -> "longString") { (string: String) =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors must contain(lengthError)
       }
     }
   }

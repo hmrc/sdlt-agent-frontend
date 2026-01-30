@@ -17,34 +17,45 @@
 package models.requests
 
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{Json, OWrites, Reads, __}
+import play.api.libs.json.Json
+import play.api.libs.json.OWrites
+import play.api.libs.json.Reads
+import play.api.libs.json.__
 
 case class CreatePredefinedAgentRequest(
-                                storn: String,
-                                agentName: String,
-                                addressLine1: Option[String],
-                                addressLine2: Option[String],
-                                addressLine3: Option[String],
-                                addressLine4: Option[String],
-                                postcode: Option[String],
-                                phone: Option[String],
-                                email: Option[String]
-                              )
+    storn: String,
+    agentName: String,
+    addressLine1: Option[String],
+    addressLine2: Option[String],
+    addressLine3: Option[String],
+    addressLine4: Option[String],
+    postcode: Option[String],
+    phone: Option[String],
+    email: Option[String]
+)
 
 object CreatePredefinedAgentRequest {
 
   implicit val reads: Reads[CreatePredefinedAgentRequest] = (
     (__ \ "storn").read[String] and
       (__ \ "agentName").read[String] and
-      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.headOption) and
-      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(1)) and
-      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(2)) and
-      (__ \ "agentAddress" \ "address" \ "lines").read[Seq[String]].map(_.lift(3)) and
+      (__ \ "agentAddress" \ "address" \ "lines")
+        .read[Seq[String]]
+        .map(_.headOption) and
+      (__ \ "agentAddress" \ "address" \ "lines")
+        .read[Seq[String]]
+        .map(_.lift(1)) and
+      (__ \ "agentAddress" \ "address" \ "lines")
+        .read[Seq[String]]
+        .map(_.lift(2)) and
+      (__ \ "agentAddress" \ "address" \ "lines")
+        .read[Seq[String]]
+        .map(_.lift(3)) and
       (__ \ "agentAddress" \ "address" \ "postcode").readNullable[String] and
       (__ \ "agentContactDetails" \ "phone").readNullable[String] and
       (__ \ "agentContactDetails" \ "email").readNullable[String]
-    )(CreatePredefinedAgentRequest.apply _)
+  )(CreatePredefinedAgentRequest.apply _)
 
-
-  implicit val writes: OWrites[CreatePredefinedAgentRequest] = Json.writes[CreatePredefinedAgentRequest]
+  implicit val writes: OWrites[CreatePredefinedAgentRequest] =
+    Json.writes[CreatePredefinedAgentRequest]
 }

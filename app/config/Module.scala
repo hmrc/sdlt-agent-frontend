@@ -16,23 +16,33 @@
 
 package config
 
+import com.google.inject.AbstractModule
 import controllers.actions._
 
-import java.time.{Clock, ZoneOffset}
-import com.google.inject.AbstractModule
+import java.time.Clock
+import java.time.ZoneOffset
 
 class Module extends AbstractModule {
 
   override def configure(): Unit = {
 
-    bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
-    bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
-    bind(classOf[StornRequiredAction]).to(classOf[StornRequiredActionImpl]).asEagerSingleton()
-
+    bind(classOf[DataRetrievalAction])
+      .to(classOf[DataRetrievalActionImpl])
+      .asEagerSingleton()
+    bind(classOf[DataRequiredAction])
+      .to(classOf[DataRequiredActionImpl])
+      .asEagerSingleton()
+    bind(classOf[StornRequiredAction])
+      .to(classOf[StornRequiredActionImpl])
+      .asEagerSingleton()
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
-    bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
+    bind(classOf[IdentifierAction])
+      .to(classOf[AuthenticatedIdentifierAction])
+      .asEagerSingleton()
 
-    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[Clock]).toInstance(
+      Clock.systemDefaultZone.withZone(ZoneOffset.UTC)
+    )
   }
 }

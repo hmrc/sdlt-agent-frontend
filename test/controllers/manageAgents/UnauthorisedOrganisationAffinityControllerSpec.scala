@@ -19,7 +19,7 @@ package controllers.manageAgents
 import base.SpecBase
 import config.FrontendAppConfig
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import views.html.manageAgents.UnauthorisedOrgView
 
 class UnauthorisedOrganisationAffinityControllerSpec extends SpecBase {
@@ -28,19 +28,29 @@ class UnauthorisedOrganisationAffinityControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
       running(application) {
-        val request = FakeRequest(GET, controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad().url)
+        val request = FakeRequest(
+          GET,
+          controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController
+            .onPageLoad()
+            .url
+        )
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UnauthorisedOrgView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, appConfig, messages(application)).toString
+        contentAsString(result) mustEqual view()(
+          request,
+          appConfig,
+          messages(application)
+        ).toString
       }
     }
   }

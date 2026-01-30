@@ -16,39 +16,53 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.actions.DataRequiredAction
+import controllers.actions.DataRetrievalAction
+import controllers.actions.IdentifierAction
+import controllers.actions.StornRequiredAction
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
 import models.NormalMode
 import models.manageAgents.ConfirmAgentContactDetails
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.AgentCheckYourAnswersPage
+import pages.manageAgents.AgentContactDetailsPage
+import pages.manageAgents.AgentNamePage
 import play.api.Logging
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.LoggerUtil.{logError, logInfo}
+import utils.LoggerUtil.logError
+import utils.LoggerUtil.logInfo
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmAgentContactDetailsController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       stornRequiredAction: StornRequiredAction,
-                                       formProvider: ConfirmAgentContactDetailsFormProvider,
-                                       navigator: Navigator,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ConfirmAgentContactDetailsView
-                                     ) extends FrontendBaseController with I18nSupport with Logging {
+class ConfirmAgentContactDetailsController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    formProvider: ConfirmAgentContactDetailsFormProvider,
+    navigator: Navigator,
+    val controllerComponents: MessagesControllerComponents,
+    view: ConfirmAgentContactDetailsView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-
-  private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =
+  private def getAgentName(implicit
+      request: DataRequest[AnyContent]
+  ): Either[Result, String] =
     request.userAnswers.get(AgentNamePage) match {
       case Some(name) => Right(name)
       case None =>
@@ -58,39 +72,57 @@ class ConfirmAgentContactDetailsController @Inject()(
         }
     }
 
-
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
       getAgentName match {
         case Left(redirect) => redirect
         case Right(agentName) =>
           val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
           Ok(view(form, agentName))
       }
-  }
+    }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
-    implicit request =>
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        getAgentName match {
+          case Right(agentName) =>
+            val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future
+                    .successful(BadRequest(view(formWithErrors, agentName))),
+                {
+                  case ConfirmAgentContactDetails.Option1 =>
+                    Future.successful(
+                      Redirect(
+                        navigator.nextPage(
+                          AgentContactDetailsPage,
+                          NormalMode,
+                          request.userAnswers
+                        )
+                      )
+                    )
 
-      getAgentName match {
-        case Right(agentName) =>
-          val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, agentName))),
-
-            {
-              case ConfirmAgentContactDetails.Option1 =>
-                Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
-
-              case ConfirmAgentContactDetails.Option2 =>
-                logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] No agent contact details option selected")
-                Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
-            }
-          )
-        case Left(redirect) => Future.successful(redirect)
+                  case ConfirmAgentContactDetails.Option2 =>
+                    logInfo(
+                      s"[ConfirmAgentContactDetailsController][onSubmit] No agent contact details option selected"
+                    )
+                    Future.successful(
+                      Redirect(
+                        navigator.nextPage(
+                          AgentCheckYourAnswersPage,
+                          NormalMode,
+                          request.userAnswers
+                        )
+                      )
+                    )
+                }
+              )
+          case Left(redirect) => Future.successful(redirect)
+        }
       }
-  }
 
 }
