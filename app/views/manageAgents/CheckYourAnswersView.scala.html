@@ -15,11 +15,12 @@
  *@
 
 @import viewmodels.govuk.button.ButtonViewModel
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
-    h1: components.H1,
+    hmrcPageHeading: HmrcPageHeading,
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton
 )
@@ -29,7 +30,12 @@
 @layout(pageTitle = titleNoForm(messages("manageAgents.checkYourAnswers.title"))) {
 
     @formHelper(action = postAction) {
-        @h1("manageAgents.checkYourAnswers.heading")
+        @hmrcPageHeading(PageHeading(
+            text           = messages("manageAgents.checkYourAnswers.heading"),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l"),
+            section        = Some(messages("manageAgents.caption"))
+        ))
 
         @govukSummaryList(list)
 

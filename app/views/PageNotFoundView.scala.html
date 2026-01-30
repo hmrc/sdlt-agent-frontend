@@ -15,30 +15,34 @@
  *@
 
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 @import views.html.components._
 
 @this(
         layout: templates.Layout,
-        heading: components.H1,
+        hmrcPageHeading: HmrcPageHeading,
         paragraph: Paragraph,
         link: components.Link
 )
 
 @()(implicit request: RequestHeader, appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(
-    pageTitle = titleNoForm(messages("pageNotFound.title")),
-    showSignOut = false
-) {
+    @layout(
+        pageTitle = titleNoForm(messages("pageNotFound.title")),
+        showSignOut = false
+    ) {
+        @hmrcPageHeading(PageHeading(
+            text           = messages("pageNotFound.heading"),
+            headingClasses = Some("govuk-heading-l")
+        ))
 
-    @heading(messages("pageNotFound.heading"))
-    @paragraph(messages("pageNotFound.p1"))
-    @paragraph(messages("pageNotFound.p2"))
-    @link(
-        "pageNotFound.link",
-        appConfig.hmrcOnlineServiceDeskUrl,
-        prefixTextKey = "pageNotFound.p3",
-        suffixTextKey = "pageNotFound.p4",
-        extraClasses = "govuk-!-margin-bottom-9"
-    )
-}
+        @paragraph(messages("pageNotFound.p1"))
+        @paragraph(messages("pageNotFound.p2"))
+        @link(
+            "pageNotFound.link",
+            appConfig.hmrcOnlineServiceDeskUrl,
+            prefixTextKey = "pageNotFound.p3",
+            suffixTextKey = "pageNotFound.p4",
+            extraClasses = "govuk-!-margin-bottom-9"
+        )
+    }

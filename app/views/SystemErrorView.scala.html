@@ -15,27 +15,31 @@
  *@
 
 @import config.FrontendAppConfig
-@import views.html.components.Heading
-@import views.html.components.ParagraphWithLink
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import views.html.components.Link
+
 @this(
         layout: templates.Layout,
-        heading: Heading,
-        paragraphWithLink: ParagraphWithLink
+        hmrcPageHeading: HmrcPageHeading,
+        link: Link
 )
 
 @()(implicit request: RequestHeader,  appConfig: FrontendAppConfig, messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("systemError.title")),
-    showBackLink = true,
-    showSignOut = false
+    @layout(
+        pageTitle = titleNoForm(messages("systemError.title")),
+        showSignOut = false
+    ) {
 
-) {
+        @hmrcPageHeading(PageHeading(
+            text           = messages("systemError.heading"),
+            headingClasses = Some("govuk-heading-l")
+        ))
 
-    @heading(messages("systemError.heading"))
-    @paragraphWithLink(
-        messages("systemError.paragraph1"),
-        messages("systemError.link"),
-        appConfig.hmrcOnlineServiceDeskUrl
-
-    )
-}
+        @link(
+            "systemError.link",
+            appConfig.hmrcOnlineServiceDeskUrl,
+            prefixTextKey = "systemError.paragraph1",
+            linkFullStop = true
+        )
+    }
