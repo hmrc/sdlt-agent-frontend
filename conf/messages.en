@@ -54,7 +54,7 @@ manageAgents.contactTelephoneNumber.change.hidden =
 manageAgents.contactEmail.checkYourAnswersLabel = Contact email
 manageAgents.contactEmail.change.hidden = 
 
-manageAgents.checkYourAnswers.title = Check your answers – Agent details
+manageAgents.checkYourAnswers.title = Check your answers – Manage agents
 manageAgents.checkYourAnswers.heading = Check your answers
 
 accessDenied.title = Sorry, there is a problem with the service
@@ -87,7 +87,7 @@ systemError.paragraph1  = Try again later or contact the
 systemError.link        = HMRC Online Services Helpdesk
 
 manageAgents.confirmAgentContactDetails.error.required = Confirm that you want to add agent contact details
-manageAgents.confirmAgentContactDetails.title = Do you want to add contact details – Agent details
+manageAgents.confirmAgentContactDetails.title = Do you want to add contact details for the agent? – Manage agents
 manageAgents.confirmAgentContactDetails.heading = Do you want to add contact details for {0}?
 manageAgents.confirmAgentContactDetails.hint = We’ll only use these details to contact {0} about this return
 
@@ -110,11 +110,11 @@ manageAgents.agentName.error.length = The agent’s name must be 28 characters o
 manageAgents.agentName.error.required = Enter the agent’s name
 manageAgents.agentName.warning = This agent name already exists, are you sure you want to continue?
 
-manageAgents.agentName.title = What is the agent’s name? – Agent details
+manageAgents.agentName.title = What is the agent’s name? – Manage agents
 manageAgents.agentName.heading = What is the agent’s name?
 manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds
 manageAgents.agentName.button = Continue
-manageAgents.removeAgent.title = Are you sure you want to remove this agent? – Agent details
+manageAgents.removeAgent.title = Are you sure you want to remove this agent? – Manage agents
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
 manageAgents.removeAgent.error.required = Confirm that you want to remove {0}
 
@@ -122,7 +122,7 @@ manageAgents.agentOverview.noAgents.info.text       = Any agents added can be li
 manageAgents.agentOverview.nonZeroAgents.info.text  = You can link an agent to a purchaser within ‘About the purchaser’.
 manageAgents.agentOverview.noAgents.text            = You have no agents listed.
 manageAgents.agentOverview.remove.visuallyHidden    = Change {0}
-manageAgents.agentOverview.title                    = Agent overview – Agent details
+manageAgents.agentOverview.title                    = Agent overview – Manage agents
 manageAgents.agentDetails.heading                   = Agent Overview
 manageAgents.agentDetails.addAgentButtonText        = Add an Agent
 manageAgents.agentDetails.summaryInfo.text          = Showing <b>{0}</b> to <b>{1}</b> of <b>{2}</b> records
