@@ -37,9 +37,9 @@ import scala.concurrent.Future
 class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport {
   val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
-  def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
+  def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
-  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/agent-contact-details")
+  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/agent-contact-details")
 
   val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = messagesApi.preferred(FakeRequest())
