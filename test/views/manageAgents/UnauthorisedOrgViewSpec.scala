@@ -31,13 +31,33 @@ import views.html.manageAgents.UnauthorisedOrgView
 class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
 
   "UnauthorisedOrgView" - {
-
     "must render the page with correct html elements" in new Setup {
       val html: Html = view()
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.unauthorised.org.title")
       displaysCorrectHeading(doc, "manageAgents.unauthorised.org.heading")
+    }
+    "must render the page with correct paragraph link" in new Setup {
+      val html = view()
+      val doc: Document = Jsoup.parse(html.toString())
+
+      val paragraph = doc.select("p.govuk-body")
+      val link = doc.selectFirst("p.govuk-body a.govuk-link")
+
+      paragraph.size() mustBe 1
+      paragraph.text() must include(messages("manageAgents.unauthorised.org.paragraph"))
+      paragraph.text() must include(messages("manageAgents.unauthorised.org.link"))
+      link.attr("href") mustBe "/stamp-duty-land-tax-agent/agent-details/agent-overview?paginationIndex=1"
+
+    }
+    "render the page with url link" in new Setup {
+      val html = view()
+      val doc: Document = Jsoup.parse(html.toString())
+
+      val linkName = doc.select("a.govuk-link.hmrc-report-technical-issue")
+
+      linkName.text() mustBe ("Is this page not working properly? (opens in new tab)")
     }
   }
 
