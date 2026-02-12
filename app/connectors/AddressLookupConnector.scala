@@ -53,7 +53,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
       "continueUrl" -> JsString(continueUrl(mode)),
       "signOutHref" -> JsString(appConfig.signOutUrlForAddressLookupFrontend),
       "ukMode" -> JsBoolean(true),
-      // TODO: we expect Welsh translation to be disabled / not working as expected
       "disableTranslations" -> JsBoolean(true),
 
       "showPhaseBanner" -> JsBoolean(true),
