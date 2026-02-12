@@ -39,7 +39,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
   def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
-  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/agent-contact-details")
+  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
 
   val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = messagesApi.preferred(FakeRequest())
