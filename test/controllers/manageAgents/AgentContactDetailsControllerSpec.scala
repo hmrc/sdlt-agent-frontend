@@ -41,7 +41,7 @@ class AgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with 
   val messagesApi = application.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = messagesApi.preferred(FakeRequest())
 
-  def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/agent-details/check-your-answers")
+  def onwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
   val formProvider = new AgentContactDetailsFormProvider()
   lazy val AgentContactDetailsRoute = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode).url
