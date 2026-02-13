@@ -142,3 +142,7 @@ manageAgents.addressLookup.lookup.heading           = Find {0}’s address
 manageAgents.addressLookup.confirm.heading          = Review and confirm {0}’s address
 manageAgents.addressLookup.confirm.changeLinkText   = Edit address
 manageAgents.addressLookup.edit.heading             = Enter {0}’s address
+manageAgents.addressLookup.confirm.title            = Review and confirm the agent’s address – Manage agents – Stamp Taxes Online – GOV.UK
+manageAgents.addressLookup.choose.title             = Choose the agent’s address – Manage agents – Stamp Taxes Online – GOV.UK
+manageAgents.addressLookup.find.title               = Find the agent’s address – Manage agents – Stamp Taxes Online – GOV.UK
+manageAgents.addressLookup.enter.title              = Enter the agent’s address – Manage agents – Stamp Taxes Online – GOV.UK
