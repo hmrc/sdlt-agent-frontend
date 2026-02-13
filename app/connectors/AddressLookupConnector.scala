@@ -103,33 +103,33 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     Seq(
       "appLevelLabels" -> JsObject(
         Seq(
-          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"$langResourcePrefix.header.title"))
+          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"manageAgents.addressLookup.header.title"))
         )
       ),
       "selectPageLabels" -> JsObject(
         Seq(
           "title" -> JsString(messages("manageAgents.addressLookup.choose.title")),
-          "heading" -> JsString(messages(s"$langResourcePrefix.select.heading", agentName.getOrElse("")))
+          "heading" -> JsString(messages(s"manageAgents.addressLookup.select.heading", agentName.getOrElse("")))
         )
       ),
       "lookupPageLabels" -> JsObject(
         Seq(
           "title" -> JsString(messages("manageAgents.addressLookup.find.title")),
-          "heading" -> JsString(messages(s"$langResourcePrefix.lookup.heading", agentName.getOrElse("")))
+          "heading" -> JsString(messages(s"manageAgents.addressLookup.lookup.heading", agentName.getOrElse("")))
         )
       ),
       "confirmPageLabels" -> JsObject(
         Seq(
           "title" -> JsString(messages("manageAgents.addressLookup.confirm.title")),
-          "heading" -> JsString(messages(s"$langResourcePrefix.confirm.heading", agentName.getOrElse(""))),
-          "changeLinkText" -> JsString(messages(s"$langResourcePrefix.confirm.changeLinkText", agentName.getOrElse(""))
+          "heading" -> JsString(messages(s"manageAgents.addressLookup.confirm.heading", agentName.getOrElse(""))),
+          "changeLinkText" -> JsString(messages(s"manageAgents.addressLookup.confirm.changeLinkText", agentName.getOrElse(""))
           ),
         )
       ),
       "editPageLabels" -> JsObject(
         Seq(
           "title" -> JsString(messages("manageAgents.addressLookup.enter.title")),
-          "heading" -> JsString(messages(s"$langResourcePrefix.edit.heading", agentName.getOrElse("")))
+          "heading" -> JsString(messages(s"manageAgents.addressLookup.edit.heading", agentName.getOrElse("")))
         )
       )
     )
