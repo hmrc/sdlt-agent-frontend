@@ -48,7 +48,7 @@ class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
       paragraph.size() mustBe 1
       paragraph.text() must include(messages("manageAgents.unauthorised.org.paragraph"))
       paragraph.text() must include(messages("manageAgents.unauthorised.org.link"))
-      link.attr("href") mustBe "/stamp-duty-land-tax-agent/agent-details/agent-overview?paginationIndex=1"
+      link.attr("href") mustBe "/stamp-duty-land-tax-agent/manage-agents/agent-overview?paginationIndex=1"
 
     }
     "render the page with url link" in new Setup {
