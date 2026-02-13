@@ -108,44 +108,28 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
       ),
       "selectPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(
-            messages(
-              s"$langResourcePrefix.select.heading", agentName.getOrElse("")
-            )
-          )
+          "title" -> JsString(messages("manageAgents.addressLookup.choose.title")),
+          "heading" -> JsString(messages(s"$langResourcePrefix.select.heading", agentName.getOrElse("")))
         )
       ),
       "lookupPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(
-            messages(
-              s"$langResourcePrefix.lookup.heading", agentName.getOrElse("")
-            )
-          )
+          "title" -> JsString(messages("manageAgents.addressLookup.find.title")),
+          "heading" -> JsString(messages(s"$langResourcePrefix.lookup.heading", agentName.getOrElse("")))
         )
       ),
       "confirmPageLabels" -> JsObject(
         Seq(
-          "heading" -> JsString(
-            messages(
-              s"$langResourcePrefix.confirm.heading", agentName.getOrElse("")
-            )
-          ),
-          "changeLinkText" -> JsString(
-            messages(
-              s"$langResourcePrefix.confirm.changeLinkText", agentName.getOrElse("")
-            )
+          "title" -> JsString(messages("manageAgents.addressLookup.confirm.title")),
+          "heading" -> JsString(messages(s"$langResourcePrefix.confirm.heading", agentName.getOrElse(""))),
+          "changeLinkText" -> JsString(messages(s"$langResourcePrefix.confirm.changeLinkText", agentName.getOrElse(""))
           ),
         )
       ),
       "editPageLabels" -> JsObject(
         Seq(
-          "heading" ->
-            JsString(
-              messages(
-                s"$langResourcePrefix.edit.heading", agentName.getOrElse("")
-              )
-            )
+          "title" -> JsString(messages("manageAgents.addressLookup.enter.title")),
+          "heading" -> JsString(messages(s"$langResourcePrefix.edit.heading", agentName.getOrElse("")))
         )
       )
     )
