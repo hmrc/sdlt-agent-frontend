@@ -131,8 +131,8 @@ manageAgents.agentDetails.removeAgent.notification  = You have removed {0}
 manageAgents.agentDetails.submitAgent.notification  = You have added {0}
 manageAgents.agentDetails.updateAgent.notification  = You have updated {0}
 
-manageAgents.unauthorised.org.title                 = Sorry, there is a problem with this service
-manageAgents.unauthorised.org.heading               = Sorry, there is a problem with this service
+manageAgents.unauthorised.org.title                 = Sorry, there is a problem with the service
+manageAgents.unauthorised.org.heading               = Sorry, there is a problem with the service
 manageAgents.unauthorised.org.paragraph             = Return to
 manageAgents.unauthorised.org.link                  = SDLT homepage.
 
