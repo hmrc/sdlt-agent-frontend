@@ -16,10 +16,12 @@
 
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import views.html.components._
 
 @this(
         layout : templates.Layout,
         hmrcPageHeading: HmrcPageHeading,
+        paragraph: Paragraph
 )
 
 
@@ -35,5 +37,11 @@
         text           = messages("manageAgents.unauthorised.org.heading"),
         headingClasses = Some("govuk-heading-l")
     ))
+
+    @paragraph(
+        message = messages("manageAgents.unauthorised.org.paragraph") +
+                s""" <a class="govuk-link" href="/stamp-duty-land-tax-agent/manage-agents/agent-overview?paginationIndex=1">SDLT homepage</a>.
+       |""".stripMargin
+    )
 
 }
