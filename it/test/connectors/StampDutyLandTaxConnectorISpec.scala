@@ -193,7 +193,7 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       dxAddress = None
     )
 
-    "return expected response" in {
+    "return expected response with status code: 200:OK" in {
       stubFor(
         post(urlPathEqualTo(updateAgentDetailsUrl))
           .willReturn(
@@ -206,6 +206,22 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
       val result = connector.updateAgentDetails(updateAgentDetails).futureValue
 
       result mustBe UpdatePredefinedAgentResponse(updated = true)
+    }
+
+    "return error response with status code: 500:INTERNAL_ERROR" in {
+      stubFor(
+        post(urlPathEqualTo(updateAgentDetailsUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(INTERNAL_SERVER_ERROR)
+              .withBody("boom")
+          )
+      )
+
+        val ex = intercept[Exception] {
+          connector.updateAgentDetails(updateAgentDetails).futureValue
+        }
+        ex.getMessage must include("returned 500")
     }
   }
 
