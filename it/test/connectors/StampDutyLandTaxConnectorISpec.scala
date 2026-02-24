@@ -18,10 +18,8 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
 import itutil.ApplicationWithWiremock
-import models.requests.CreatePredefinedAgentRequest
-import models.responses.CreatePredefinedAgentResponse
-import models.requests.DeletePredefinedAgentRequest
-import models.responses.DeletePredefinedAgentResponse
+import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
+import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -174,6 +172,40 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
         connector.getSdltOrganisation(storn).futureValue
       }
       ex.getMessage must include("returned 500")
+    }
+  }
+
+  "updateAgentDetails" should {
+    val updateAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/update/predefined-agent"
+
+    val updateAgentDetails = UpdatePredefinedAgent(
+      agentResourceReference = Some("REF"),
+      storn = "STORN",
+      agentName = "AgentName",
+      houseNumber = None,
+      addressLine1 = None,
+      addressLine2 = None,
+      addressLine3 = None,
+      addressLine4 = None,
+      postcode = None,
+      phone = None,
+      email = None,
+      dxAddress = None
+    )
+
+    "return expected response" in {
+      stubFor(
+        post(urlPathEqualTo(updateAgentDetailsUrl))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("""{"updated": true }""")
+          )
+      )
+
+      val result = connector.updateAgentDetails(updateAgentDetails).futureValue
+
+      result mustBe UpdatePredefinedAgentResponse(updated = true)
     }
   }
 
