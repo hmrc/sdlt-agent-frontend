@@ -23,13 +23,13 @@ import models.responses.addresslookup.JourneyInitResponse.AddressLookupResponse
 import models.responses.addresslookup.JourneyOutcomeResponse.AddressLookupJourneyOutcome
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.libs.json.*
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-
+import utils.LoggerUtil.{logDebug, logInfo}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.Logger
-import play.api.mvc.RequestHeader
+
 
 @Singleton
 class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
@@ -159,7 +159,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                  (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
-    Logger("application").debug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
+    logDebug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]
@@ -168,7 +168,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 2: Extract journey result/outcome
   def getJourneyOutcome(id: String)
                        (implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
-    Logger("application").info(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
+    logInfo(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
     http.get(url"${addressLookupOutcomeUrl(id)}").execute[AddressLookupJourneyOutcome]
   }
 
