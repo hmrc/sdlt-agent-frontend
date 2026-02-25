@@ -49,6 +49,7 @@ trait SpecBase
   )
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, stornData)
+  def emptyUserAnswersWithNoStorn: UserAnswers = UserAnswers(userAnswersId, Json.obj())
 
   val emptyUserAnswersWithStorn: UserAnswers = emptyUserAnswers.set(StornPage, testStorn).success.value
 
