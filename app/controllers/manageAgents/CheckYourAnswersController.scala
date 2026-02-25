@@ -48,7 +48,7 @@ class CheckYourAnswersController @Inject()(
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           )(implicit executionContext: ExecutionContext)
-  extends FrontendBaseController with I18nSupport  with UserAnswersHelper {
+  extends FrontendBaseController with I18nSupport  {
 
   def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
@@ -73,7 +73,7 @@ class CheckYourAnswersController @Inject()(
         case (_, Some(paramArn)) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, paramArn) flatMap {
             case Some(agentDetails) =>
-              updateUserAnswers(agentDetails)
+              stampDutyLandTaxService.updateUserAnswers(agentDetails)
                 .fold({ error =>
                   logError(s"[CheckYourAnswersController][onPageLoad] Failed to build UA: ${error.getMessage}")
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))

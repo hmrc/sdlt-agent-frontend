@@ -22,6 +22,7 @@ import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentRes
 import models.requests.DeletePredefinedAgentRequest
 import models.responses.organisation.CreatedAgent
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.manageAgents.UserAnswersHelper
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext) extends UserAnswersHelper{
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
                      (implicit headerCarrier: HeaderCarrier): Future[Option[CreatedAgent]] =

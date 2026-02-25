@@ -26,7 +26,6 @@ import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
-import utils.manageAgents.UserAnswersHelper
 
 class UserAnswersHelperSpec
   extends SpecBase

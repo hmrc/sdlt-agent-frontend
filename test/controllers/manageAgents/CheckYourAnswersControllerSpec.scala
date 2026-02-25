@@ -18,13 +18,16 @@ package controllers.manageAgents
 
 import controllers.routes
 import models.{NormalMode, UserAnswers}
-import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
+import models.manageAgents.AgentContactDetails
+import models.requests.DataRequest
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
 import navigation.Navigator
@@ -37,6 +40,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil with MockitoSugar {
 
@@ -45,6 +49,16 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
+
+  private def toUserAnswerConverter(agentDetails: CreatedAgent) = {
+      for {
+        userAnswersTwo <- emptyUserAnswers.set(AgentNamePage, agentDetails.name)
+        addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
+        userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
+        userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
+        userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
+      } yield userAnswersFive
+  }
 
   "onPageLoad" - {
     "Check Your Answers Controller (with no ARN population)" - {
@@ -166,8 +180,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
 
+        val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+        when(service.updateUserAnswers(any())(any()))
+          .thenReturn(userAnswersTry)
+
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
           val result = route(application, request).value
           val body = contentAsString(result)
 
@@ -258,6 +277,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
 
+          val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+          when(mockService.updateUserAnswers(any())(any()))
+            .thenReturn(userAnswersTry)
+
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
 
@@ -318,6 +341,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+          when(mockService.updateUserAnswers(any())(any()))
+            .thenReturn(userAnswersTry)
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))

@@ -16,15 +16,18 @@
 
 package utils.manageAgents
 
+import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
 
+import scala.util.Try
+
 trait UserAnswersHelper {
 
-  def updateUserAnswers(agentDetails: CreatedAgent)(implicit request: DataRequest[_]) = {
+  def updateUserAnswers(agentDetails: CreatedAgent)(implicit request: DataRequest[_]): Try[UserAnswers] = {
     for {
       userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
       userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
