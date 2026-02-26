@@ -43,8 +43,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private val sessionTimeout: Long = appConfig.sessionTimeOut
   private val addressLookupTimeoutUrl: String = appConfig.addressLookupTimeoutUrl
 
-  private val langResourcePrefix : String = "manageAgents.addressLookup"
-
   private val continueUrl = (mode: Mode) => appConfig.host +
     controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
