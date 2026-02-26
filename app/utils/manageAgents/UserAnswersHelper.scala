@@ -28,7 +28,9 @@ import scala.util.Try
 
 trait UserAnswersHelper {
 
-  def updateUserAnswers(agentDetails: CreatedAgent)(implicit request: DataRequest[_]): Try[UserAnswers] = {
+  // Try to convert createdAgent object to UserAnswers
+  def updateUserAnswers(agentDetails: CreatedAgent)
+                       (implicit request: DataRequest[_]): Try[UserAnswers] = {
     for {
       userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
       userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
@@ -39,9 +41,7 @@ trait UserAnswersHelper {
     } yield userAnswersFive
   }
 
-  /*
-    Attempt to extract agentName from request.userAnswer
-   */
+  // Attempt to extract agentName from request.userAnswer
   def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] =
     request.userAnswers.get(AgentNamePage) match {
       case Some(name) =>
