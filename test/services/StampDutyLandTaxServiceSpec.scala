@@ -305,4 +305,33 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   }
 
+
+  "getAgentDetails" should {
+    "call connector and handle result correctly" in new Fixture {
+
+      when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(payload))
+
+      val result: Option[CreatedAgent] = service.getAgentDetails(storn, agentReferenceNumber).futureValue
+      result mustBe Some(payload.agents.head)
+
+      verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
+      verifyNoMoreInteractions(connector)
+    }
+
+
+    "propagate failures from the connector" in new Fixture {
+
+      when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val ex = intercept[RuntimeException] {
+        service.getAgentDetails(storn, agentReferenceNumber).futureValue
+      }
+
+      ex.getMessage must include("boom")
+    }
+
+
+  }
 }
