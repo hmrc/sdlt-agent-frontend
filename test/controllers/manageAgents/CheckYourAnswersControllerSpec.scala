@@ -26,7 +26,6 @@ import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, C
 import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
 import models.manageAgents.AgentContactDetails
-import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
@@ -50,7 +49,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
   private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
 
-  private def toUserAnswerConverter(agentDetails: CreatedAgent) = {
+  private def convertToUserAnswer(agentDetails: CreatedAgent): Try[UserAnswers] = {
       for {
         userAnswersTwo <- emptyUserAnswers.set(AgentNamePage, agentDetails.name)
         addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
@@ -58,6 +57,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
         userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
       } yield userAnswersFive
+  }
+
+  private def convertToUserAnswerAndFail(agentDetails: CreatedAgent): Try[UserAnswers] = {
+    Try{
+      throw new Error("ConversionFailed")
+    }
   }
 
   "onPageLoad" - {
@@ -180,7 +185,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
 
-        val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+        val userAnswersTry = convertToUserAnswer(testAgentResponse)
         when(service.updateUserAnswers(any())(any()))
           .thenReturn(userAnswersTry)
 
@@ -199,6 +204,49 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           body must include("01214567890")
           body must include("info@harborviewestates.co.uk")
           body must include(s"""action="${controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some(testArn)).url}"""")
+        }
+      }
+
+      "must return SEE_OTHERS and redirect to ~" in {
+
+        val service = mock[StampDutyLandTaxService]
+
+        val testAgentResponse: CreatedAgent = CreatedAgent(
+          storn = testStorn,
+          agentId = None,
+          name = "Harborview Estates",
+          houseNumber = None,
+          address1 = "42 Queensway",
+          address2 = None,
+          address3 = Some("Birmingham"),
+          address4 = None,
+          postcode = Some("B2 4ND"),
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
+          dxAddress = None,
+          agentResourceReference = testArn
+        )
+
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+          .overrides(bind[StampDutyLandTaxService].toInstance(service))
+          .build()
+
+        when(service.getAgentDetails(any(), any())(any()))
+          .thenReturn(Future.successful(Some(testAgentResponse)))
+
+        val userAnswersTry = convertToUserAnswerAndFail(testAgentResponse)
+        when(service.updateUserAnswers(any())(any()))
+          .thenReturn(userAnswersTry)
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
+          val result = route(application, request).value
+          val body = contentAsString(result)
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -277,7 +325,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
 
-          val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+          val userAnswersTry = convertToUserAnswer(testAgentResponse)
           when(mockService.updateUserAnswers(any())(any()))
             .thenReturn(userAnswersTry)
 
@@ -342,7 +390,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
 
-          val userAnswersTry = toUserAnswerConverter(testAgentResponse)
+          val userAnswersTry = convertToUserAnswer(testAgentResponse)
           when(mockService.updateUserAnswers(any())(any()))
             .thenReturn(userAnswersTry)
 
