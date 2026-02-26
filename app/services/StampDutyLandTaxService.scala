@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class StampDutyLandTaxService @Inject() (
   stampDutyLandTaxConnector: StampDutyLandTaxConnector
-)(implicit ec: ExecutionContext) extends UserAnswersHelper{
+)(implicit ec: ExecutionContext) extends UserAnswersHelper {
   
   def getAgentDetails(storn: String, agentReferenceNumber: String)
                      (implicit headerCarrier: HeaderCarrier): Future[Option[CreatedAgent]] =
