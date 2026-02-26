@@ -22,6 +22,7 @@ import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
+import play.api.mvc.AnyContent
 
 import scala.util.Try
 
@@ -37,4 +38,16 @@ trait UserAnswersHelper {
       userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
     } yield userAnswersFive
   }
+
+  /*
+    Attempt to extract agentName from request.userAnswer
+   */
+  def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] =
+    request.userAnswers.get(AgentNamePage) match {
+      case Some(name) =>
+        Right(name)
+      case None =>
+        Left(Error("Couldn't find agent in user answers"))
+    }
+
 }

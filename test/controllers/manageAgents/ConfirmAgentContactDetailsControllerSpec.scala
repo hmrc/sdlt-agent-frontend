@@ -23,6 +23,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.AgentNamePage
+import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.inject.bind
@@ -30,29 +31,35 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import scala.concurrent.Future
 
-class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar with I18nSupport {
-  val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
+class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
-  def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
+  trait Fixture {
+    val agentName = "null"
 
-  def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
+    val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
-  val messagesApi = application.injector.instanceOf[MessagesApi]
-  implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+    def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
-  lazy val confirmAgentContactDetailsRoute = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
+    def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
 
-  private val agentName = "null"
-  val formProvider = new ConfirmAgentContactDetailsFormProvider()
-  private val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)(messages)
+    val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
+    implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+
+    lazy val confirmAgentContactDetailsRoute: String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
+
+    val formProvider = new ConfirmAgentContactDetailsFormProvider()
+    val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)(messages)
+
+  }
 
   "ConfirmAgentContactDetailsController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET" in new Fixture {
 
       running(application) {
         val request = FakeRequest(GET, confirmAgentContactDetailsRoute)
@@ -66,9 +73,9 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to the Journey Recovery page for a GET when agent details are not found" in  {
+    "must redirect to the Journey Recovery page for a GET when agent details are not found" in  new Fixture {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, confirmAgentContactDetailsRoute)
@@ -80,43 +87,87 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must redirect to the agent contact details page when valid YES option is submitted" in {
-      val mockSessionRepo = mock[SessionRepository]
+    "must redirect to the agent contact details page when valid YES option is submitted" in new Fixture {
+
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
       when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
+      running(application) {
+
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual yesOnwardRoute.url
+      }
+    }
+
+    "must redirect to journey recovery when fail to extract agentName" in new Fixture {
+      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
+      when(mockService.getAgentName(any())) thenReturn Left(Error("Failed to extract agentName"))
+
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+        .build()
+      running(application) {
+
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+
+    "must return BadRequest" in new Fixture {
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
         .build()
 
-      val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+      running(application) {
 
-      val result = route(application, request).value
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", "malformedBodyRequest"))
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual yesOnwardRoute.url
+        val result = route(application, request).value
 
+        status(result) mustEqual BAD_REQUEST
+      }
     }
 
-    "must redirect to the agent contact details page when valid NO option is submitted" in {
-      val mockSessionRepo = mock[SessionRepository]
+    "must redirect to the agent contact details page when valid NO option is submitted" in new Fixture {
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
       when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
         .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
         .build()
 
-      val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-        .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+      running(application) {
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
 
-      val result = route(application, request).value
+        val result = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual noOnwardRoute.url
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual noOnwardRoute.url
+      }
 
     }
-
-
 
   }
 

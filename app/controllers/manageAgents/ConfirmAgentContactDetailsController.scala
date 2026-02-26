@@ -27,6 +27,7 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.{logError, logInfo}
 import views.html.manageAgents.ConfirmAgentContactDetailsView
@@ -42,28 +43,18 @@ class ConfirmAgentContactDetailsController @Inject()(
                                        requireData: DataRequiredAction,
                                        stornRequiredAction: StornRequiredAction,
                                        formProvider: ConfirmAgentContactDetailsFormProvider,
+                                       stampDutyLandTaxService: StampDutyLandTaxService,
                                        navigator: Navigator,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: ConfirmAgentContactDetailsView
                                      ) extends FrontendBaseController with I18nSupport with Logging {
 
-
-  private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =
-    request.userAnswers.get(AgentNamePage) match {
-      case Some(name) => Right(name)
-      case None =>
-        Left {
-          logError("Couldn't find agent in user answers")
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        }
-    }
-
-
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
-
-      getAgentName match {
-        case Left(redirect) => redirect
+      stampDutyLandTaxService.getAgentName match {
+        case Left(error) =>
+          logError(s"Couldn't find agent in user answers: $error")
+          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Right(agentName) =>
           val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
           Ok(view(form, agentName))
@@ -72,14 +63,12 @@ class ConfirmAgentContactDetailsController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
-
-      getAgentName match {
+      stampDutyLandTaxService.getAgentName match {
         case Right(agentName) =>
           val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, agentName))),
-
             {
               case ConfirmAgentContactDetails.Option1 =>
                 Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
@@ -89,7 +78,9 @@ class ConfirmAgentContactDetailsController @Inject()(
                 Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
             }
           )
-        case Left(redirect) => Future.successful(redirect)
+        case Left(error) =>
+          logError(s"Couldn't find agent in user answers: $error")
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
 
