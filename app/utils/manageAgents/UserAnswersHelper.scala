@@ -16,15 +16,21 @@
 
 package utils.manageAgents
 
+import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
+import play.api.mvc.AnyContent
+
+import scala.util.Try
 
 trait UserAnswersHelper {
 
-  def updateUserAnswers(agentDetails: CreatedAgent)(implicit request: DataRequest[_]) = {
+  // Try to convert createdAgent object to UserAnswers
+  def updateUserAnswers(agentDetails: CreatedAgent)
+                       (implicit request: DataRequest[_]): Try[UserAnswers] = {
     for {
       userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
       userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
@@ -34,4 +40,14 @@ trait UserAnswersHelper {
       userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
     } yield userAnswersFive
   }
+
+  // Attempt to extract agentName from request.userAnswer
+  def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] =
+    request.userAnswers.get(AgentNamePage) match {
+      case Some(name) =>
+        Right(name)
+      case None =>
+        Left(Error("Couldn't find agent in user answers"))
+    }
+
 }

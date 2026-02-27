@@ -18,13 +18,15 @@ package controllers.manageAgents
 
 import controllers.routes
 import models.{NormalMode, UserAnswers}
-import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage, AgentReferenceNumberPage, StornPage}
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
 import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
+import models.manageAgents.AgentContactDetails
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
 import navigation.Navigator
@@ -37,6 +39,7 @@ import play.api.test.Helpers.*
 import repositories.SessionRepository
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil with MockitoSugar {
 
@@ -45,6 +48,22 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
   private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
     controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
+
+  private def convertToUserAnswer(agentDetails: CreatedAgent): Try[UserAnswers] = {
+      for {
+        userAnswersTwo <- emptyUserAnswers.set(AgentNamePage, agentDetails.name)
+        addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
+        userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
+        userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
+        userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
+      } yield userAnswersFive
+  }
+
+  private def convertToUserAnswerAndFail(agentDetails: CreatedAgent): Try[UserAnswers] = {
+    Try{
+      throw new Error("ConversionFailed")
+    }
+  }
 
   "onPageLoad" - {
     "Check Your Answers Controller (with no ARN population)" - {
@@ -166,8 +185,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
 
+        val userAnswersTry = convertToUserAnswer(testAgentResponse)
+        when(service.updateUserAnswers(any())(any()))
+          .thenReturn(userAnswersTry)
+
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
           val result = route(application, request).value
           val body = contentAsString(result)
 
@@ -180,6 +204,49 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           body must include("01214567890")
           body must include("info@harborviewestates.co.uk")
           body must include(s"""action="${controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some(testArn)).url}"""")
+        }
+      }
+
+      "must return SEE_OTHERS and redirect to ~" in {
+
+        val service = mock[StampDutyLandTaxService]
+
+        val testAgentResponse: CreatedAgent = CreatedAgent(
+          storn = testStorn,
+          agentId = None,
+          name = "Harborview Estates",
+          houseNumber = None,
+          address1 = "42 Queensway",
+          address2 = None,
+          address3 = Some("Birmingham"),
+          address4 = None,
+          postcode = Some("B2 4ND"),
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk"),
+          dxAddress = None,
+          agentResourceReference = testArn
+        )
+
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+          .overrides(bind[StampDutyLandTaxService].toInstance(service))
+          .build()
+
+        when(service.getAgentDetails(any(), any())(any()))
+          .thenReturn(Future.successful(Some(testAgentResponse)))
+
+        val userAnswersTry = convertToUserAnswerAndFail(testAgentResponse)
+        when(service.updateUserAnswers(any())(any()))
+          .thenReturn(userAnswersTry)
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
+
+          val result = route(application, request).value
+          val body = contentAsString(result)
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -258,6 +325,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
 
+          val userAnswersTry = convertToUserAnswer(testAgentResponse)
+          when(mockService.updateUserAnswers(any())(any()))
+            .thenReturn(userAnswersTry)
+
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
 
@@ -318,6 +389,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
+
+          val userAnswersTry = convertToUserAnswer(testAgentResponse)
+          when(mockService.updateUserAnswers(any())(any()))
+            .thenReturn(userAnswersTry)
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
