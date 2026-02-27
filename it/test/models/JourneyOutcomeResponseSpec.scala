@@ -38,6 +38,7 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
   with EitherValues {
 
   //TODO: keep on working on this next Monday morning
+  // Add case for NOT_FOUND and UnexpectedGetStatusFailure case etc
   "Json to object conversion" should {
 
     "success when correct json provided" in {
