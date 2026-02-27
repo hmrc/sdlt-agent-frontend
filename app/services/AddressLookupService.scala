@@ -48,7 +48,8 @@ class AddressLookupService @Inject()(
   }
 
   // Step 2: extract and save AddressDetails
-  private def saveAddressDetails(userAnswers: UserAnswers, addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
+  private def saveAddressDetails(userAnswers: UserAnswers,
+                                 addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
         userAnswers.set(AgentAddressPage, addressDetails).toEither match {
