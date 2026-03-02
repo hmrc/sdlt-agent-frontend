@@ -96,7 +96,7 @@ class JourneyInitResponseISpec extends AnyWordSpec
 
     }
 
-    "~: with header: status code any other" in {
+    "failed with header: status code any other" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val jsonStr =
