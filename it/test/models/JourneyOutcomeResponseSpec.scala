@@ -37,8 +37,6 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
   with WireMockSupport
   with EitherValues {
 
-  //TODO: keep on working on this next Monday morning
-  // Add case for NOT_FOUND and UnexpectedGetStatusFailure case etc
   "Json to object conversion" should {
 
     "success when correct json provided: status code 200:OK" in {
@@ -48,8 +46,6 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
               """
                 |{"auditRef":"ref","address":{"lines":["line 1"],"postcode":"SE19 2WE"}}
                 |""".stripMargin
-            val js = Json.parse(jsonStr)
-
       stubFor(
         get(
           urlEqualTo("/addressLookUp"))
