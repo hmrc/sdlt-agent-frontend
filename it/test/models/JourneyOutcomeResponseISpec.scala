@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class JourneyOutcomeResponseSpec extends AnyWordSpec
+class JourneyOutcomeResponseISpec extends AnyWordSpec
   with Matchers
   with ScalaFutures
   with IntegrationPatience
