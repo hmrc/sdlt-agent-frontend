@@ -41,10 +41,10 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
   // Add case for NOT_FOUND and UnexpectedGetStatusFailure case etc
   "Json to object conversion" should {
 
-    "success when correct json provided" in {
+    "success when correct json provided: status code 200:OK" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
-     val jsonStr =
+      val jsonStr =
               """
                 |{"auditRef":"ref","address":{"lines":["line 1"],"postcode":"SE19 2WE"}}
                 |""".stripMargin
@@ -71,7 +71,7 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
 
     }
 
-    "failure when wrong json provided" in {
+    "failure when wrong json provided: status code 200:OK" in {
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val jsonStrWrong =
@@ -84,6 +84,64 @@ class JourneyOutcomeResponseSpec extends AnyWordSpec
           urlEqualTo("/addressLookUp"))
           .willReturn(aResponse()
             .withStatus(200)
+            .withBody(jsonStrWrong)
+          )
+      )
+      val parsingOutCome = httpClientV2
+        .get(url"$wireMockUrl/addressLookUp")
+        .execute[AddressLookupJourneyOutcome]
+        .futureValue
+
+      parsingOutCome.isLeft mustBe true
+
+      verify(
+        getRequestedFor(urlEqualTo("/addressLookUp"))
+      )
+
+    }
+
+    "when status code 404:NOT_FOUND" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val jsonStrWrong =
+        """
+          |{}
+          |""".stripMargin
+
+      stubFor(
+        get(
+          urlEqualTo("/addressLookUp"))
+          .willReturn(aResponse()
+            .withStatus(404)
+            .withBody(jsonStrWrong)
+          )
+      )
+      val parsingOutCome = httpClientV2
+        .get(url"$wireMockUrl/addressLookUp")
+        .execute[AddressLookupJourneyOutcome]
+        .futureValue
+
+      parsingOutCome mustBe Right(None)
+
+      verify(
+        getRequestedFor(urlEqualTo("/addressLookUp"))
+      )
+
+    }
+
+    "when any other error status code: 500:INTERNAL_SERVER_ERROR" in {
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+
+      val jsonStrWrong =
+        """
+          |{}
+          |""".stripMargin
+
+      stubFor(
+        get(
+          urlEqualTo("/addressLookUp"))
+          .willReturn(aResponse()
+            .withStatus(500)
             .withBody(jsonStrWrong)
           )
       )
