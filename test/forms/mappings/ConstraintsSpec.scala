@@ -17,7 +17,6 @@
 package forms.mappings
 
 import java.time.LocalDate
-
 import config.CurrencyFormatter
 import generators.Generators
 import org.scalacheck.Gen
@@ -26,8 +25,10 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.validation.{Invalid, Valid}
 
-class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators  with Constraints {
+import scala.util.Random
 
+class ConstraintsSpec extends AnyFreeSpec with Matchers
+  with ScalaCheckPropertyChecks with Generators  with Constraints {
 
   "firstError" - {
 
@@ -190,7 +191,6 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
     }
   }
 
-
   "minimumCurrency" - {
 
     "must return Valid for a number greater than the threshold" in {
@@ -225,5 +225,33 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
       val result = maximumCurrency(1, "error.max").apply(1.01)
       result mustEqual Invalid("error.max", CurrencyFormatter.currencyFormat(1))
     }
+  }
+
+  "inRange" - {
+
+    "must return Valid for any Int" in {
+      val result = inRange(Int.MinValue, Int.MaxValue, "ErrorKey.Int").apply(Random().nextInt(Int.MaxValue))
+      result mustEqual Valid
+    }
+
+    "must return InValid for any Int" in {
+      val result = inRange(Int.MinValue, -1, "ErrorKey.Int").apply(Random().nextInt( Math.abs(Int.MaxValue)) )
+      result mustNot be eq Valid
+    }
+
+  }
+
+  "nonEmptySet" - {
+
+    "must return Valid for any Int" in {
+      val result = nonEmptySet("ErrorKeySet.Int").apply( Set(Random().nextInt(Int.MaxValue)) )
+      result mustEqual Valid
+    }
+
+    "must return InValid for any Int" in {
+      val result = nonEmptySet("ErrorKeySet.Int").apply(Set())
+      result mustNot be eq Valid
+    }
+
   }
 }
