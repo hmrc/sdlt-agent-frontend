@@ -28,7 +28,7 @@ private[mappings] class LocalDateFormatter(
                                             allRequiredKey: String,
                                             twoRequiredKey: String,
                                             requiredKey: String,
-                                            args: Seq[String] = Seq.empty
+                                            args: Seq[String]
                                           )(implicit messages: Messages) extends Formatter[LocalDate] with Formatters {
 
   private val fieldKeys: List[String] = List("day", "month", "year")
@@ -95,7 +95,7 @@ private[mappings] class LocalDateFormatter(
     )
 }
 
-private class MonthFormatter(invalidKey: String, args: Seq[String] = Seq.empty) extends Formatter[Int] with Formatters {
+private class MonthFormatter(invalidKey: String, args: Seq[String]) extends Formatter[Int] with Formatters {
 
   private val baseFormatter = stringFormatter(invalidKey, args)
 

@@ -56,7 +56,7 @@ package object models {
                   case _: IdxPathNode =>
                     JsSuccess(Json.arr())
                   case _: RecursiveSearch =>
-                    JsError("recursive search is not supported")
+                    JsError("recursive search is not supported:level-2")
                 }
               }.flatMap {
                 _.set(JsPath(second :: rest), value).flatMap {
@@ -142,4 +142,5 @@ package object models {
       }
     }
   }
+
 }

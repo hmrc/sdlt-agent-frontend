@@ -23,7 +23,6 @@ import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResp
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentCheckYourAnswersPage, ConfirmAgentContactDetailsPage}
-import play.api.Logger
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
@@ -33,6 +32,7 @@ import utils.LoggerUtil.{logDebug, logError, logInfo}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+import utils.LoggerUtil.*
 
 @Singleton
 class AddressLookupController @Inject()(
@@ -60,8 +60,7 @@ class AddressLookupController @Inject()(
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
-
-    Logger("application").debug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
+    logDebug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)
@@ -75,11 +74,8 @@ class AddressLookupController @Inject()(
     case Right(updatedAnswer) if mode == CheckMode =>
       logInfo(s"[AddressLookupController][onSubmit] - edit::address extracted and saved")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
-    case Right(_) =>
-      Logger("application").info(s"[AddressLookupController][onSubmit] - Invalid mode: $mode")
-      Redirect(SystemErrorController.onPageLoad())
-    case Left(ex) =>
-      logError(s"[AddressLookupController][onSubmit] - failed to extract address: ${ex}")
+    case _ =>
+      logError("[AddressLookupController][onSubmit] - failed to extract address or invalid mode")
       Redirect(SystemErrorController.onPageLoad())
     }
   }

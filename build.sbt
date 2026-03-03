@@ -35,9 +35,11 @@ lazy val microservice = (project in file("."))
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
       ".*PurchasersAddress.*,.*SdltOrganisationResponse.*,.*FrontendAppConfig.*," +
       ".*Mode.*,.*AgentContactDetails.*,.*DeletePredefinedAgentRequest.*," +
+      ".*DeletePredefinedAgentResponse.*,.*CreatedAgent.*,"  +
+      ".*CreatePredefinedAgentResponse.*,.*UpdatePredefinedAgentResponse.*," +
       ".*Routes.*;.*viewmodels.govuk.*,",
     ScoverageKeys.coverageExcludedPackages := "views.*;testOnly.*;pages.*",
-    ScoverageKeys.coverageMinimumStmtTotal := 85,
+    ScoverageKeys.coverageMinimumStmtTotal := 97,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(

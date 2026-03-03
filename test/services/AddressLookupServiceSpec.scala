@@ -40,6 +40,8 @@ import play.api.test.Helpers.stubMessages
 import org.scalactic.TripleEquals.*
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
+import scala.util.Try
+import scala.util.*
 
 
 class AddressLookupServiceSpec extends AnyWordSpec
@@ -56,6 +58,7 @@ class AddressLookupServiceSpec extends AnyWordSpec
     val storn: String = "SN001"
     val id: String = "idToExtractAddress"
     val userId: String = "userId"
+
     val userAnswer = UserAnswers(userId)
 
     val connector: AddressLookupConnector = mock(classOf[AddressLookupConnector])
@@ -205,7 +208,6 @@ class AddressLookupServiceSpec extends AnyWordSpec
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
     }
 
-    // TODO: required trait for UserAnswer class to abstract away methods/-> mock UserAnswer
     "failed to set UserAnswer while attempt to save" in new Fixture {
 
       val updatedAnswersMaybe: Option[UserAnswers] = None
@@ -216,6 +218,33 @@ class AddressLookupServiceSpec extends AnyWordSpec
       val _ = service.getJourneyOutcome(id, UserAnswers("")).futureValue
 
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
+    }
+
+    // WARNING: we have to remove "final" attribute from the UserAnswer class due to mockito limitation
+    // > - should failed to persist updated userAnswer in MongoDb *** FAILED ***
+    //[info]   org.mockito.exceptions.base.MockitoException: Cannot mock/spy class models.UserAnswers
+    //[info] Mockito cannot mock/spy because :
+    //[info]  - final class
+    "failed to persist updated userAnswer in MongoDb" in new Fixture {
+
+      val userAnswerMock: UserAnswers = mock(classOf[UserAnswers])
+      when(userAnswerMock.set(any(), any())( any() ))
+        .thenReturn( Failure(Error("SomeError")))
+
+      when(sessionRepository.set(any()))
+        .thenReturn(Future.successful(true))
+
+      when(connector.getJourneyOutcome(eqTo(id))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Right(Some(expectedAddressDetails))))
+
+      val result: Either[Throwable, UserAnswers] =  service.getJourneyOutcome(id, userAnswerMock).futureValue
+      result mustBe a[Either[Throwable, UserAnswers]]
+
+      result.left.value.isInstanceOf[Error] mustBe true
+      result.left.value.asInstanceOf[Error].getMessage mustBe "Failed to update user session"
+
+      verify(connector, times(1)).getJourneyOutcome(eqTo(id))(any[HeaderCarrier])
+      verify(userAnswerMock, times(1)).set(any(), any())( any() )
     }
 
   }

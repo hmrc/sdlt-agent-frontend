@@ -20,7 +20,8 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, ConfirmAgentContactDetailsPage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage,
+  AgentNamePage, ConfirmAgentContactDetailsPage}
 
 class NavigatorSpec extends SpecBase {
 
@@ -80,6 +81,12 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
       }
+
+      "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(CheckMode) in Check mode" in {
+        navigator.nextPage(AgentContactDetailsPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode)
+      }
+
     }
   }
 }

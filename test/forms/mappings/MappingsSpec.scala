@@ -168,7 +168,6 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     }
   }
 
-
   "currency" - {
 
     val testForm: Form[BigDecimal] =

@@ -37,9 +37,25 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
     }
   }
 
-    "set" - {
+  "set" - {
 
-      "must return an error if the path is empty" in {
+    "must return an error if RecursiveSearch use" in {
+
+      val value = Json.obj()
+
+      val path = JsPath( List() :+ RecursiveSearch("child"))
+      value.set( path, Json.obj()) mustEqual JsError("recursive search not supported")
+    }
+
+    "must return an error if RecursiveSearch use as second element" in {
+
+      val value = Json.obj()
+
+      val path = JsPath(List() :+ KeyPathNode("key") :+ RecursiveSearch("child"))
+      value.set(path, Json.obj()) mustEqual JsError("recursive search is not supported:level-2")
+    }
+
+    "must return an error if the path is empty" in {
 
         val value = Json.obj()
 
@@ -224,6 +240,7 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
           )
         ))
       }
+
     }
 
   "remove" - {
@@ -234,6 +251,13 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
       value.set(JsPath, Json.obj()) mustEqual JsError("path cannot be empty")
     }
 
+    "must return an error for Nil path" in {
+
+      val value = Json.obj()
+      val path = JsPath( Nil )
+
+      value.remove(path) mustEqual JsError("path cannot be empty")
+    }
 
     "must return an error if the path does not contain a value" in {
 
@@ -359,4 +383,5 @@ class RichJsValueSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
       )
     )
   }
+
 }
