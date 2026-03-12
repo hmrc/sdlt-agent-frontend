@@ -18,6 +18,7 @@ package base
 
 import controllers.actions.*
 import models.UserAnswers
+import models.responses.addresslookup.{JourneyResultAddressModel, Address}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -46,6 +47,14 @@ trait SpecBase
 
   val stornData = Json.obj(
     "storn" -> "STN001"
+  )
+
+  val testAgentAddress: JourneyResultAddressModel = JourneyResultAddressModel(
+    auditRef = "d8819c6a-8d78-4219-8f9d-40b119edcb3d",
+    address = Address(
+      lines = Seq("10 Downing Street", "South Kensington", "London"),
+      postcode = Some("SW7 5JT")
+    )
   )
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId, stornData)

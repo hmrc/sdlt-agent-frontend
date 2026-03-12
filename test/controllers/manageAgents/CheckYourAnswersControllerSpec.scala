@@ -408,7 +408,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       }
       "when storedARN has Some(value) and UrlARN is None" - {
         "must use the data from session" in {
-          val userAnswers = emptyUserAnswers.set(AgentReferenceNumberPage, "A").success.value
+          val userAnswers = emptyUserAnswers
+            .set(AgentReferenceNumberPage, "A").success.value
+            .set(AgentNamePage, "testName").success.value
+            .set(AgentAddressPage, testAgentAddress).success.value
 
           val mockSessionRepository = mock[SessionRepository]
 
@@ -418,12 +421,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
             .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
             .build()
-
-          when(mockSessionRepository.set(any()))
-            .thenReturn(Future.successful(true))
-
-          when(mockService.getAgentDetails(any(), any())(any()))
-            .thenReturn(Future.successful(Some(testAgentResponse)))
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(None))
@@ -435,6 +432,33 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             verify(mockSessionRepository, never()).set(any())
             verify(mockService, never()).getAgentDetails(any(), any())(any())
 
+          }
+        }
+
+        "must redirect when required answers are missing from session" in {
+          val userAnswers = emptyUserAnswers
+            .set(AgentReferenceNumberPage, "A").success.value
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(None))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.NoSessionDataController.onPageLoad().url
+
+            verify(mockSessionRepository, never()).set(any())
+            verify(mockService, never()).getAgentDetails(any(), any())(any())
+            
           }
         }
       }
