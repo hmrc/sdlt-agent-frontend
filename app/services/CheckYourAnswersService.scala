@@ -21,14 +21,17 @@ import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import utils.LoggerUtil.{logError, logInfo}
 
 @Singleton
 class CheckYourAnswersService @Inject() {
   
   def validateUserAnswers(userAnswers: UserAnswers): Either[Result, Unit] = {
     if(userAnswers.get(AgentNamePage).nonEmpty && userAnswers.get(AgentAddressPage).nonEmpty) {
+      logInfo("[CheckYourAnswersService][validateUserAnswers] Successfully validated session data")
       Right(())
     } else {
+      logError("[CheckYourAnswersService][validateUserAnswers] AgentNamePage or AgentAddressPage are empty")
       Left(Redirect(controllers.routes.NoSessionDataController.onPageLoad()))
     }
   }
