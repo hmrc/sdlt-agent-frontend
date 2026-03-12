@@ -24,7 +24,7 @@ import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPag
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
-import services.StampDutyLandTaxService
+import services.{StampDutyLandTaxService, CheckYourAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.logError
 import utils.manageAgents.UserAnswersHelper
@@ -45,6 +45,7 @@ class CheckYourAnswersController @Inject()(
                                             sessionRepository: SessionRepository,
                                             navigator: Navigator,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
+                                            checkYourAnswersService: CheckYourAnswersService,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           )(implicit executionContext: ExecutionContext)
@@ -65,6 +66,13 @@ class CheckYourAnswersController @Inject()(
           ContactEmailSummary.row(userAnswers)
         ).flatten
       )
+      
+      def renderPageOrError(userAnswers: UserAnswers, postAction: Call) = {
+        checkYourAnswersService.validateUserAnswers(userAnswers).fold(
+          errorPage => errorPage,
+          _         => Ok(view(getSummaryListRows(request.userAnswers), postAction))
+        )
+      }
 
       (storedArn, agentReferenceNumber) match {
         case (Some(storedArn), Some(paramArn)) if storedArn == paramArn =>
@@ -93,7 +101,7 @@ class CheckYourAnswersController @Inject()(
           }
         case _ =>
           logError(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          Future.successful(renderPageOrError(request.userAnswers, postAction))
       }
 
   }
