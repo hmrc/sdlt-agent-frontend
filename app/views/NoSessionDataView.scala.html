@@ -32,7 +32,7 @@
     messages: Messages
 )
 
-@layout(pageTitle = title(form, messages("site.error.noSessionData.title"))) {
+@layout(pageTitle = title(form, messages("noSessionData.title"))) {
 
     @formHelper(action = routes.NoSessionDataController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -41,7 +41,7 @@
         }
 
         @hmrcPageHeading(PageHeading(
-            text           = messages("site.error.noSessionData.heading"),
+            text           = messages("noSessionData.heading"),
             headingClasses = Some("govuk-heading-l"),
         ))
 
@@ -50,7 +50,7 @@
                 field = form("value"),
                 legend = Legend(),
                 items = NoSessionData.options
-            ).withHint(HintViewModel(HtmlContent(Html(messages("site.error.noSessionData.hint")))))
+            ).withHint(HintViewModel(HtmlContent(Html(messages("noSessionData.hint")))))
         )
 
         @govukButton(

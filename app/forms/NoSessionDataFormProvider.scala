@@ -27,6 +27,6 @@ class NoSessionDataFormProvider @Inject() extends Mappings {
 
   def apply(): Form[NoSessionData] =
     Form(
-      "value" -> enumerable[NoSessionData]("site.error.noSessionData.error.required")
+      "value" -> enumerable[NoSessionData]("noSessionData.error.required")
     )
 }
