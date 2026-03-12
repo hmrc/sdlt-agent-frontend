@@ -54,5 +54,5 @@ POST        /manage-agents/remove-agent                  controllers.manageAgent
 
 GET        /system-error/there-is-a-problem              controllers.SystemErrorController.onPageLoad()
 
-GET        /no-session-data                              controllers.NoSessionDataController.onPageLoad()
-POST       /no-session-data                              controllers.NoSessionDataController.onSubmit()
+GET        /cannot-reach-this-page                       controllers.NoSessionDataController.onPageLoad()
+POST       /cannot-reach-this-page                       controllers.NoSessionDataController.onSubmit()
