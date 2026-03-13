@@ -80,6 +80,12 @@ unauthorised.individual.title = Sorry, there is a problem with this service
 unauthorised.individual.heading = Sorry, there is a problem with this service
 unauthorised.individual.paragraph1 = You are signed in with an individual account. You need an organisation account to use this service.
 
+noSessionData.title = You cannot reach this page
+noSessionData.heading = You cannot reach this page
+noSessionData.hint = Select what you would like to do next
+noSessionData.fileNewReturn = File a new SDLT return
+noSessionData.manageStampTaxes = Manage your Stamp Taxes
+noSessionData.error.required = Please select an option
 
 systemError.title       = Sorry, there is a problem with this service
 systemError.heading     = Sorry, there is a problem with this service
