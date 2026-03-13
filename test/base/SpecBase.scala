@@ -18,12 +18,12 @@ package base
 
 import controllers.actions.*
 import models.UserAnswers
-import models.responses.addresslookup.{JourneyResultAddressModel, Address}
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
-import pages.manageAgents.StornPage
+import pages.manageAgents.{AgentAddressPage, AgentNamePage, StornPage}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
@@ -61,6 +61,10 @@ trait SpecBase
   def emptyUserAnswersWithNoStorn: UserAnswers = UserAnswers(userAnswersId, Json.obj())
 
   val emptyUserAnswersWithStorn: UserAnswers = emptyUserAnswers.set(StornPage, testStorn).success.value
+
+  val validUserAnswers = emptyUserAnswersWithStorn
+    .set(AgentNamePage, "Sunrise Realty").success.value
+    .set(AgentAddressPage, testAgentAddress).success.value
 
   val testUserAnswers: JsObject = Json.obj(
     "agentName" -> "John",
