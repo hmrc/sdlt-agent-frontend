@@ -39,7 +39,6 @@ class NoSessionDataController @Inject()(
                                        requireData: DataRequiredAction,
                                        stornRequiredAction: StornRequiredAction,
                                        formProvider: NoSessionDataFormProvider,
-                                       navigator: Navigator,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: NoSessionDataView
                                      )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
