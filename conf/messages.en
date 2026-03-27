@@ -85,7 +85,7 @@ noSessionData.heading = You cannot reach this page
 noSessionData.hint = Select what you would like to do next
 noSessionData.fileNewReturn = File a new SDLT return
 noSessionData.manageStampTaxes = Manage your Stamp Taxes
-noSessionData.error.required = Please select an option
+noSessionData.error.required = Select if you want to file a new SDLT return or manage your Stamp Taxes
 
 systemError.title       = Sorry, there is a problem with this service
 systemError.heading     = Sorry, there is a problem with this service
