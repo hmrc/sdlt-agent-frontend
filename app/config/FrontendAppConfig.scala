@@ -48,6 +48,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val feedbackFrontend: String = configuration.get[String]("feedback-frontend.host")
   val exitSurveyUrl: String             = s"$feedbackFrontend/feedback/stamp-duty-land-tax"
 
+  private val filingServiceBaseUrl: String = configuration.get[String]("stamp-duty-land-tax-filing.host")
+  val startNewReturnUrl: String = s"$filingServiceBaseUrl/stamp-duty-land-tax-filing"
+
+  private val managementServiceBaseUrl: String = configuration.get[String]("stamp-duty-land-tax-management.host")
+  val managementAtAGlanceUrl: String = s"$managementServiceBaseUrl/stamp-duty-land-tax-management/manage-your-stamp-taxes"
+
   val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 

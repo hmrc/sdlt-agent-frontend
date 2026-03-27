@@ -16,7 +16,7 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MandatoryAnswersAction, StornRequiredAction}
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -42,6 +42,7 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
+                                            mandatoryAnswersPresent: MandatoryAnswersAction,
                                             sessionRepository: SessionRepository,
                                             navigator: Navigator,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
@@ -50,7 +51,7 @@ class CheckYourAnswersController @Inject()(
                                           )(implicit executionContext: ExecutionContext)
   extends FrontendBaseController with I18nSupport  {
 
-  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
+  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired andThen mandatoryAnswersPresent).async {
     implicit request =>
 
       val storedArn = request.userAnswers.get(AgentReferenceNumberPage)

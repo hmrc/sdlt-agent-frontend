@@ -119,7 +119,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
@@ -141,7 +141,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
@@ -178,7 +178,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         )
 
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
@@ -228,7 +228,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         )
 
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
@@ -314,7 +314,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
             .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
             .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
             .build()
@@ -373,13 +373,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       "when storedARN and UrlARN are different" - {
         "must fetch the agent from with UrlARN and override the session" in {
 
-          val userAnswers = emptyUserAnswers.set(AgentReferenceNumberPage, "A").success.value
-
           val mockSessionRepository = mock[SessionRepository]
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(userAnswers))
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
             .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
             .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
             .build()
@@ -390,9 +388,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           when(mockService.getAgentDetails(any(), any())(any()))
             .thenReturn(Future.successful(Some(testAgentResponse)))
 
-          val userAnswersTry = convertToUserAnswer(testAgentResponse)
           when(mockService.updateUserAnswers(any())(any()))
-            .thenReturn(userAnswersTry)
+            .thenReturn(Try(populatedUserAnswersWithArn))
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
@@ -408,22 +405,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       }
       "when storedARN has Some(value) and UrlARN is None" - {
         "must use the data from session" in {
-          val userAnswers = emptyUserAnswers.set(AgentReferenceNumberPage, "A").success.value
 
           val mockSessionRepository = mock[SessionRepository]
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(userAnswers))
+          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
             .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
             .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
             .build()
-
-          when(mockSessionRepository.set(any()))
-            .thenReturn(Future.successful(true))
-
-          when(mockService.getAgentDetails(any(), any())(any()))
-            .thenReturn(Future.successful(Some(testAgentResponse)))
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(None))
@@ -435,6 +425,33 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             verify(mockSessionRepository, never()).set(any())
             verify(mockService, never()).getAgentDetails(any(), any())(any())
 
+          }
+        }
+
+        "must redirect when required answers are missing from session" in {
+          val userAnswers = emptyUserAnswers
+            .set(AgentReferenceNumberPage, "A").success.value
+
+          val mockSessionRepository = mock[SessionRepository]
+
+          val mockService = mock[StampDutyLandTaxService]
+
+          val application = applicationBuilder(userAnswers = Some(userAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .build()
+
+          running(application) {
+            val request = FakeRequest(GET, checkYourAnswersUrl(None))
+
+            val result = route(application, request).value
+
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.NoSessionDataController.onPageLoad().url
+
+            verify(mockSessionRepository, never()).set(any())
+            verify(mockService, never()).getAgentDetails(any(), any())(any())
+            
           }
         }
       }
