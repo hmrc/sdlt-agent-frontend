@@ -16,20 +16,17 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MandatoryAnswersAction, StornRequiredAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Request, Result}
 import repositories.SessionRepository
-import services.StampDutyLandTaxService
+import services.{CheckYourAnswersService, StampDutyLandTaxService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.logError
-import utils.manageAgents.UserAnswersHelper
-import viewmodels.govuk.summarylist.*
-import viewmodels.manageAgents.checkAnswers.*
 import views.html.manageAgents.CheckYourAnswersView
 
 import javax.inject.{Inject, Singleton}
@@ -42,35 +39,26 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
-                                            mandatoryAnswersPresent: MandatoryAnswersAction,
                                             sessionRepository: SessionRepository,
                                             navigator: Navigator,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
+                                            cyaService: CheckYourAnswersService,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: CheckYourAnswersView
                                           )(implicit executionContext: ExecutionContext)
   extends FrontendBaseController with I18nSupport  {
 
-  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired andThen mandatoryAnswersPresent).async {
+  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
       val storedArn = request.userAnswers.get(AgentReferenceNumberPage)
 
       val postAction:Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
 
-      def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
-        rows = Seq(
-          AgentNameSummary.row(userAnswers),
-          AddressSummary.row(userAnswers),
-          ContactPhoneNumberSummary.row(userAnswers),
-          ContactEmailSummary.row(userAnswers)
-        ).flatten
-      )
-
       (storedArn, agentReferenceNumber) match {
         case (Some(storedArn), Some(paramArn)) if storedArn == paramArn =>
           logError(s"[CheckYourAnswersController][onPageLoad] storedArn: ${storedArn}, paramArn: ${paramArn}")
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          Future.successful(Ok(view(cyaService.getSummaryListRows(request.userAnswers), postAction)))
         case (_, Some(paramArn)) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, paramArn) flatMap {
             case Some(agentDetails) =>
@@ -80,7 +68,7 @@ class CheckYourAnswersController @Inject()(
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
                   sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(userAnswers), postAction))
+                    Ok(view(cyaService.getSummaryListRows(userAnswers), postAction))
                   }
                 })
 
@@ -94,7 +82,7 @@ class CheckYourAnswersController @Inject()(
           }
         case _ =>
           logError(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          Future.successful(renderPageOrError(request.userAnswers, postAction))
       }
 
   }
@@ -148,5 +136,11 @@ class CheckYourAnswersController @Inject()(
       }
 
   }
-}
 
+  def renderPageOrError(ua: UserAnswers, postAction: Call)(implicit messages: Messages, request: Request[_]): Result = {
+    cyaService.validateUserAnswers(ua).fold(
+      errorPage => errorPage,
+      _ => Ok(view(cyaService.getSummaryListRows(ua), postAction))
+    )
+  }
+}
