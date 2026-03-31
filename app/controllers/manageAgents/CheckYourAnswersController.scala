@@ -82,7 +82,10 @@ class CheckYourAnswersController @Inject()(
           }
         case _ =>
           logError(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
-          Future.successful(renderPageOrError(request.userAnswers, postAction, view))
+          validateUserAnswers(request.userAnswers).fold(
+            noSessionDataPage => Future.successful(noSessionDataPage),
+            summaryListRows => Future.successful(Ok(view(summaryListRows, postAction)))
+          )
       }
 
   }

@@ -20,13 +20,11 @@ import controllers.routes.NoSessionDataController
 import models.UserAnswers
 import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.i18n.Messages
-import play.api.mvc.{Call, Request, Result}
+import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import play.api.mvc.Results.Ok
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.SummaryListViewModel
 import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
-import views.html.manageAgents.CheckYourAnswersView
 
 object CheckYourAnswersHelper {
 
@@ -39,14 +37,7 @@ object CheckYourAnswersHelper {
     ).flatten
   )
 
-  def renderPageOrError(ua: UserAnswers, postAction: Call, view: CheckYourAnswersView)(implicit messages: Messages, request: Request[_]): Result = {
-    validateUserAnswers(ua).fold(
-      errorPage => errorPage,
-      summaryListRows => Ok(view(summaryListRows, postAction))
-    )
-  }
-
-  private def validateUserAnswers(userAnswers: UserAnswers)(implicit messages: Messages): Either[Result, SummaryList] = {
+  def validateUserAnswers(userAnswers: UserAnswers)(implicit messages: Messages): Either[Result, SummaryList] = {
     val agentName = userAnswers.get(AgentNamePage)
     val agentAddress = userAnswers.get(AgentAddressPage)
 
