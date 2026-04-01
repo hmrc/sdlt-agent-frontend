@@ -16,7 +16,7 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, MandatoryAnswersAction, StornRequiredAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -27,9 +27,7 @@ import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.logError
-import utils.manageAgents.UserAnswersHelper
-import viewmodels.govuk.summarylist.*
-import viewmodels.manageAgents.checkAnswers.*
+import utils.manageAgents.CheckYourAnswersHelper.*
 import views.html.manageAgents.CheckYourAnswersView
 
 import javax.inject.{Inject, Singleton}
@@ -42,7 +40,6 @@ class CheckYourAnswersController @Inject()(
                                             getData: DataRetrievalAction,
                                             requireData: DataRequiredAction,
                                             stornRequired: StornRequiredAction,
-                                            mandatoryAnswersPresent: MandatoryAnswersAction,
                                             sessionRepository: SessionRepository,
                                             navigator: Navigator,
                                             stampDutyLandTaxService: StampDutyLandTaxService,
@@ -51,21 +48,12 @@ class CheckYourAnswersController @Inject()(
                                           )(implicit executionContext: ExecutionContext)
   extends FrontendBaseController with I18nSupport  {
 
-  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired andThen mandatoryAnswersPresent).async {
+  def onPageLoad(agentReferenceNumber: Option[String]): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequired).async {
     implicit request =>
 
       val storedArn = request.userAnswers.get(AgentReferenceNumberPage)
 
       val postAction:Call = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber)
-
-      def getSummaryListRows(userAnswers: UserAnswers) = SummaryListViewModel(
-        rows = Seq(
-          AgentNameSummary.row(userAnswers),
-          AddressSummary.row(userAnswers),
-          ContactPhoneNumberSummary.row(userAnswers),
-          ContactEmailSummary.row(userAnswers)
-        ).flatten
-      )
 
       (storedArn, agentReferenceNumber) match {
         case (Some(storedArn), Some(paramArn)) if storedArn == paramArn =>
@@ -94,7 +82,10 @@ class CheckYourAnswersController @Inject()(
           }
         case _ =>
           logError(s"[CheckYourAnswersController][onPageLoad] ReloadPage from existing data from session}")
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          validateUserAnswers(request.userAnswers).fold(
+            noSessionDataPage => Future.successful(noSessionDataPage),
+            summaryListRows => Future.successful(Ok(view(summaryListRows, postAction)))
+          )
       }
 
   }
@@ -148,5 +139,5 @@ class CheckYourAnswersController @Inject()(
       }
 
   }
-}
 
+}
