@@ -18,7 +18,6 @@ package models.responses.addresslookup
 
 import play.api.http.Status.ACCEPTED
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import play.api.Logger
 import utils.LoggerUtil.*
 
 object JourneyInitResponse {

@@ -46,7 +46,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private val continueUrl = (mode: Mode) => appConfig.host +
     controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
-  private def setJourneyOptions(mode: Mode)(implicit rh: RequestHeader): Seq[(String, JsValue)] = {
+  private def setJourneyOptions(mode: Mode): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl(mode)),
       "signOutHref" -> JsString(appConfig.signOutUrlForAddressLookupFrontend),
@@ -134,7 +134,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   private def buildConfig(agentName: Option[String], mode: Mode)
-      (implicit messages: Messages, rh: RequestHeader): JsValue = {
+      (implicit messages: Messages): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),

@@ -32,7 +32,6 @@ import utils.LoggerUtil.{logDebug, logError, logInfo}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
-import utils.LoggerUtil.*
 
 @Singleton
 class AddressLookupController @Inject()(
