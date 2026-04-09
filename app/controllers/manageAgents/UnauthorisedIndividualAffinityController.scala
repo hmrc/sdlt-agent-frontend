@@ -16,7 +16,6 @@
 
 package controllers.manageAgents
 
-import config.FrontendAppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,8 +27,7 @@ class UnauthorisedIndividualAffinityController @Inject()(
                                                           override val messagesApi: MessagesApi,
                                                           val controllerComponents: MessagesControllerComponents,
                                                           view: UnauthorisedIndividualView
-                                                        )(implicit config: FrontendAppConfig) extends FrontendBaseController
-  with I18nSupport {
+                                                        ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action {
     implicit request => {

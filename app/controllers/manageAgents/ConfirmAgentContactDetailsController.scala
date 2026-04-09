@@ -20,13 +20,12 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
 import models.NormalMode
 import models.manageAgents.ConfirmAgentContactDetails
-import models.requests.DataRequest
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.{logError, logInfo}

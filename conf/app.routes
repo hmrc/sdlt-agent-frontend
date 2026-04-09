@@ -17,10 +17,6 @@ GET         /account/sign-out-survey                     controllers.auth.AuthCo
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
-GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
-GET         /unauthorised/individual                     controllers.manageAgents.UnauthorisedIndividualAffinityController.onPageLoad()
-GET         /manage-agents/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
-
 GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
 GET         /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
 
@@ -56,3 +52,10 @@ GET        /system-error/there-is-a-problem              controllers.SystemError
 
 GET        /cannot-reach-this-page                       controllers.NoSessionDataController.onPageLoad()
 POST       /cannot-reach-this-page                       controllers.NoSessionDataController.onSubmit()
+
+# auth routes
+GET         /manage-agents/unauthorised                 controllers.UnauthorisedController.onPageLoad()
+GET         /manage-agents/unauthorised/individual       controllers.manageAgents.UnauthorisedIndividualAffinityController.onPageLoad()
+GET         /manage-agents/unauthorised/organisation     controllers.manageAgents.UnauthorisedOrganisationAffinityController.onPageLoad()
+
+#

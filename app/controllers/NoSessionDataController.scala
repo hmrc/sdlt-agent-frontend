@@ -18,18 +18,16 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-import controllers.routes.*
 import forms.NoSessionDataFormProvider
 import models.NoSessionData
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import navigation.Navigator
+import views.html.NoSessionDataView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.data.Form
-import views.html.NoSessionDataView
+import scala.concurrent.Future
 
 @Singleton
 class NoSessionDataController @Inject()(
@@ -41,7 +39,7 @@ class NoSessionDataController @Inject()(
                                        formProvider: NoSessionDataFormProvider,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: NoSessionDataView
-                                     )(implicit ec: ExecutionContext, appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
+                                     )(implicit appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
 
   val form: Form[NoSessionData] = formProvider()
 
