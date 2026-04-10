@@ -24,15 +24,17 @@
         govukSummaryList: GovukSummaryList,
         govukPagination: GovukPagination,
         govukErrorSummary: GovukErrorSummary,
+        govukRadios : GovukRadios,
         p: Paragraph,
+        formHelper: FormWithCSRF,
         hmrcPageHeading: HmrcPageHeading,
         successNotificationBanner: SuccessNotificationBanner
 )
-@(
+@(      form:               Form[_],
         maybeSummaryList:   Option[SummaryList],
         pagination:         Option[Pagination],
         paginationInfoText: Option[String],
-        redirect:           Call
+        paginationIndex:    Int
 )(
         implicit request: Request[_],
         messages: Messages
@@ -65,34 +67,49 @@
             )
         }
 
-        @hmrcPageHeading(PageHeading(
-            text = messages("manageAgents.agentDetails.heading"),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l"),
-            section = Some(messages("manageAgents.caption"))
-        ))
-
-        @{
-            maybeSummaryList match {
-                case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
-                case None => p(messages("manageAgents.agentOverview.noAgents.info.text"))
+        @formHelper(action = controllers.manageAgents.routes.AgentOverviewController.onSubmit(paginationIndex), Symbol("autoComplete") -> "off"){
+            
+            @if(form.errors.nonEmpty){
+                @govukErrorSummary(ErrorSummaryViewModel(form))
             }
+
+            @hmrcPageHeading(PageHeading(
+                text = messages("manageAgents.agentDetails.heading"),
+                headingClasses = Some("govuk-heading-l"),
+                captionClasses = Some("govuk-caption-l"),
+                section = Some(messages("manageAgents.caption"))
+            ))
+
+            @{
+                maybeSummaryList match {
+                    case Some(summary) => p(messages("manageAgents.agentOverview.nonZeroAgents.info.text"))
+                    case None => p(messages("manageAgents.agentOverview.noAgents.info.text"))
+                }
+            }
+
+            @paginationInfoText.map(p(_))
+
+            @{
+                maybeSummaryList match {
+                    case Some(summary) => govukSummaryList(summary)
+                    case None => p(messages("manageAgents.agentOverview.noAgents.text"))
+                }
+            }
+
+            @pagination.map(govukPagination(_))
+
+            @govukRadios(
+                RadiosViewModel.yesNo(
+                    field = form("value"),
+                    legend = LegendViewModel(messages("manageAgents.agentDetails.addAnotherAgent")).asPageSubHeading()
+                )
+            )
+
+            @govukButton(
+                ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
+                .withCssClass("govuk-!-margin-top-2")
+            )
         }
 
-        @paginationInfoText.map(p(_))
 
-        @{
-            maybeSummaryList match {
-                case Some(summary) => govukSummaryList(summary)
-                case None => p(messages("manageAgents.agentOverview.noAgents.text"))
-            }
-        }
-
-        @pagination.map(govukPagination(_))
-
-        @govukButton(
-            ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-            .asLink(redirect.url)
-            .withCssClass("govuk-!-margin-top-2")
-        )
 }

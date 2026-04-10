@@ -17,10 +17,15 @@
 package controllers.manageAgents
 
 import base.SpecBase
+import config.FrontendAppConfig
+import forms.manageAgents.AddAnotherAgentFormProvider
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
+import play.api.data.Form
 import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.StampDutyLandTaxService
@@ -32,16 +37,28 @@ import scala.concurrent.Future
 class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
   private val service = mock[StampDutyLandTaxService]
+  
+  private val mockConfig = mock[FrontendAppConfig]
+  
+  val formProvider = new AddAnotherAgentFormProvider()()
+
+  val formWithErrors: Form[Boolean] = formProvider.bind(Map.empty[String, String])
+  
+  val testManagementHomePageUrl = "http://localhost:1234/test-management-url"
+
+  val paginationIndex:Int = 1
 
   private def agentOverviewUrl(page: Int) =
     controllers.manageAgents.routes.AgentOverviewController.onPageLoad(page).url
 
-  private def startAddAgentJourneyUrl =
-    controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
+  private def agentOverviewOnSubmitUrl(page:Int) =
+    controllers.manageAgents.routes.AgentOverviewController.onSubmit(page).url
+
+  private def startAddAgentRouteUrl = controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
 
   private val agents22 = getAgentList(22)
 
-  "AgentOverviewController.onPageLoad" - {
+  "AgentOverviewController.onPageLoad()" - {
 
     "must return OK and the correct view for a GET when there are no agents" in {
       val application =
@@ -61,11 +78,13 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         status(result) mustEqual OK
         contentAsString(result) mustEqual
           view(
+            form               = formProvider,
             maybeSummaryList   = None,
             pagination         = None,
             paginationInfoText = None,
-            redirect           = controllers.manageAgents.routes.StartAddAgentController.onPageLoad()
-          )(request, messages(application)).toString
+            paginationIndex    = 1
+          )
+          (request, messages(application)).toString
       }
     }
 
@@ -89,7 +108,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         body must include("Agent 10")
         body must not include "Agent 11"
 
-        body must include(s"""href="$startAddAgentJourneyUrl"""")
+        body must include(s"""href="${agentOverviewOnSubmitUrl(page = 1)}"""")
 
         body must include("pagination")
         body must include("Next")
@@ -144,6 +163,125 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+      }
+    }
+  }
+
+  "AgentOverviewController.onSubmit()" - {
+    "must return BadRequest and the correct view for a POST when there are no agents with the form has errors" in {
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
+
+        when(service.getAllAgentDetails(any())(any()))
+          .thenReturn(Future.successful(Nil))
+
+        running(application) {
+          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+            .withFormUrlEncodedBody(("value", ""))
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[AgentOverviewView]
+
+          status(result) mustEqual BAD_REQUEST
+          contentAsString(result) mustEqual
+            view(
+              form = formWithErrors,
+              maybeSummaryList = None,
+              pagination = None,
+              paginationInfoText = None,
+              paginationIndex = 1
+            )
+            (request, messages(application)).toString
+        }
+      }
+    "must return BadRequest and render a summary and pagination when there are agents (valid first page) when form has errors" in {
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
+
+        when(service.getAllAgentDetails(any())(any()))
+          .thenReturn(Future.successful(agents22))
+
+        running(application) {
+          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+            .withFormUrlEncodedBody(("value", ""))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual BAD_REQUEST
+          val body = contentAsString(result)
+
+          body must include("Agent 1")
+          body must include("Agent 10")
+          body must not include "Agent 11"
+
+          body must include(s"""href="${agentOverviewOnSubmitUrl(page =1)}"""")
+
+          body must include("pagination")
+          body must include("Next")
+          body must include("paginationIndex=2")
+        }
+      }
+    "must redirect to StartAddAgentController when user select yes(true) option" in {
+        val application =
+          applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
+
+        when(service.getAllAgentDetails(any())(any()))
+          .thenReturn(Future.successful(agents22))
+
+        running(application) {
+          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+            .withFormUrlEncodedBody(("value", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual startAddAgentRouteUrl
+        }
+      }
+    "must redirect to managementUrl when user select no(false) option" in {
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[StampDutyLandTaxService].toInstance(service))
+          .overrides(bind[FrontendAppConfig].toInstance(mockConfig))
+          .build()
+
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.successful(agents22))
+      
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 12))
+          .withFormUrlEncodedBody(("value", "false"))
+
+        val result = route(application, request).value
+        
+        when(mockConfig.managementAtAGlanceUrl)
+          .thenReturn(testManagementHomePageUrl)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testManagementHomePageUrl
+      }
+    }
+    "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in {
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[StampDutyLandTaxService].toInstance(service))
+          .build()
+
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
