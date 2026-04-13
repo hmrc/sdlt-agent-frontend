@@ -23,6 +23,7 @@ import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
@@ -47,7 +48,7 @@ class AgentOverviewController @Inject()(
                                          view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext, appConfig:FrontendAppConfig) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  val form = addAgentFormProvider()
+  val form: Form[Boolean] = addAgentFormProvider()
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     stampDutyLandTaxService
@@ -59,7 +60,6 @@ class AgentOverviewController @Inject()(
             .fold(
               Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
             ) { summary =>
-
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
               val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
               val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)

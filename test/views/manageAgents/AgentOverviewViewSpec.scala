@@ -121,7 +121,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
       )
     }
     "must render the error summary when no Yes or No option is not selected for Do you want to add agent?" in new Setup {
-      val formWithErrors: Form[?] = form.bind(Map.empty[String, String])
+      val formWithErrors: Form[Boolean] = form.bind(Map.empty[String, String])
       val html: Html = view(formWithErrors, None, None, None, paginationIndex)
       val doc:Document = Jsoup.parse(html.toString())
       
@@ -135,7 +135,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     implicit def messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: AgentOverviewView      = app.injector.instanceOf[AgentOverviewView]
     val formProvider                 = new AddAnotherAgentFormProvider()
-    val form: Form[?]                 = formProvider()
+    val form: Form[Boolean]          = formProvider()
     val paginationIndex              = 1
   }
 
