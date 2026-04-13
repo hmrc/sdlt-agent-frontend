@@ -18,6 +18,7 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
 GET         /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onPageLoad(paginationIndex: Int)
+POST        /manage-agents/agent-overview                controllers.manageAgents.AgentOverviewController.onSubmit(paginationIndex: Int)
 GET         /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
 
 GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)

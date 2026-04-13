@@ -16,61 +16,94 @@
 
 package controllers.manageAgents
 
+import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
-
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
-import services.StampDutyLandTaxService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.PaginationHelper
-import views.html.manageAgents.AgentOverviewView
-import play.api.Logging
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
-import controllers.manageAgents.routes.*
-import javax.inject.{Inject, Singleton}
+import forms.manageAgents.AddAnotherAgentFormProvider
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
+import play.api.Logging
+import play.api.data.Form
+import play.api.i18n.I18nSupport
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.StampDutyLandTaxService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.PaginationHelper
+import views.html.manageAgents.AgentOverviewView
 
-import scala.concurrent.ExecutionContext
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AgentOverviewController @Inject()(
-                                        val controllerComponents: MessagesControllerComponents,
-                                        stampDutyLandTaxService: StampDutyLandTaxService,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        stornRequiredAction: StornRequiredAction,
-                                        navigator: Navigator,
-                                        view: AgentOverviewView
-                                      )(implicit executionContext: ExecutionContext) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
+                                         val controllerComponents: MessagesControllerComponents,
+                                         stampDutyLandTaxService: StampDutyLandTaxService,
+                                         identify: IdentifierAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         addAgentFormProvider: AddAnotherAgentFormProvider,
+                                         stornRequiredAction: StornRequiredAction,
+                                         navigator: Navigator,
+                                         view: AgentOverviewView
+                                      )(implicit executionContext: ExecutionContext, appConfig:FrontendAppConfig) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
+  val form: Form[Boolean] = addAgentFormProvider()
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-
-    val postAction: Call = StartAddAgentController.onPageLoad()
-
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn).map {
-        case Nil              => Ok(view(None, None, None, postAction))
+        case Nil              => Ok(view(form, None, None, None, paginationIndex))
         case agentDetailsList =>
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
               Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
             ) { summary =>
-
               val numberOfPages:  Int                = getNumberOfPages(agentDetailsList)
               val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
               val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
 
-              Ok(view(Some(summary), pagination, paginationText, postAction))
+              Ok(view(form, Some(summary), pagination, paginationText, paginationIndex))
             }
       } recover {
         case ex =>
           logger.error("[AgentOverviewController][onPageLoad] Unexpected failure", ex)
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
+    }
+  }
+
+  def onSubmit(paginationIndex: Int):Action[AnyContent] = {
+    (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors => {
+          stampDutyLandTaxService.getAllAgentDetails(request.storn).map  {
+            case Nil  => BadRequest(view(formWithErrors,None, None, None, paginationIndex))
+            case agentDetailsList =>
+              generateAgentSummary(paginationIndex, agentDetailsList) match {
+                case None => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+                case Some(summary) =>
+                  val numberOfPages: Int = getNumberOfPages(agentDetailsList)
+                  val pagination: Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
+                  val paginationText: Option[String] = getPaginationInfoText(paginationIndex, agentDetailsList)
+                  BadRequest(view(formWithErrors, Some(summary), pagination, paginationText, paginationIndex))
+              }
+          }recover {
+            case ex =>
+              logger.error("[AgentOverviewController][onPageLoad] Unexpected failure", ex)
+              Redirect(controllers.routes.SystemErrorController.onPageLoad())
+          }
+        },
+        value =>
+          if(value){
+            Future.successful(Redirect(controllers.manageAgents.routes.StartAddAgentController.onPageLoad()))
+          }
+          else {
+            Future.successful(Redirect(appConfig.managementAtAGlanceUrl))
+          }
+      )
+
     }
   }
 }
