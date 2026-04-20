@@ -67,7 +67,7 @@ class AgentContactDetailsFormProviderSpec
     "must not bind email longer than 36 characters" in {
       val longEmail = ("a" * 40) + "@example.com"
       val result = form.bind(Map("phone" -> validPhone.get, "email" -> longEmail))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailLength", agentName)) mustBe true
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.maxEmailLength", agentName)) mustBe true
     }
 
     "must not bind invalid email format" in {
