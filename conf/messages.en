@@ -102,17 +102,19 @@ manageAgents.agentContactDetails.heading = What are {0}’s contact details?
 manageAgents.agentContactDetails.label1 = Agent phone number
 manageAgents.agentContactDetails.label2 = Agent email address
 manageAgents.agentContactDetails.hint = For international numbers include the country code, like 0049 for Germany (+49 on mobile)
+manageAgents.agentContactDetails.error.phoneOrEmailRequired = Enter {0}’s phone number or email address
 manageAgents.agentContactDetails.error.phoneRequired = Enter {0}’s phone number
-manageAgents.agentContactDetails.error.phoneLength = {0}’s phone number must be 14 characters or less
-manageAgents.agentContactDetails.error.phoneInvalid = {0}’s phone number must only include numbers 0 to 9, plus signs, spaces, dashes, hyphens and brackets
-manageAgents.agentContactDetails.error.phoneInvalidFormat = Enter a phone number, like 01632960001, 07700900982
+manageAgents.agentContactDetails.error.phoneLength = Your input for {0}’s telephone number contains too many characters. Please amend.
+manageAgents.agentContactDetails.error.phoneInvalid = Your entry for {0}’s telephone number contains an invalid character. Please amend.
+manageAgents.agentContactDetails.error.phoneInvalidFormat = Enter a phone number, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 manageAgents.agentContactDetails.error.emailRequired = Enter {0}’s email address
-manageAgents.agentContactDetails.error.emailInvalid = {0}’s email address must only include letters a to z without accents, numbers 0 to 9, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
+manageAgents.agentContactDetails.error.emailInvalid = {0}’s email address must only include letters a to z, ampersands (&), apostrophes, at signs (@), forward slashes, full stops, hyphens, numbers 0-9, question marks and spaces
 manageAgents.agentContactDetails.error.emailInvalidFormat = Enter {0}’s email address in the correct format, like name@example.com
-manageAgents.agentContactDetails.error.emailLength = {0}’s email address must be 36 characters or less
+manageAgents.agentContactDetails.error.maxEmailLength = {0}’s email address must be 36 characters or fewer
+manageAgents.agentContactDetails.error.minEmailLength = {0}’s email address must be 3 characters or more
 
-manageAgents.agentName.error.invalid = The agent’s name must only include letters a to z, numbers 0 to 9, ampersands (&), commas(,) , apostrophes, at signs (@), forward slashes, full stops, hyphens, question marks and spaces
-manageAgents.agentName.error.length = The agent’s name must be 28 characters or less
+manageAgents.agentName.error.invalid = The agent’s name must only include letters a to z, apostrophes, hyphens and spaces
+manageAgents.agentName.error.length = The agent’s name must be 28 characters or fewer
 manageAgents.agentName.error.required = Enter the agent’s name
 manageAgents.agentName.warning = This agent name already exists, are you sure you want to continue?
 
