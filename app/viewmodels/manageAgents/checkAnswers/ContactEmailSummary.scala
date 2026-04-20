@@ -28,7 +28,7 @@ object ContactEmailSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     val maybeEmail: Option[String] =
-      answers.get(AgentContactDetailsPage).flatMap(_.email)
+      answers.get(AgentContactDetailsPage).map(_.email)
 
     val value =
       ValueViewModel(
