@@ -28,7 +28,7 @@ object ContactPhoneNumberSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     val maybePhone: Option[String] =
-      answers.get(AgentContactDetailsPage).map(_.phone)
+      answers.get(AgentContactDetailsPage).flatMap(_.phone)
 
     val value =
       ValueViewModel(

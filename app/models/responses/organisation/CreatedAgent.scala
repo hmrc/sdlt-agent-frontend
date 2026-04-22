@@ -28,8 +28,8 @@ case class CreatedAgent(
                          address3:               Option[String],
                          address4:               Option[String],
                          postcode:               Option[String],
-                         phone:                  String,
-                         email:                  String,
+                         phone:                  Option[String],
+                         email:                  Option[String],
                          dxAddress:              Option[String],
                          agentResourceReference: String
                        ) {

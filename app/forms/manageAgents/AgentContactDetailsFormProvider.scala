@@ -18,13 +18,11 @@ package forms.manageAgents
 
 import models.manageAgents.AgentContactDetails
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
-import forms.mappings.Mappings
+import play.api.data.Forms.{mapping, optional, text}
 import play.api.i18n.Messages
-
 import javax.inject.Inject
 
-class AgentContactDetailsFormProvider @Inject()  {
+class AgentContactDetailsFormProvider @Inject(){
 
   private val phoneInvalidRegex = "^[0-9+\\s\\-()]+$"
   private val phoneInvalidFormatRegex = "^[0-9+\\s\\-()]+$"
@@ -38,16 +36,29 @@ class AgentContactDetailsFormProvider @Inject()  {
 
     Form(
       mapping(
-        "phone" -> text(messages("manageAgents.agentContactDetails.error.phoneRequired", agentName))
-          .transform(_.trim, identity)
-          .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName), _.forall(_.matches(phoneInvalidRegex)))
-          .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName), _.forall(_.matches(phoneInvalidFormatRegex)))
-          .verifying(messages("manageAgents.agentContactDetails.error.phoneLength", agentName), _.forall(phone => phone.replaceAll("\\s", "").length <= maxAgentPhoneLength)),
-        "email" -> text(messages("manageAgents.agentContactDetails.error.emailRequired", agentName))
-          .verifying(messages("manageAgents.agentContactDetails.error.emailMinLength", agentName), _.length >= minAgentEmailLength)
-          .verifying(messages("manageAgents.agentContactDetails.error.emailMaxLength", agentName), _.length <= maxAgentEmailLength)
-          .verifying(messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName), _.forall(_.matches(emailInvalidFormatRegex)))
-          .verifying(messages("manageAgents.agentContactDetails.error.emailInvalid", agentName), _.forall(_.matches(emailInvalidRegex))),
-      )(AgentContactDetails.apply)(contactDetails => (contactDetails.phone, contactDetails.email))
+        "phone" -> optional(text)
+          .transform[Option[String]](_.map(_.trim), identity)
+          .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName),
+            _.forall(_.matches(phoneInvalidRegex)))
+          .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName),
+            _.forall(_.matches(phoneInvalidFormatRegex)))
+          .verifying(messages("manageAgents.agentContactDetails.error.phoneLength", agentName),
+            _.forall(phone => phone.replaceAll("\\s", "").length <= maxAgentPhoneLength)),
+
+        "email" -> optional(text)
+          .verifying(messages("manageAgents.agentContactDetails.error.emailInvalid", agentName),
+            _.forall(_.matches(emailInvalidRegex)))
+          .verifying(messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName),
+            _.forall(_.matches(emailInvalidFormatRegex)))
+          .verifying(messages("manageAgents.agentContactDetails.error.minEmailLength", agentName),
+            _.forall(_.length >= minAgentEmailLength))
+          .verifying(messages("manageAgents.agentContactDetails.error.maxEmailLength", agentName),
+            _.forall(_.length <= maxAgentEmailLength))
+
+      )(AgentContactDetails.apply)(contactDetails => Some((contactDetails.phone, contactDetails.email)))
+        .verifying(
+          messages("manageAgents.agentContactDetails.error.phoneOrEmailRequired", agentName),
+          details => details.phone.exists(_.nonEmpty) || details.email.exists(_.nonEmpty)
+        )
     )
 }
