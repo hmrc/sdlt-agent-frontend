@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package pages.manageAgents
+package viewmodels.manageAgents.checkAnswers
 
-import models.UserAnswers
-import models.manageAgents.AgentContactDetails
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-import scala.util.Try
-
-case object AgentContactDetailsPage extends QuestionPage[AgentContactDetails] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "agentContactDetails"
-
-  override def cleanup(value: Option[AgentContactDetails], userAnswers: UserAnswers): Try[UserAnswers] =
-    super.cleanup(value, userAnswers)
+object AgentContactDetailsSummary {
 
 }

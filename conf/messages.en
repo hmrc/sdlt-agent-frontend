@@ -50,7 +50,9 @@ manageAgents.agentName.change.hidden =
 manageAgents.address.checkYourAnswersLabel = Address
 manageAgents.address.change.hidden = 
 manageAgents.contactTelephoneNumber.checkYourAnswersLabel = Contact telephone number
-manageAgents.contactTelephoneNumber.change.hidden = 
+manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel = Do you want to add contact details for {0}?
+manageAgents.addContactDetailsYesNoSummary.change.hidden = 
+manageAgents.contactTelephoneNumber.change.hidden =
 manageAgents.contactEmail.checkYourAnswersLabel = Contact email
 manageAgents.contactEmail.change.hidden = 
 
