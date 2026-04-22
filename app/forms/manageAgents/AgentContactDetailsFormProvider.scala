@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 class AgentContactDetailsFormProvider @Inject(){
 
-  private val phoneInvalidRegex = "[A-Za-z0-9 ~!@%\\&\\'()*+,\\-\\.\\/\\:\\=?\\[\\]^_{\\}\\;]*"
-  private val phoneInvalidFormatRegex = "^[0-9+\\s\\-()]+$"
+  private val phoneInvalidRegex = "^[0-9+\\s\\-()]+$"
+  private val phoneInvalidFormatRegex = "[A-Za-z0-9 ~!@%\\&\\'()*+,\\-\\.\\/\\:\\=?\\[\\]^_{\\}\\;]*"
   private val emailInvalidFormatRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
   private val emailInvalidRegex = "^[A-Za-z0-9&'@\\/.\\-? ]+$"
   private val maxAgentPhoneLength = 14
