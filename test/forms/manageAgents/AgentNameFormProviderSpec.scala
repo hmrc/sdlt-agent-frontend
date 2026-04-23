@@ -36,18 +36,50 @@ class AgentNameFormProviderSpec extends StringFieldBehaviours with GuiceOneServe
       result.errors mustBe empty
       result.value mustBe Some("Agent Name")
     }
-    "must bind valid agentName with all the special characters " in {
+    "must bind valid agentName with all the special characters 12345&@/.-? " in {
       val result = form.bind(Map("value" -> "Agent, Name12345&@/.-?"))
 
       result.errors mustBe empty
       result.value mustBe Some("Agent, Name12345&@/.-?")
     }
 
-    "must reject invalid characters" in {
+    "must bind valid agentName with all the special characters !%()*+:=[]^_{}; " in {
+      val result = form.bind(Map("value" -> "Agent, Name!%()*+:=[]^_{};"))
+
+      result.errors mustBe empty
+      result.value mustBe Some("Agent, Name!%()*+:=[]^_{};")
+    }
+
+    "must reject invalid character # " in {
       val result = form.bind(Map("value" -> "Agent#"))
       result.errors.map(_.message) must contain ("manageAgents.agentName.error.invalid")
     }
 
+    "must reject invalid character $" in {
+      val result = form.bind(Map("value" -> "Agent$"))
+      result.errors.map(_.message) must contain("manageAgents.agentName.error.invalid")
+    }
+
+    "must reject invalid character `" in {
+      val result = form.bind(Map("value" -> "Agent ` "))
+      result.errors.map(_.message) must contain("manageAgents.agentName.error.invalid")
+    }
+
+    "must reject invalid characters |" in {
+      val result = form.bind(Map("value" -> "Agent|"))
+      result.errors.map(_.message) must contain("manageAgents.agentName.error.invalid")
+    }
+
+    "must reject invalid character <" in {
+      val result = form.bind(Map("value" -> "Agent<"))
+      result.errors.map(_.message) must contain("manageAgents.agentName.error.invalid")
+    }
+
+    "must reject invalid characters >" in {
+      val result = form.bind(Map("value" -> "Agent>"))
+      result.errors.map(_.message) must contain("manageAgents.agentName.error.invalid")
+    }
+    
     "must reject empty value " in {
       val result = form.bind(Map("value" -> ""))
       result.errors.map(_.message) must contain("manageAgents.agentName.error.required")
