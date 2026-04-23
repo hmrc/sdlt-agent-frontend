@@ -52,8 +52,9 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
       val errorForm: Form[?] = form
         .withError("phone", "manageAgents.agentContactDetails.error.phoneLength")
         .withError("phone", "manageAgents.agentContactDetails.error.phoneInvalid")
-        .withError("phone", "manageAgents.agentContactDetails.error.phoneInvalidFormat")
-        .withError("email", "manageAgents.agentContactDetails.error.emailLength")
+        .withError("phone", "manageAgents.agentContactDetails.error.phoneOrEmailRequired")
+        .withError("email", "manageAgents.agentContactDetails.error.maxEmailLength")
+        .withError("email", "manageAgents.agentContactDetails.error.minEmailLength")
         .withError("email", "manageAgents.agentContactDetails.error.emailInvalid")
         .withError("email", "manageAgents.agentContactDetails.error.emailInvalidFormat")
 
@@ -65,8 +66,9 @@ class AgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
         Seq(
           "manageAgents.agentContactDetails.error.phoneLength",
           "manageAgents.agentContactDetails.error.phoneInvalid",
-          "manageAgents.agentContactDetails.error.phoneInvalidFormat",
-          "manageAgents.agentContactDetails.error.emailLength",
+          "manageAgents.agentContactDetails.error.phoneOrEmailRequired",
+          "manageAgents.agentContactDetails.error.maxEmailLength",
+          "manageAgents.agentContactDetails.error.minEmailLength",
           "manageAgents.agentContactDetails.error.emailInvalid",
           "manageAgents.agentContactDetails.error.emailInvalidFormat"
         )
