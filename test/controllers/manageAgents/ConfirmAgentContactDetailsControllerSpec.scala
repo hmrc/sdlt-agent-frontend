@@ -18,11 +18,11 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
-import models.manageAgents.ConfirmAgentContactDetails
+import models.manageAgents.{AgentContactDetails, ConfirmAgentContactDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.AgentNamePage
+import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -41,11 +41,15 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
   trait Fixture {
     val agentName = "null"
 
+    val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
+
     val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
-    def noOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
+    def noOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
-    def yesOnwardRoute = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
+    def yesOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
+
+    val journeyRecoveryRoute: String = controllers.routes.JourneyRecoveryController.onPageLoad().url
 
     val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
     implicit val messages: Messages = messagesApi.preferred(FakeRequest())
@@ -107,6 +111,81 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
+    "must remove AgentContactDetailsPage and redirect to CheckYourAnswersController when NO is submitted after previously selecting YES " in new Fixture {
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      override val application: Application = applicationBuilder(
+        userAnswers = Some(
+          emptyUserAnswers
+            .set(AgentNamePage, agentName).success.value
+            .set(AgentContactDetailsPage, agentContactDetails).success.value
+        )
+      )
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
+
+      running(application) {
+
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.tail.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual noOnwardRoute.url
+
+      }
+    }
+
+      "must redirect to CheckYourAnswersController when user selects NO option and is submitted first time " in new Fixture {
+        override val application: Application = applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentNamePage, agentName).success.value
+          )
+        )
+          .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+            .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual noOnwardRoute.url
+        }
+      }
+
+    "must redirect to JourneyRecovery controller if user answers couldn't be updated in session repository" in new Fixture {
+        val mockSessionRepo: SessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepo.set(any())) thenReturn Future.failed(new RuntimeException("Boom"))
+
+        override val application: Application = applicationBuilder(
+          userAnswers = Some(
+            emptyUserAnswers
+              .set(AgentNamePage, agentName).success.value
+              .set(AgentContactDetailsPage, agentContactDetails).success.value
+          )
+        )
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+          .build()
+
+        running(application) {
+
+          val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+            .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual journeyRecoveryRoute
+        }
+      }
+
     "must redirect to journey recovery when fail to extract agentName" in new Fixture {
       val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
       when(mockService.getAgentName(any())) thenReturn Left(Error("Failed to extract agentName"))
@@ -126,7 +205,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual journeyRecoveryRoute
       }
     }
 
@@ -148,27 +227,6 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         status(result) mustEqual BAD_REQUEST
       }
     }
-
-    "must redirect to the agent contact details page when valid NO option is submitted" in new Fixture {
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
-
-      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
-        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
-        .build()
-
-      running(application) {
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual noOnwardRoute.url
-      }
-
-    }
-
   }
 
 }

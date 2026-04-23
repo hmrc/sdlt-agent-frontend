@@ -25,34 +25,27 @@ import utils.manageAgents.UserAnswersHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddContactDetailsYesNoSummary extends UserAnswersHelper {
+object AddContactDetailsYesNoSummary {
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
 
-    val agentName:String = answers.get(AgentNamePage).getOrElse("")
-    
-    val isAgentContactDetailsPageDefined:String = answers.get(AgentContactDetailsPage).isDefined match {
-      case true => "Yes"
-      case false => "No"
-    }
-    
-    val value =
-      ValueViewModel(
-        HtmlFormat.escape(isAgentContactDetailsPageDefined).toString
-      )
-
-    Some(
-      SummaryListRowViewModel(
-        key = messages("manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel", agentName),
-        value = value,
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+    answers.get(AgentNamePage).map { agentName =>
+      val isAgentContactDetailsPageDefined: String = answers.get(AgentContactDetailsPage).isDefined match {
+        case true => messages("manageAgents.agentContactDetailsSummary.value.yes")
+        case false => messages("manageAgents.agentContactDetailsSummary.value.no")
+      }
+        SummaryListRowViewModel(
+          key = messages("manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel", agentName),
+          value = ValueViewModel(HtmlFormat.escape(isAgentContactDetailsPageDefined).toString),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+            )
+              .withVisuallyHiddenText(messages(s"manageAgents.addContactDetailsYesNoSummary.change.hidden"))
+              .withAttribute("id" -> "change-agent-contact-details")
           )
-            .withVisuallyHiddenText(messages(s"manageAgents.addContactDetailsYesNoSummary.change.hidden"))
-            .withAttribute("id" -> "change-agent-contact-details")
         )
-      )
-    )
+    }
+
   }
 }

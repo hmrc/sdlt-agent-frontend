@@ -18,35 +18,38 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import models.manageAgents.ConfirmAgentContactDetails
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.LoggerUtil.{logError, logInfo}
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class ConfirmAgentContactDetailsController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       stornRequiredAction: StornRequiredAction,
-                                       formProvider: ConfirmAgentContactDetailsFormProvider,
-                                       stampDutyLandTaxService: StampDutyLandTaxService,
-                                       navigator: Navigator,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ConfirmAgentContactDetailsView
-                                     ) extends FrontendBaseController with I18nSupport with Logging {
+                                                      override val messagesApi: MessagesApi,
+                                                      identify: IdentifierAction,
+                                                      getData: DataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      stornRequiredAction: StornRequiredAction,
+                                                      formProvider: ConfirmAgentContactDetailsFormProvider,
+                                                      sessionRepository: SessionRepository,
+                                                      stampDutyLandTaxService: StampDutyLandTaxService,
+                                                      navigator: Navigator,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: ConfirmAgentContactDetailsView
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -73,8 +76,12 @@ class ConfirmAgentContactDetailsController @Inject()(
                 Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
 
               case ConfirmAgentContactDetails.Option2 =>
-                logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] No agent contact details option selected")
-                Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
+                request.userAnswers.get(AgentContactDetailsPage) match {
+                  case Some(page) => removePageUpdateUserAnswersAndRedirect(request.userAnswers)
+                  case None =>
+                    logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` First time in the journey")
+                    Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
+                }
             }
           )
         case Left(error) =>
@@ -82,5 +89,23 @@ class ConfirmAgentContactDetailsController @Inject()(
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
+
+  private def removePageUpdateUserAnswersAndRedirect(userAnswers: UserAnswers): Future[Result] = {
+    userAnswers.remove(AgentContactDetailsPage).map { updatedUserAnswers =>
+        logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User Selected `No` going back in the journey after previously selecting `Yes`")
+        sessionRepository.set(updatedUserAnswers).map { value =>
+            Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedUserAnswers))
+          }
+          .recover { case ex =>
+            logError("[ConfirmAgentContactDetailsController][onSubmit] Failed to update Session Repository with user answers")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+          }
+      }
+      .getOrElse {
+        logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
+  }
+
 
 }

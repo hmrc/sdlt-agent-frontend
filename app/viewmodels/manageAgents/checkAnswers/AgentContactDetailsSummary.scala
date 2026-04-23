@@ -16,6 +16,39 @@
 
 package viewmodels.manageAgents.checkAnswers
 
+import models.{CheckMode, UserAnswers}
+import pages.manageAgents.AgentContactDetailsPage
+import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.govuk.summarylist.*
+import viewmodels.implicits.*
+
 object AgentContactDetailsSummary {
+
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(AgentContactDetailsPage).map { agentContactDetails =>
+      SummaryListRowViewModel(
+        key = messages("manageAgents.agentContactDetailsSummary.checkYourAnswersLabel"),
+        value = ValueViewModel(
+          HtmlContent(
+            s"""
+               |${messages("manageAgents.agentContactDetailsSummary.value.telephone")}: ${HtmlFormat.escape(agentContactDetails.phone.getOrElse("")).toString}<br>
+               |${messages("manageAgents.agentContactDetailsSummary.value.email")}: ${HtmlFormat.escape(agentContactDetails.email.getOrElse("")).toString}
+               |""".stripMargin
+          )
+        ),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+          )
+            .withVisuallyHiddenText(messages(s"manageAgents.agentContactDetailsSummary.change.hidden"))
+            .withAttribute("id" -> "change-agent-contact-details")
+        )
+      )
+    }
+  }
 
 }

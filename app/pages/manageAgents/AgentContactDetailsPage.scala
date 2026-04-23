@@ -16,20 +16,14 @@
 
 package pages.manageAgents
 
-import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-
-import scala.util.Try
 
 case object AgentContactDetailsPage extends QuestionPage[AgentContactDetails] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "agentContactDetails"
-
-  override def cleanup(value: Option[AgentContactDetails], userAnswers: UserAnswers): Try[UserAnswers] =
-    super.cleanup(value, userAnswers)
-
+  
 }

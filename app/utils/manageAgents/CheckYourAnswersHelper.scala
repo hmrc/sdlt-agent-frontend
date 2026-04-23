@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
+import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, AddressSummary, AgentContactDetailsSummary, AgentNameSummary}
 
 object CheckYourAnswersHelper {
 
@@ -34,7 +34,7 @@ object CheckYourAnswersHelper {
         AgentNameSummary.row(userAnswers),
         AddressSummary.row(userAnswers),
         AddContactDetailsYesNoSummary.row(userAnswers),
-        ContactEmailSummary.row(userAnswers)
+        AgentContactDetailsSummary.row(userAnswers)
       ).flatten
     }
     else {

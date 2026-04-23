@@ -16,27 +16,27 @@
 
 package controllers.manageAgents
 
-import controllers.routes
-import models.{NormalMode, UserAnswers}
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentOverviewPage, AgentReferenceNumberPage, StornPage}
-import services.StampDutyLandTaxService
-import utils.manageAgents.AgentDetailsTestUtil
-import viewmodels.govuk.SummaryListFluency
-import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
-import views.html.manageAgents.CheckYourAnswersView
 import base.SpecBase
+import controllers.routes
 import models.manageAgents.AgentContactDetails
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
-import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.responses.organisation.CreatedAgent
+import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.manageAgents.*
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
+import services.StampDutyLandTaxService
+import utils.manageAgents.AgentDetailsTestUtil
+import viewmodels.govuk.SummaryListFluency
+import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, AddressSummary, AgentContactDetailsSummary, AgentNameSummary}
+import views.html.manageAgents.CheckYourAnswersView
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -68,7 +68,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
   "onPageLoad" - {
     "Check Your Answers Controller (with no ARN population)" - {
 
-      "must return OK and the correct view for a GET" in {
+      "must return OK and the correct view for a GET with all SummaryListRows when all pages are populated " in {
 
         val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
 
@@ -89,8 +89,37 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
                 Seq(
                   AgentNameSummary.row(ua)(messages(application)),
                   AddressSummary.row(ua)(messages(application)),
-                  ContactPhoneNumberSummary.row(ua)(messages(application)),
-                  ContactEmailSummary.row(ua)(messages(application))
+                  AddContactDetailsYesNoSummary.row(ua)(messages(application)),
+                  AgentContactDetailsSummary.row(ua)(messages(application))
+                ).flatten
+              ),
+              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+            )(request, messages(application)).toString
+        }
+      }
+      "must return OK and the correct view for a GET without AgentContactDetailsSummary row when AgentContactDetails is not populated " in {
+        val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+
+        val userAnswersWithoutAgentContactDetailsPage = ua.remove(AgentContactDetailsPage).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutAgentContactDetailsPage)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersUrl(None))
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CheckYourAnswersView]
+
+          status(result) mustEqual OK
+
+          contentAsString(result) mustEqual
+            view(
+              list = SummaryListViewModel(
+                Seq(
+                  AgentNameSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
+                  AddressSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
+                  AddContactDetailsYesNoSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application))
                 ).flatten
               ),
               postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
