@@ -64,6 +64,11 @@ class AgentContactDetailsFormProviderSpec
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
     }
 
+    "must not bind AgentContactDetails when phone and email both are empty" in {
+      val result = form.bind(Map("phone" -> "", "email" -> ""))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneOrEmailRequired", agentName)) mustBe true
+    }
+
     "must not bind email longer than 36 characters" in {
       val longEmail = ("a" * 40) + "@example.com"
       val result = form.bind(Map("phone" -> validPhone.get, "email" -> longEmail))
