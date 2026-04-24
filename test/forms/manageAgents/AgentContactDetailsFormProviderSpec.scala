@@ -35,6 +35,7 @@ class AgentContactDetailsFormProviderSpec
   val validPhone = Some("01234 567890")
   val validEmail = Some("test@example.com")
 
+
   "AgentContactDetailsFormProvider" - {
 
     "must bind valid phone and email" in {
@@ -84,5 +85,68 @@ class AgentContactDetailsFormProviderSpec
       val result = form.bind(Map("phone" -> validPhone.get, "email" -> "bad#chars@email.com"))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
     }
+    //invalid phone character tests
+    "must reject invalid phone with character # " in {
+      val result = form.bind(Map("phone" -> "#123456", "email" -> "bad#chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid phone with character $" in {
+      val result = form.bind(Map("phone" -> "$123456", "email" -> "bad#chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid phone with character `" in {
+      val result = form.bind(Map("phone" -> "`123456", "email" -> "badchars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid phone with characters |" in {
+      val result = form.bind(Map("phone" -> "|123456", "email" -> "badchars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid phone with character < " in {
+      val result = form.bind(Map("phone" -> "<123456", "email" -> "badchars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid phone with characters > " in {
+      val result = form.bind(Map("phone" -> ">123456", "email" -> "badchars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+    
+    //invalid email characters tests
+    "must reject invalid email with character # " in {
+      val result = form.bind(Map("phone" -> "#123456", "email" -> "badchars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid email with character $" in {
+      val result = form.bind(Map("phone" -> "123456", "email" -> "bad$chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid email with character `" in {
+      val result = form.bind(Map("phone" -> "123456", "email" -> "bad`chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid email with characters |" in {
+      val result = form.bind(Map("phone" -> "123456", "email" -> "bad|chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid email with character <" in {
+      val result = form.bind(Map("phone" -> "123456", "email" -> "bad<chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+    }
+
+    "must reject invalid email with characters > " in {
+      val result = form.bind(Map("phone" -> "123456", "email" -> "bad>chars@email.com"))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+    }
+
+
   }
 }
