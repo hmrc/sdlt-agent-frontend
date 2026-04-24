@@ -18,14 +18,14 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
-import models.{NormalMode, UserAnswers}
 import models.manageAgents.ConfirmAgentContactDetails
+import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -34,7 +34,6 @@ import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 @Singleton
 class ConfirmAgentContactDetailsController @Inject()(
@@ -45,9 +44,9 @@ class ConfirmAgentContactDetailsController @Inject()(
                                                       stornRequiredAction: StornRequiredAction,
                                                       formProvider: ConfirmAgentContactDetailsFormProvider,
                                                       sessionRepository: SessionRepository,
-                                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                                       navigator: Navigator,
                                                       val controllerComponents: MessagesControllerComponents,
+                                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                                       view: ConfirmAgentContactDetailsView
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
@@ -73,11 +72,19 @@ class ConfirmAgentContactDetailsController @Inject()(
               Future.successful(BadRequest(view(formWithErrors, agentName))),
             {
               case ConfirmAgentContactDetails.Option1 =>
+                logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `Yes` Redirect to AgentContactDetailsController onPageLoad()")
                 Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
 
               case ConfirmAgentContactDetails.Option2 =>
                 request.userAnswers.get(AgentContactDetailsPage) match {
-                  case Some(page) => removePageUpdateUserAnswersAndRedirect(request.userAnswers)
+                  case Some(page) => stampDutyLandTaxService.removeAgentContactDetailsPageAndUpdateUserAnswers(request.userAnswers, sessionRepository).flatMap{
+                    case Right(updatedUserAnswers) =>
+                      logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User Selected `No` going back in the journey after previously selecting `Yes`")
+                      Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedUserAnswers)))
+                    case Left(error) =>
+                      logInfo(s"[ConfirmAgentContactDetailsController][onSubmit]:User Selected`No`but there are some issues, Redirect to JourneyRecoveryController")
+                      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                  }
                   case None =>
                     logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` First time in the journey")
                     Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
@@ -89,23 +96,5 @@ class ConfirmAgentContactDetailsController @Inject()(
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }
-
-  private def removePageUpdateUserAnswersAndRedirect(userAnswers: UserAnswers): Future[Result] = {
-    userAnswers.remove(AgentContactDetailsPage).map { updatedUserAnswers =>
-        logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User Selected `No` going back in the journey after previously selecting `Yes`")
-        sessionRepository.set(updatedUserAnswers).map { value =>
-            Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedUserAnswers))
-          }
-          .recover { case ex =>
-            logError("[ConfirmAgentContactDetailsController][onSubmit] Failed to update Session Repository with user answers")
-            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-          }
-      }
-      .getOrElse {
-        logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      }
-  }
-
-
+  
 }

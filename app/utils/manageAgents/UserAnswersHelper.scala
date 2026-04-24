@@ -23,7 +23,10 @@ import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
 import play.api.mvc.AnyContent
+import repositories.SessionRepository
+import utils.LoggerUtil.logError
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 trait UserAnswersHelper {
@@ -42,12 +45,34 @@ trait UserAnswersHelper {
   }
 
   // Attempt to extract agentName from request.userAnswer
-  def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] =
+  def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] = {
     request.userAnswers.get(AgentNamePage) match {
       case Some(name) =>
         Right(name)
       case None =>
         Left(Error("Couldn't find agent in user answers"))
     }
+  }
+  
+  // Attempt to remove AgentContactDetailsPage and update UserAnswers in session repository
+  def removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswers: UserAnswers, sessionRepository: SessionRepository)
+                                                       (implicit ec: ExecutionContext): Future[Either[Throwable, UserAnswers]] = {
+    {
+      for {
+        updatedUserAnswersEither <- Future.successful(userAnswers.remove(AgentContactDetailsPage).toEither)
+      } yield updatedUserAnswersEither match {
+        case Right(updatedUserAnswers) =>
+          sessionRepository.set(updatedUserAnswers)
+            .map(x => Right(updatedUserAnswers))
+            .recover { case ex =>
+              logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't set UsersAnswers in session Repository")
+              Left(ex)
+            }
+        case Left(ex) =>
+          logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
+          Future.successful(Left(ex))
+      }
+    }.flatten
 
+  }
 }

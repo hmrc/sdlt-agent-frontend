@@ -21,21 +21,26 @@ import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import utils.manageAgents.UserAnswersHelper
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 object AddContactDetailsYesNoSummary {
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
 
+  def isAgentContactDetailsPageDefined(answers: UserAnswers)(implicit messages: Messages): String = {
+    answers.get(AgentContactDetailsPage) match {
+      case Some(_) =>
+        messages("manageAgents.agentContactDetailsSummary.value.yes")
+      case None =>
+        messages("manageAgents.agentContactDetailsSummary.value.no")
+    }
+  }
+  
+  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentNamePage).map { agentName =>
-      val isAgentContactDetailsPageDefined: String = answers.get(AgentContactDetailsPage).isDefined match {
-        case true => messages("manageAgents.agentContactDetailsSummary.value.yes")
-        case false => messages("manageAgents.agentContactDetailsSummary.value.no")
-      }
+
         SummaryListRowViewModel(
           key = messages("manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel", agentName),
-          value = ValueViewModel(HtmlFormat.escape(isAgentContactDetailsPageDefined).toString),
+          value = ValueViewModel(HtmlFormat.escape(isAgentContactDetailsPageDefined(answers)).toString),
           actions = Seq(
             ActionItemViewModel(
               "site.change",

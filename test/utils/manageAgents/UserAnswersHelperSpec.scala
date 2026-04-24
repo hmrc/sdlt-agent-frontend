@@ -21,11 +21,17 @@ import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import models.responses.organisation.CreatedAgent
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
+import repositories.SessionRepository
+
+import scala.concurrent.Future
 
 class UserAnswersHelperSpec
   extends SpecBase
@@ -40,6 +46,14 @@ class UserAnswersHelperSpec
     req
   }
 
+  private val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
+
+  val userAnswersWithAgentContactDetailsPage: UserAnswers = Some(
+    emptyUserAnswers
+      .set(AgentNamePage, "John Doe").success.value
+      .set(AgentContactDetailsPage, agentContactDetails).success.value
+  ).value
+  
   "UserAnswersHelper.updateUserAnswers" - {
 
     "should populate AgentName, Address (with missing optional lines), and ContactDetails" in {
@@ -115,5 +129,38 @@ class UserAnswersHelperSpec
       updated.get(AgentContactDetailsPage).value mustBe
         AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
     }
+
+  }
+
+  "UserAnswersHelper.removeAgentContactDetailsPageAndUpdateUserAnswers" - {
+
+    "should return Right(true) remove AgentContactDetailsPage and update session Repository with  new users Answers" in {
+
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+
+      val userAnswersWithOutAgentContactDetailsPage: UserAnswers = userAnswersWithAgentContactDetailsPage
+        .remove(AgentContactDetailsPage).success.value
+
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+
+      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
+
+      result.futureValue mustBe Right(userAnswersWithOutAgentContactDetailsPage)
+    }
+
+    "should return Left(error) when setting the session repository fails" in {
+
+      val exception = new RuntimeException("Boom")
+
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+
+      when(mockSessionRepo.set(any())).thenReturn(Future.failed(exception))
+
+      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
+
+      result.futureValue mustBe Left(exception)
+
+    }
+
   }
 }

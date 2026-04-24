@@ -18,6 +18,7 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
+import models.UserAnswers
 import models.manageAgents.{AgentContactDetails, ConfirmAgentContactDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -32,20 +33,28 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
+import utils.manageAgents.UserAnswersHelper
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {
 
   trait Fixture {
-    val agentName = "null"
+    val agentName = "John Doe"
 
     val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
 
     val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
     def noOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
+
+    val userAnswersWithAgentContactDetails: UserAnswers = Some(emptyUserAnswers
+      .set(AgentNamePage, agentName).success.value
+      .set(AgentContactDetailsPage, agentContactDetails).success.value).value
+
+    val userAnswersWithOutAgentContactDetails: UserAnswers = userAnswersWithAgentContactDetails.remove(AgentContactDetailsPage).success.value
 
     def yesOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
 
@@ -92,13 +101,12 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must redirect to the agent contact details page when valid YES option is submitted" in new Fixture {
+      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
-
+      when(mockService.getAgentName(any())).thenReturn(Right(agentName))
       override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
-        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
         .build()
+
       running(application) {
 
         val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
@@ -112,17 +120,14 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
     }
 
     "must remove AgentContactDetailsPage and redirect to CheckYourAnswersController when NO is submitted after previously selecting YES " in new Fixture {
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
+      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-      override val application: Application = applicationBuilder(
-        userAnswers = Some(
-          emptyUserAnswers
-            .set(AgentNamePage, agentName).success.value
-            .set(AgentContactDetailsPage, agentContactDetails).success.value
-        )
-      )
-        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+      when(mockService.getAgentName(any())).thenReturn(Right(agentName))
+      when(mockService.removeAgentContactDetailsPageAndUpdateUserAnswers(any(), any())(any()))
+        .thenReturn(Future.successful(Right(userAnswersWithOutAgentContactDetails)))
+
+      override val application: Application = applicationBuilder(Some(userAnswersWithAgentContactDetails))
+        .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
         .build()
 
       running(application) {
@@ -139,6 +144,11 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
     }
 
       "must redirect to CheckYourAnswersController when user selects NO option and is submitted first time " in new Fixture {
+
+        val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
+
+        when(mockService.getAgentName(any())).thenReturn(Right(agentName))
+
         override val application: Application = applicationBuilder(
           userAnswers = Some(
             emptyUserAnswers
@@ -160,31 +170,28 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
 
     "must redirect to JourneyRecovery controller if user answers couldn't be updated in session repository" in new Fixture {
-        val mockSessionRepo: SessionRepository = mock[SessionRepository]
+      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-        when(mockSessionRepo.set(any())) thenReturn Future.failed(new RuntimeException("Boom"))
+      when(mockService.getAgentName(any())).thenReturn(Right(agentName))
 
-        override val application: Application = applicationBuilder(
-          userAnswers = Some(
-            emptyUserAnswers
-              .set(AgentNamePage, agentName).success.value
-              .set(AgentContactDetailsPage, agentContactDetails).success.value
-          )
-        )
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
-          .build()
+      when(mockService.removeAgentContactDetailsPageAndUpdateUserAnswers(any(), any())(any()))
+        .thenReturn(Future.successful(Left(new RuntimeException("Boom"))))
 
-        running(application) {
+      override val application: Application = applicationBuilder(Some(userAnswersWithAgentContactDetails))
+        .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+        .build()
 
-          val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-            .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+      running(application) {
 
-          val result = route(application, request).value
+        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
+          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual journeyRecoveryRoute
-        }
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual journeyRecoveryRoute
       }
+    }
 
     "must redirect to journey recovery when fail to extract agentName" in new Fixture {
       val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]

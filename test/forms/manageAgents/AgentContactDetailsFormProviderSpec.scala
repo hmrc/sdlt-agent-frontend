@@ -32,8 +32,8 @@ class AgentContactDetailsFormProviderSpec
   val formProvider = new AgentContactDetailsFormProvider()
   val form: Form[AgentContactDetails] = formProvider(agentName)
 
-  val validPhone = Some("01234 567890")
-  val validEmail = Some("test@example.com")
+  val validPhone: Option[String] = Some("01234 567890")
+  val validEmail: Option[String] = Some("test@example.com")
 
 
   "AgentContactDetailsFormProvider" - {
