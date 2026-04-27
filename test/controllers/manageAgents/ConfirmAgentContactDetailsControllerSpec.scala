@@ -26,17 +26,15 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
 import play.api.Application
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
-import utils.manageAgents.UserAnswersHelper
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSugar {

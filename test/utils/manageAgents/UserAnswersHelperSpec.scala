@@ -154,7 +154,7 @@ class UserAnswersHelperSpec
 
       val mockSessionRepo: SessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepo.set(any())).thenReturn(Future.failed(exception))
+      when(mockSessionRepo.set(any())).thenThrow(exception)
 
       val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
 

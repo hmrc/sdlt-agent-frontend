@@ -26,7 +26,7 @@ import viewmodels.implicits.*
 
 object AddContactDetailsYesNoSummary {
 
-  def isAgentContactDetailsPageDefined(answers: UserAnswers)(implicit messages: Messages): String = {
+  private def isAgentContactDetailsPageDefined(answers: UserAnswers)(implicit messages: Messages): String = {
     answers.get(AgentContactDetailsPage) match {
       case Some(_) =>
         messages("manageAgents.agentContactDetailsSummary.value.yes")

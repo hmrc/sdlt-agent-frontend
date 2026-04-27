@@ -62,12 +62,10 @@ trait UserAnswersHelper {
         updatedUserAnswersEither <- Future.successful(userAnswers.remove(AgentContactDetailsPage).toEither)
       } yield updatedUserAnswersEither match {
         case Right(updatedUserAnswers) =>
-          sessionRepository.set(updatedUserAnswers)
-            .map(x => Right(updatedUserAnswers))
-            .recover { case ex =>
-              logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't set UsersAnswers in session Repository")
-              Left(ex)
-            }
+          Try {sessionRepository.set(updatedUserAnswers)}.toEither match {
+            case Right(_) => Future.successful(Right(updatedUserAnswers))
+            case Left(ex) => Future.successful(Left(ex))
+          }
         case Left(ex) =>
           logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
           Future.successful(Left(ex))
