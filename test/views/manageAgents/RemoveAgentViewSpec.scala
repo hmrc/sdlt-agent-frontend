@@ -29,7 +29,10 @@ import play.twirl.api.Html
 import utils.manageAgents.{AgentDetailsTestUtil, ViewSpecBase}
 import views.html.manageAgents.RemoveAgentView
 
-class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTestUtil {
+class RemoveAgentViewSpec
+    extends SpecBase
+    with ViewSpecBase
+    with AgentDetailsTestUtil {
 
   "RemoveAgentView" - {
 
@@ -38,7 +41,11 @@ class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTe
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.removeAgent.title")
-      displaysCorrectHeading(doc, "manageAgents.removeAgent.heading", Seq(testAgentDetails.name))
+      displaysCorrectHeading(
+        doc,
+        "manageAgents.removeAgent.heading",
+        Seq(testAgentDetails.name)
+      )
       displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasCorrectNumOfItems(doc, ".govuk-radios__item", 2)
@@ -48,7 +55,11 @@ class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTe
 
     "must display error messages when form has errors" in new Setup {
       val errorForm: Form[?] = form
-        .withError("value", "manageAgents.removeAgent.error.required", testAgentDetails.name)
+        .withError(
+          "value",
+          "manageAgents.removeAgent.error.required",
+          testAgentDetails.name
+        )
 
       val html: Html = view(errorForm, postAction, testAgentDetails)
       val doc: Document = Jsoup.parse(html.toString())
@@ -62,12 +73,16 @@ class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTe
   }
 
   trait Setup {
-    val app: Application                      = applicationBuilder().build()
-    val formProvider                          = new RemoveAgentFormProvider()
-    val form: Form[?]                         = formProvider(testAgentDetails)
-    val postAction: Call                      = controllers.manageAgents.routes.RemoveAgentController.onSubmit("123")
-    implicit def request: Request[?]          = FakeRequest()
-    implicit def messages: Messages           = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: RemoveAgentView                 = app.injector.instanceOf[RemoveAgentView]
+    val app: Application = applicationBuilder().build()
+    val formProvider = new RemoveAgentFormProvider()
+    val form: Form[?] = formProvider(testAgentDetails)
+    val postAction: Call =
+      controllers.manageAgents.routes.RemoveAgentController.onSubmit("123")
+    implicit def request: Request[?] = FakeRequest()
+    implicit def messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: RemoveAgentView = app.injector.instanceOf[RemoveAgentView]
   }
 }

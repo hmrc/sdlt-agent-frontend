@@ -23,14 +23,15 @@ import views.html.manageAgents.UnauthorisedIndividualView
 
 import javax.inject.Inject
 
-class UnauthorisedIndividualAffinityController @Inject()(
-                                                          override val messagesApi: MessagesApi,
-                                                          val controllerComponents: MessagesControllerComponents,
-                                                          view: UnauthorisedIndividualView
-                                                        ) extends FrontendBaseController with I18nSupport {
+class UnauthorisedIndividualAffinityController @Inject() (
+    override val messagesApi: MessagesApi,
+    val controllerComponents: MessagesControllerComponents,
+    view: UnauthorisedIndividualView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = Action {
-    implicit request => {
+  def onPageLoad(): Action[AnyContent] = Action { implicit request =>
+    {
       Ok(view())
     }
   }

@@ -27,9 +27,13 @@ import play.api.test.FakeRequest
 import play.twirl.api.Html
 import views.html.SystemErrorView
 
-class SystemErrorViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
+class SystemErrorViewSpec
+    extends SpecBase
+    with GuiceOneAppPerSuite
+    with MockitoSugar {
 
-  lazy val systemErrorRoute = controllers.routes.SystemErrorController.onPageLoad().url
+  lazy val systemErrorRoute =
+    controllers.routes.SystemErrorController.onPageLoad().url
 
   "SystemErrorView" - {
     "render the page with correct title and heading" in new Setup {
@@ -66,15 +70,19 @@ class SystemErrorViewSpec extends SpecBase with GuiceOneAppPerSuite with Mockito
 
   trait Setup {
 
-    implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    implicit val appConfig: FrontendAppConfig = new FrontendAppConfig(app.configuration)
+    implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest()
+    implicit val appConfig: FrontendAppConfig = new FrontendAppConfig(
+      app.configuration
+    )
 
-    implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-    implicit lazy val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
+    implicit lazy val messagesApi: MessagesApi =
+      app.injector.instanceOf[MessagesApi]
+    implicit lazy val messages: Messages =
+      MessagesImpl(Lang.defaultLang, messagesApi)
 
     def parseHtml(html: Html) = Jsoup.parse(html.toString)
 
     val view: SystemErrorView = app.injector.instanceOf[SystemErrorView]
   }
 }
-

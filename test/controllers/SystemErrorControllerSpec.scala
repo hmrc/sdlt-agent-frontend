@@ -37,7 +37,8 @@ class SystemErrorControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn("https://www.gov.uk")
 
         running(app) {
-          val request = FakeRequest(GET, routes.SystemErrorController.onPageLoad().url)
+          val request =
+            FakeRequest(GET, routes.SystemErrorController.onPageLoad().url)
 
           val result = route(app, request).value
 

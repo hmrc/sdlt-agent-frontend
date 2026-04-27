@@ -21,9 +21,9 @@ import play.api.data.Form
 
 import javax.inject.Inject
 
-class AddAnotherAgentFormProvider @Inject extends Mappings{
-  
-  def apply(): Form[Boolean]= {
+class AddAnotherAgentFormProvider @Inject extends Mappings {
+
+  def apply(): Form[Boolean] = {
     Form(
       "value" -> boolean("manageAgents.agentOverview.error.required")
     )

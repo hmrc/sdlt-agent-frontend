@@ -26,8 +26,12 @@ import javax.inject.Inject
 
 class RemoveAgentFormProvider @Inject() extends Mappings {
 
-  def apply(agentdetails: CreatedAgent)(implicit messages: Messages): Form[RemoveAgent] =
+  def apply(
+      agentdetails: CreatedAgent
+  )(implicit messages: Messages): Form[RemoveAgent] =
     Form(
-      "value" -> enumerable[RemoveAgent]( messages("manageAgents.removeAgent.error.required", agentdetails.name))
+      "value" -> enumerable[RemoveAgent](
+        messages("manageAgents.removeAgent.error.required", agentdetails.name)
+      )
     )
 }

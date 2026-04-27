@@ -46,9 +46,15 @@ class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
       val link = doc.selectFirst("p.govuk-body a.govuk-link")
 
       paragraph.size() mustBe 1
-      paragraph.text() must include(messages("manageAgents.unauthorised.org.paragraph"))
-      paragraph.text() must include(messages("manageAgents.unauthorised.org.link"))
-      link.attr("href") mustBe "/stamp-duty-land-tax-agent/manage-agents/agent-overview?paginationIndex=1"
+      paragraph.text() must include(
+        messages("manageAgents.unauthorised.org.paragraph")
+      )
+      paragraph.text() must include(
+        messages("manageAgents.unauthorised.org.link")
+      )
+      link.attr(
+        "href"
+      ) mustBe "/stamp-duty-land-tax-agent/manage-agents/agent-overview?paginationIndex=1"
 
     }
     "render the page with url link" in new Setup {
@@ -57,18 +63,20 @@ class UnauthorisedOrgViewSpec extends SpecBase with ViewSpecBase {
 
       val linkName = doc.select("a.govuk-link.hmrc-report-technical-issue")
 
-      linkName.text() mustBe ("Is this page not working properly? (opens in new tab)")
+      linkName
+        .text() mustBe ("Is this page not working properly? (opens in new tab)")
     }
   }
 
   trait Setup {
-    val app: Application                                   = applicationBuilder().build()
-    implicit val request: Request[?]                       = FakeRequest()
-    implicit val messages: Messages                        = play.api.i18n.MessagesImpl(
+    val app: Application = applicationBuilder().build()
+    implicit val request: Request[?] = FakeRequest()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
       play.api.i18n.Lang.defaultLang,
-      app.injector.instanceOf[play.api.i18n.MessagesApi])
-    implicit lazy val applicationConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-    val view: UnauthorisedOrgView                          = app.injector.instanceOf[UnauthorisedOrgView]
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    implicit lazy val applicationConfig: FrontendAppConfig =
+      app.injector.instanceOf[FrontendAppConfig]
+    val view: UnauthorisedOrgView = app.injector.instanceOf[UnauthorisedOrgView]
   }
 }
-

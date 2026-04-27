@@ -36,7 +36,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       s"must redirect to the Landing page with the userId added to the session" in {
 
         val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers = None)
           .overrides(
@@ -45,12 +46,17 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+          val request =
+            FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.manageAgents.routes.AgentOverviewController
+            .onPageLoad(1)
+            .url
           verify(mockSessionRepository).set(any[UserAnswers])
         }
       }
@@ -58,7 +64,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
       "must update UserAnswers model with the userId pulled from the request" in {
 
         val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.set(any())).thenReturn(Future.successful(true))
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
 
         val application = applicationBuilder(userAnswers = None)
           .overrides(
@@ -67,7 +74,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+          val request =
+            FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
           val result = route(application, request).value
 
@@ -79,9 +87,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
           val savedUserAnswers = captor.getValue
           savedUserAnswers.id must not be empty
 
-          verify(mockSessionRepository).set(argThat((ua: UserAnswers) =>
-            ua.id.contains(savedUserAnswers.id)
-          ))
+          verify(mockSessionRepository).set(
+            argThat((ua: UserAnswers) => ua.id.contains(savedUserAnswers.id))
+          )
         }
       }
     }

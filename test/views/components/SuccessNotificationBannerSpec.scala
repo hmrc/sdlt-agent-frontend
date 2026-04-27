@@ -31,25 +31,37 @@ class SuccessNotificationBannerSpec extends SpecBase with Matchers {
 
     "must render the correct title" in new Setup {
       val html: Html = successNotificationBanner(bannerText, agentName)
-      val title: Element = getNotificationBanner(html).selectFirst(".govuk-notification-banner__title")
+      val title: Element = getNotificationBanner(html).selectFirst(
+        ".govuk-notification-banner__title"
+      )
 
       title.text mustBe "Success"
     }
 
     "must render the correct heading" in new Setup {
       val html: Html = successNotificationBanner(bannerText, agentName)
-      val heading: Element = getNotificationBanner(html).selectFirst(".govuk-notification-banner__heading")
+      val heading: Element = getNotificationBanner(html).selectFirst(
+        ".govuk-notification-banner__heading"
+      )
 
-      heading.text mustBe messages("manageAgents.agentDetails.submitAgent.notification", agentName)
+      heading.text mustBe messages(
+        "manageAgents.agentDetails.submitAgent.notification",
+        agentName
+      )
     }
   }
 
   trait Setup {
-    val app: Application              = applicationBuilder().build()
-    implicit val messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val successNotificationBanner: SuccessNotificationBanner = app.injector.instanceOf[SuccessNotificationBanner]
+    val app: Application = applicationBuilder().build()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val successNotificationBanner: SuccessNotificationBanner =
+      app.injector.instanceOf[SuccessNotificationBanner]
     val agentName: String = "testAgentName"
-    val bannerText: String = "manageAgents.agentDetails.submitAgent.notification"
+    val bannerText: String =
+      "manageAgents.agentDetails.submitAgent.notification"
   }
 
   def getNotificationBanner(html: Html): Element =

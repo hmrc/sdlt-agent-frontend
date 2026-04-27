@@ -28,7 +28,11 @@ import play.api.test.Helpers.stubMessages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 
-class NoSessionDataSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class NoSessionDataSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues {
 
   "NoSessionData" - {
 
@@ -36,21 +40,24 @@ class NoSessionDataSpec extends AnyFreeSpec with Matchers with ScalaCheckPropert
 
       val gen = Gen.oneOf(NoSessionData.values)
 
-      forAll(gen) {
-        noSessionData =>
-
-          JsString(noSessionData.toString).validate[NoSessionData].asOpt.value mustEqual noSessionData
+      forAll(gen) { noSessionData =>
+        JsString(noSessionData.toString)
+          .validate[NoSessionData]
+          .asOpt
+          .value mustEqual noSessionData
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!NoSessionData.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!NoSessionData.values
+        .map(_.toString)
+        .contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[NoSessionData] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[NoSessionData] mustEqual JsError(
+          "error.invalid"
+        )
       }
     }
 
@@ -58,10 +65,8 @@ class NoSessionDataSpec extends AnyFreeSpec with Matchers with ScalaCheckPropert
 
       val gen = Gen.oneOf(NoSessionData.values)
 
-      forAll(gen) {
-        noSessionData =>
-
-          Json.toJson(noSessionData) mustEqual JsString(noSessionData.toString)
+      forAll(gen) { noSessionData =>
+        Json.toJson(noSessionData) mustEqual JsString(noSessionData.toString)
       }
     }
     "options" - {
@@ -101,7 +106,10 @@ class NoSessionDataSpec extends AnyFreeSpec with Matchers with ScalaCheckPropert
 
         val radios = NoSessionData.options
 
-        radios.map(_.value) mustEqual Seq(Some(NoSessionData.FileNewReturn.toString), Some(NoSessionData.ManageStampTaxes.toString))
+        radios.map(_.value) mustEqual Seq(
+          Some(NoSessionData.FileNewReturn.toString),
+          Some(NoSessionData.ManageStampTaxes.toString)
+        )
       }
     }
   }

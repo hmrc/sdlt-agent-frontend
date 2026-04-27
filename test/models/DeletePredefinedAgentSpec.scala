@@ -40,7 +40,7 @@ class DeletePredefinedAgentSpec extends AnyWordSpec with Matchers {
 
     "deserialize from JSON correctly" in {
       val json = Json.obj(
-        "storn"                -> "STN001",
+        "storn" -> "STN001",
         "agentReferenceNumber" -> "ARN001"
       )
 

@@ -17,12 +17,20 @@
 package controllers.manageAgents
 
 import cats.data.EitherT
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  StornRequiredAction
+}
 import controllers.routes.{JourneyRecoveryController, SystemErrorController}
 import models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse
 import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, ConfirmAgentContactDetailsPage}
+import pages.manageAgents.{
+  AgentCheckYourAnswersPage,
+  ConfirmAgentContactDetailsPage
+}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
@@ -34,49 +42,91 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Singleton
-class AddressLookupController @Inject()(
-                                         val controllerComponents: MessagesControllerComponents,
-                                         val addressLookupService: AddressLookupService,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         stornRequiredAction: StornRequiredAction,
-                                         navigator: Navigator
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class AddressLookupController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    val addressLookupService: AddressLookupService,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    navigator: Navigator
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
-      case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
-        logDebug(s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}")
-        Redirect(addressLookupLocation)
-      case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
-        logError("[AddressLookupController][onPageLoad] - Failed::Location not provided")
-        Redirect(JourneyRecoveryController.onPageLoad())
-      case Left(ex) =>
-        logError(s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex")
-        Redirect(SystemErrorController.onPageLoad())
-    }
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        addressLookupService
+          .initJourney(request.userAnswers, request.storn, mode)
+          .map {
+            case Right(
+                  JourneyInitSuccessResponse(Some(addressLookupLocation))
+                ) =>
+              logDebug(
+                s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}"
+              )
+              Redirect(addressLookupLocation)
+            case Right(
+                  models.responses.addresslookup.JourneyInitResponse
+                    .JourneyInitSuccessResponse(None)
+                ) =>
+              logError(
+                "[AddressLookupController][onPageLoad] - Failed::Location not provided"
+              )
+              Redirect(JourneyRecoveryController.onPageLoad())
+            case Left(ex) =>
+              logError(
+                s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex"
+              )
+              Redirect(SystemErrorController.onPageLoad())
+          }
+      }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
-    logDebug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
-    for {
-      id <- EitherT(Future.successful(Try {
-        request.queryString.get("id").get(0)
-      }.toEither))
-      journeyOutcome <- EitherT(addressLookupService.getJourneyOutcome(id, request.userAnswers))
-    } yield journeyOutcome
-  }.value.map {
-    case Right(updatedAnswer) if mode == NormalMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - address extracted and saved")
-      Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
-    case Right(updatedAnswer) if mode == CheckMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - edit::address extracted and saved")
-      Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
-    case _ =>
-      logError("[AddressLookupController][onSubmit] - failed to extract address or invalid mode")
-      Redirect(SystemErrorController.onPageLoad())
-    }
-  }
+  def onSubmit(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        {
+          logDebug(
+            s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}"
+          )
+          for {
+            id <- EitherT(Future.successful(Try {
+              request.queryString.get("id").get(0)
+            }.toEither))
+            journeyOutcome <- EitherT(
+              addressLookupService.getJourneyOutcome(id, request.userAnswers)
+            )
+          } yield journeyOutcome
+        }.value.map {
+          case Right(updatedAnswer) if mode == NormalMode =>
+            logInfo(
+              s"[AddressLookupController][onSubmit] - address extracted and saved"
+            )
+            Redirect(
+              navigator.nextPage(
+                ConfirmAgentContactDetailsPage,
+                NormalMode,
+                updatedAnswer
+              )
+            )
+          case Right(updatedAnswer) if mode == CheckMode =>
+            logInfo(
+              s"[AddressLookupController][onSubmit] - edit::address extracted and saved"
+            )
+            Redirect(
+              navigator.nextPage(
+                AgentCheckYourAnswersPage,
+                CheckMode,
+                updatedAnswer
+              )
+            )
+          case _ =>
+            logError(
+              "[AddressLookupController][onSubmit] - failed to extract address or invalid mode"
+            )
+            Redirect(SystemErrorController.onPageLoad())
+        }
+      }
 
 }

@@ -23,23 +23,33 @@ import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
 import utils.manageAgents.AgentDetailsTestUtil
 
-class ConfirmAgentContactDetailsFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class ConfirmAgentContactDetailsFormProviderSpec
+    extends OptionFieldBehaviours
+    with StringFieldBehaviours
+    with AgentDetailsTestUtil
+    with GuiceOneAppPerSuite {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
-  val formProvider =  new ConfirmAgentContactDetailsFormProvider
+  val formProvider = new ConfirmAgentContactDetailsFormProvider
   val agentName = "Harborview Estates"
 
   val form = formProvider(agentName)
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = messages("manageAgents.confirmAgentContactDetails.error.required", agentName)
+    val requiredKey = messages(
+      "manageAgents.confirmAgentContactDetails.error.required",
+      agentName
+    )
 
     behave like optionsField[ConfirmAgentContactDetails](
       form,
       fieldName,
-      validValues  = ConfirmAgentContactDetails.values,
+      validValues = ConfirmAgentContactDetails.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

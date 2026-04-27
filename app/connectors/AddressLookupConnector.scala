@@ -30,21 +30,25 @@ import utils.LoggerUtil.{logDebug, logInfo}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
 @Singleton
-class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
-                                        http: HttpClientV2,
-                                        val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
+class AddressLookupConnector @Inject() (
+    val appConfig: FrontendAppConfig,
+    http: HttpClientV2,
+    val messagesApi: MessagesApi
+)(implicit ec: ExecutionContext) {
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
-  val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
-  val addressLookupOutcomeUrl: String => String = (id: String) => s"$baseUrl/api/v2/confirmed?id=$id"
+  val addressLookupInitializeUrl: String = s"$baseUrl/api/v2/init"
+  val addressLookupOutcomeUrl: String => String = (id: String) =>
+    s"$baseUrl/api/v2/confirmed?id=$id"
 
   private val sessionTimeout: Long = appConfig.sessionTimeOut
-  private val addressLookupTimeoutUrl: String = appConfig.addressLookupTimeoutUrl
+  private val addressLookupTimeoutUrl: String =
+    appConfig.addressLookupTimeoutUrl
 
-  private val continueUrl = (mode: Mode) => appConfig.host +
-    controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
+  private val continueUrl = (mode: Mode) =>
+    appConfig.host +
+      controllers.manageAgents.routes.AddressLookupController.onSubmit(mode).url
 
   private def setJourneyOptions(mode: Mode): Seq[(String, JsValue)] = {
     Seq(
@@ -69,7 +73,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
           "showChangeLink" -> JsBoolean(true),
           "showSubHeadingAndInfo" -> JsBoolean(false),
           "showSearchAgainLink" -> JsBoolean(false),
-          "showConfirmChangeText" -> JsBoolean(false),
+          "showConfirmChangeText" -> JsBoolean(false)
         )
       ),
       "manualAddressEntryConfig" -> JsObject(
@@ -96,45 +100,83 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
     )
   }
 
-  private def setLabels(agentName: Option[String], lang : Lang)
-                       (implicit messages: Messages): Seq[(String, JsObject)] = {
+  private def setLabels(agentName: Option[String], lang: Lang)(implicit
+      messages: Messages
+  ): Seq[(String, JsObject)] = {
     Seq(
       "appLevelLabels" -> JsObject(
         Seq(
-          "navTitle" -> JsString(messagesApi.preferred( Seq( lang ) )(s"manageAgents.addressLookup.header.title"))
+          "navTitle" -> JsString(
+            messagesApi.preferred(Seq(lang))(
+              s"manageAgents.addressLookup.header.title"
+            )
+          )
         )
       ),
       "selectPageLabels" -> JsObject(
         Seq(
-          "title" -> JsString(messages("manageAgents.addressLookup.choose.title")),
-          "heading" -> JsString(messages(s"manageAgents.addressLookup.select.heading", agentName.getOrElse("")))
+          "title" -> JsString(
+            messages("manageAgents.addressLookup.choose.title")
+          ),
+          "heading" -> JsString(
+            messages(
+              s"manageAgents.addressLookup.select.heading",
+              agentName.getOrElse("")
+            )
+          )
         )
       ),
       "lookupPageLabels" -> JsObject(
         Seq(
-          "title" -> JsString(messages("manageAgents.addressLookup.find.title")),
-          "heading" -> JsString(messages(s"manageAgents.addressLookup.lookup.heading", agentName.getOrElse("")))
+          "title" -> JsString(
+            messages("manageAgents.addressLookup.find.title")
+          ),
+          "heading" -> JsString(
+            messages(
+              s"manageAgents.addressLookup.lookup.heading",
+              agentName.getOrElse("")
+            )
+          )
         )
       ),
       "confirmPageLabels" -> JsObject(
         Seq(
-          "title" -> JsString(messages("manageAgents.addressLookup.confirm.title")),
-          "heading" -> JsString(messages(s"manageAgents.addressLookup.confirm.heading", agentName.getOrElse(""))),
-          "changeLinkText" -> JsString(messages(s"manageAgents.addressLookup.confirm.changeLinkText", agentName.getOrElse(""))
+          "title" -> JsString(
+            messages("manageAgents.addressLookup.confirm.title")
           ),
+          "heading" -> JsString(
+            messages(
+              s"manageAgents.addressLookup.confirm.heading",
+              agentName.getOrElse("")
+            )
+          ),
+          "changeLinkText" -> JsString(
+            messages(
+              s"manageAgents.addressLookup.confirm.changeLinkText",
+              agentName.getOrElse("")
+            )
+          )
         )
       ),
       "editPageLabels" -> JsObject(
         Seq(
-          "title" -> JsString(messages("manageAgents.addressLookup.enter.title")),
-          "heading" -> JsString(messages(s"manageAgents.addressLookup.edit.heading", agentName.getOrElse("")))
+          "title" -> JsString(
+            messages("manageAgents.addressLookup.enter.title")
+          ),
+          "heading" -> JsString(
+            messages(
+              s"manageAgents.addressLookup.edit.heading",
+              agentName.getOrElse("")
+            )
+          )
         )
       )
     )
   }
 
-  private def buildConfig(agentName: Option[String], mode: Mode)
-      (implicit messages: Messages): JsValue = {
+  private def buildConfig(agentName: Option[String], mode: Mode)(implicit
+      messages: Messages
+  ): JsValue = {
     JsObject(
       Seq(
         "version" -> JsNumber(2),
@@ -144,7 +186,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
         "labels" -> JsObject(
           Seq(
             "en" -> JsObject(
-              setLabels(agentName, Lang("en") )
+              setLabels(agentName, Lang("en"))
             )
           )
         )
@@ -153,21 +195,30 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   }
 
   // Step 1: Journey start/init
-  def initJourney(agentName: Option[String], mode: Mode)
-                 (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
+  def initJourney(agentName: Option[String], mode: Mode)(implicit
+      hc: HeaderCarrier,
+      messages: Messages,
+      rh: RequestHeader
+  ): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
     logDebug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
-    http.post(url"$addressLookupInitializeUrl")
+    http
+      .post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]
   }
 
   // Step 2: Extract journey result/outcome
-  def getJourneyOutcome(id: String)
-                       (implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
-    logInfo(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
-    http.get(url"${addressLookupOutcomeUrl(id)}").execute[AddressLookupJourneyOutcome]
+  def getJourneyOutcome(
+      id: String
+  )(implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
+    logInfo(
+      s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}"
+    )
+    http
+      .get(url"${addressLookupOutcomeUrl(id)}")
+      .execute[AddressLookupJourneyOutcome]
   }
 
 }

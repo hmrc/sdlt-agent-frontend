@@ -19,9 +19,10 @@ package models.responses
 import play.api.libs.json.{Json, OFormat}
 
 case class DeletePredefinedAgentResponse(
-                                          deleted: Boolean
-                                        )
+    deleted: Boolean
+)
 
 object DeletePredefinedAgentResponse {
-  implicit val format: OFormat[DeletePredefinedAgentResponse] = Json.format[DeletePredefinedAgentResponse]
+  implicit val format: OFormat[DeletePredefinedAgentResponse] =
+    Json.format[DeletePredefinedAgentResponse]
 }

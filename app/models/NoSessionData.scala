@@ -23,22 +23,25 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 sealed trait NoSessionData
 
 object NoSessionData extends Enumerable.Implicits {
-  
+
   case object FileNewReturn extends WithName("fileNewReturn") with NoSessionData
-  case object ManageStampTaxes extends WithName("manageStampTaxes") with NoSessionData
+  case object ManageStampTaxes
+      extends WithName("manageStampTaxes")
+      with NoSessionData
 
   val values: Seq[NoSessionData] = Seq(
-    FileNewReturn, ManageStampTaxes
+    FileNewReturn,
+    ManageStampTaxes
   )
 
-  def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map {
-    case (value, index) =>
+  def options(implicit messages: Messages): Seq[RadioItem] =
+    values.zipWithIndex.map { case (value, index) =>
       RadioItem(
         content = Text(messages(s"noSessionData.${value.toString}")),
         value = Some(value.toString),
         id = Some(s"value_$index")
       )
-  }
+    }
 
   implicit val enumerable: Enumerable[NoSessionData] =
     Enumerable(values.map(v => v.toString -> v): _*)

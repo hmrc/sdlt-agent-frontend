@@ -18,8 +18,8 @@ package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
 
-case class IdentifierRequest[A] (
-  request: Request[A],
-  userId: String,
-  storn: String
+case class IdentifierRequest[A](
+    request: Request[A],
+    userId: String,
+    storn: String
 ) extends WrappedRequest[A](request)

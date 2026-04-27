@@ -16,7 +16,12 @@
 
 package controllers.manageAgents
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  StornRequiredAction
+}
 import forms.manageAgents.RemoveAgentFormProvider
 import models.manageAgents.RemoveAgent
 import play.api.Logging
@@ -38,81 +43,132 @@ import utils.LoggerUtil.{logError, logInfo}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RemoveAgentController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       stornRequiredAction: StornRequiredAction,
-                                       formProvider: RemoveAgentFormProvider,
-                                       stampDutyLandTaxService: StampDutyLandTaxService,
-                                       navigator: Navigator,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: RemoveAgentView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class RemoveAgentController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    formProvider: RemoveAgentFormProvider,
+    stampDutyLandTaxService: StampDutyLandTaxService,
+    navigator: Navigator,
+    val controllerComponents: MessagesControllerComponents,
+    view: RemoveAgentView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   // TODO: Tidy up logic on this page
 
-  val postAction: String => Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit
+  val postAction: String => Call =
+    controllers.manageAgents.routes.RemoveAgentController.onSubmit
 
-  def onPageLoad(agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
-    implicit request =>
-
-      stampDutyLandTaxService
-        .getAgentDetails(request.storn, agentReferenceNumber) map {
+  def onPageLoad(agentReferenceNumber: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        stampDutyLandTaxService
+          .getAgentDetails(request.storn, agentReferenceNumber) map {
           case Some(agentDetails) => {
             val form: Form[RemoveAgent] = formProvider(agentDetails)
             Ok(view(form, postAction(agentReferenceNumber), agentDetails))
           }
-          case None               =>
-            logError(s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}")
+          case None =>
+            logError(
+              s"[RemoveAgentController][onPageLoad] Failed to retrieve details for agent with storn: ${request.storn}"
+            )
             Redirect(JourneyRecoveryController.onPageLoad())
-      } recover {
-        case ex =>
-          logError(s"[RemoveAgentController][onPageLoad] Unexpected failure: ${ex.getMessage}")
-          Redirect(controllers.routes.SystemErrorController.onPageLoad())
-      }
-  }
-
-  def onSubmit(agentReferenceNumber: String): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
-    implicit request =>
-      stampDutyLandTaxService.getAgentDetails(request.storn, agentReferenceNumber) flatMap {
-        case Some(agentDetails) =>
-          val form: Form[RemoveAgent] = formProvider(agentDetails)
-
-          form.bindFromRequest().fold(
-            formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, postAction(agentReferenceNumber), agentDetails))),
-
-            removeChoice =>
-              removeChoice match {
-                case RemoveAgent.Option1 =>
-                  val req = DeletePredefinedAgentRequest(request.storn, agentReferenceNumber)
-                  stampDutyLandTaxService
-                    .deletePredefinedAgent(req).map { response =>
-                      if(response.deleted) {
-                        logInfo(s"[RemoveAgentController][onSubmit] Successfull removal of agent: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber")
-                        Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-                          .flashing("agentRemoved" -> agentDetails.name)
-                      } else {
-                        logError(s"[RemoveAgentController][onSubmit] Failed to remove agent: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber")
-                        Redirect(controllers.routes.SystemErrorController.onPageLoad())
-                      }
-                    }
-
-                case RemoveAgent.Option2 =>
-                  logInfo(s"[RemoveAgentController][onSubmit] User cancelled removal: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber")
-                  Future.successful(Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers)))
-              }
+        } recover { case ex =>
+          logError(
+            s"[RemoveAgentController][onPageLoad] Unexpected failure: ${ex.getMessage}"
           )
-
-        case None =>
-          logError(s"[RemoveAgentController][onSubmit] Agent not found for storn=${request.storn} agentReferenceNumber=$agentReferenceNumber")
-          Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
-      } recover {
-        case ex =>
-          logError(s"[RemoveAgentController][onSubmit] Unexpected failure ${ex.getMessage}")
           Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
       }
-  }
+
+  def onSubmit(agentReferenceNumber: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        stampDutyLandTaxService.getAgentDetails(
+          request.storn,
+          agentReferenceNumber
+        ) flatMap {
+          case Some(agentDetails) =>
+            val form: Form[RemoveAgent] = formProvider(agentDetails)
+
+            form
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        postAction(agentReferenceNumber),
+                        agentDetails
+                      )
+                    )
+                  ),
+
+                removeChoice =>
+                  removeChoice match {
+                    case RemoveAgent.Option1 =>
+                      val req = DeletePredefinedAgentRequest(
+                        request.storn,
+                        agentReferenceNumber
+                      )
+                      stampDutyLandTaxService
+                        .deletePredefinedAgent(req)
+                        .map { response =>
+                          if (response.deleted) {
+                            logInfo(
+                              s"[RemoveAgentController][onSubmit] Successfull removal of agent: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber"
+                            )
+                            Redirect(
+                              navigator.nextPage(
+                                AgentOverviewPage,
+                                NormalMode,
+                                request.userAnswers
+                              )
+                            )
+                              .flashing("agentRemoved" -> agentDetails.name)
+                          } else {
+                            logError(
+                              s"[RemoveAgentController][onSubmit] Failed to remove agent: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber"
+                            )
+                            Redirect(
+                              controllers.routes.SystemErrorController
+                                .onPageLoad()
+                            )
+                          }
+                        }
+
+                    case RemoveAgent.Option2 =>
+                      logInfo(
+                        s"[RemoveAgentController][onSubmit] User cancelled removal: storn=${request.storn} agentReferenceNumber=$agentReferenceNumber"
+                      )
+                      Future.successful(
+                        Redirect(
+                          navigator.nextPage(
+                            AgentOverviewPage,
+                            NormalMode,
+                            request.userAnswers
+                          )
+                        )
+                      )
+                  }
+              )
+
+          case None =>
+            logError(
+              s"[RemoveAgentController][onSubmit] Agent not found for storn=${request.storn} agentReferenceNumber=$agentReferenceNumber"
+            )
+            Future.successful(Redirect(JourneyRecoveryController.onPageLoad()))
+        } recover { case ex =>
+          logError(
+            s"[RemoveAgentController][onSubmit] Unexpected failure ${ex.getMessage}"
+          )
+          Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
+      }
 }

@@ -16,7 +16,11 @@
 
 package testOnly
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction
+}
 import models.UserAnswers
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
@@ -28,20 +32,19 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-class StubSetSessionController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 sessionRepository: SessionRepository,
-                                                 identify: IdentifierAction,
-                                                 getData: DataRetrievalAction,
-                                                 requireData: DataRequiredAction,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class StubSetSessionController @Inject() (
+    override val messagesApi: MessagesApi,
+    sessionRepository: SessionRepository,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def set(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       val fields: Seq[(String, JsValue)] =
         request.queryString.collect {
           case (k, vs) if vs.nonEmpty =>
@@ -58,27 +61,30 @@ class StubSetSessionController @Inject()(
         )
 
       sessionRepository.set(updatedAnswers).map { _ =>
-        Ok(Json.obj(
-          "status" -> "ok",
-          "merged" -> patch,
-          "resultingData" -> updatedAnswers.data
-        ))
+        Ok(
+          Json.obj(
+            "status" -> "ok",
+            "merged" -> patch,
+            "resultingData" -> updatedAnswers.data
+          )
+        )
       }
     }
 
   def clear(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
       val updatedAnswers: UserAnswers =
         request.userAnswers.copy(
           data = Json.obj()
         )
 
       sessionRepository.set(updatedAnswers).map { _ =>
-        Ok(Json.obj(
-          "status" -> "ok",
-          "resultingData" -> updatedAnswers.data
-        ))
+        Ok(
+          Json.obj(
+            "status" -> "ok",
+            "resultingData" -> updatedAnswers.data
+          )
+        )
       }
     }
 }

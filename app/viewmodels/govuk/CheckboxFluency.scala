@@ -19,7 +19,10 @@ package viewmodels.govuk
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.{CheckboxItem, Checkboxes}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.{
+  CheckboxItem,
+  Checkboxes
+}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
@@ -30,14 +33,16 @@ object checkbox extends CheckboxFluency
 
 trait CheckboxFluency {
 
-  object CheckboxesViewModel extends ErrorMessageAwareness with FieldsetFluency {
+  object CheckboxesViewModel
+      extends ErrorMessageAwareness
+      with FieldsetFluency {
 
     def apply(
-               form: Form[_],
-               name: String,
-               items: Seq[CheckboxItem],
-               legend: Legend
-             )(implicit messages: Messages): Checkboxes =
+        form: Form[_],
+        name: String,
+        items: Seq[CheckboxItem],
+        legend: Legend
+    )(implicit messages: Messages): Checkboxes =
       apply(
         form = form,
         name = name,
@@ -46,18 +51,17 @@ trait CheckboxFluency {
       )
 
     def apply(
-               form: Form[_],
-               name: String,
-               items: Seq[CheckboxItem],
-               fieldset: Fieldset
-             )(implicit messages: Messages): Checkboxes =
+        form: Form[_],
+        name: String,
+        items: Seq[CheckboxItem],
+        fieldset: Fieldset
+    )(implicit messages: Messages): Checkboxes =
       Checkboxes(
-        fieldset     = Some(fieldset),
-        name         = name,
+        fieldset = Some(fieldset),
+        name = name,
         errorMessage = errorMessage(form(name)),
-        items        = items.map {
-          item =>
-            item.copy(checked = form.data.exists(data => data._2 == item.value))
+        items = items.map { item =>
+          item.copy(checked = form.data.exists(data => data._2 == item.value))
         }
       )
   }
@@ -71,16 +75,16 @@ trait CheckboxFluency {
   object CheckboxItemViewModel {
 
     def apply(
-               content: Content,
-               fieldId: String,
-               index: Int,
-               value: String
-             ): CheckboxItem =
+        content: Content,
+        fieldId: String,
+        index: Int,
+        value: String
+    ): CheckboxItem =
       CheckboxItem(
         content = content,
-        id      = Some(s"${fieldId}_$index"),
-        name    = Some(s"$fieldId[$index]"),
-        value   = value
+        id = Some(s"${fieldId}_$index"),
+        name = Some(s"$fieldId[$index]"),
+        value = value
       )
   }
 

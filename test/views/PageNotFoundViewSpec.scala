@@ -27,17 +27,26 @@ import play.api.mvc.AnyContentAsEmpty
 import play.twirl.api.Html
 import views.html.PageNotFoundView
 
-class PageNotFoundViewSpec extends SpecBase with GuiceOneAppPerSuite with MockitoSugar {
+class PageNotFoundViewSpec
+    extends SpecBase
+    with GuiceOneAppPerSuite
+    with MockitoSugar {
 
-  lazy val PageNotFoundRoute = controllers.routes.PageNotFoundController.onPageLoad().url
+  lazy val PageNotFoundRoute =
+    controllers.routes.PageNotFoundController.onPageLoad().url
 
   trait Setup {
 
-    implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    implicit val appConfig: FrontendAppConfig = new FrontendAppConfig(app.configuration)
+    implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] =
+      FakeRequest()
+    implicit val appConfig: FrontendAppConfig = new FrontendAppConfig(
+      app.configuration
+    )
 
-    implicit lazy val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-    implicit lazy val messages: Messages = MessagesImpl(Lang.defaultLang, messagesApi)
+    implicit lazy val messagesApi: MessagesApi =
+      app.injector.instanceOf[MessagesApi]
+    implicit lazy val messages: Messages =
+      MessagesImpl(Lang.defaultLang, messagesApi)
 
     def parseHtml(html: Html) = Jsoup.parse(html.toString)
 

@@ -18,19 +18,33 @@ package utils
 
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{Pagination, PaginationItem, PaginationLink}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.{
+  Pagination,
+  PaginationItem,
+  PaginationLink
+}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
-import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, FluentKey, FluentValue, KeyViewModel, SummaryListRowViewModel, SummaryListViewModel, ValueViewModel}
+import viewmodels.govuk.all.{
+  ActionItemViewModel,
+  FluentActionItem,
+  FluentKey,
+  FluentValue,
+  KeyViewModel,
+  SummaryListRowViewModel,
+  SummaryListViewModel,
+  ValueViewModel
+}
 import controllers.manageAgents.routes.*
 import models.responses.organisation.CreatedAgent
 
 trait PaginationHelper {
 
   private val ROWS_ON_PAGE = 10
-  
-  def getPaginationInfoText[A](paginationIndex: Int, itemList: Seq[A])
-                              (implicit messages: Messages): Option[String] = {
-    
+
+  def getPaginationInfoText[A](paginationIndex: Int, itemList: Seq[A])(implicit
+      messages: Messages
+  ): Option[String] = {
+
     if (itemList.length <= ROWS_ON_PAGE || paginationIndex <= 0) { None }
     else {
       val paged = itemList.grouped(ROWS_ON_PAGE).toSeq
@@ -39,7 +53,12 @@ trait PaginationHelper {
         val total = itemList.length
         val start = (paginationIndex - 1) * ROWS_ON_PAGE + 1
         val end = math.min(paginationIndex * ROWS_ON_PAGE, total)
-        messages("manageAgents.agentDetails.summaryInfo.text", start, end, total)
+        messages(
+          "manageAgents.agentDetails.summaryInfo.text",
+          start,
+          end,
+          total
+        )
       }
     }
   }
@@ -49,9 +68,10 @@ trait PaginationHelper {
       .grouped(ROWS_ON_PAGE)
       .size
 
-  def generateAgentSummary(paginationIndex: Int, agents: Seq[CreatedAgent])
-                          (implicit messages: Messages): Option[SummaryList] = {
-    
+  def generateAgentSummary(paginationIndex: Int, agents: Seq[CreatedAgent])(
+      implicit messages: Messages
+  ): Option[SummaryList] = {
+
     val paged: Seq[Seq[CreatedAgent]] = agents.grouped(ROWS_ON_PAGE).toSeq
 
     val currentPage: Option[Seq[CreatedAgent]] = paged.lift(paginationIndex - 1)
@@ -63,20 +83,30 @@ trait PaginationHelper {
             key = KeyViewModel(
               Text(agentDetails.name)
             )
-              .withCssClass("govuk-!-width-one-third govuk-!-font-weight-regular hmrc-summary-list__key"),
+              .withCssClass(
+                "govuk-!-width-one-third govuk-!-font-weight-regular hmrc-summary-list__key"
+              ),
             value = ValueViewModel(
               Text(agentDetails.getAddressLine1AndAddressLine2)
             )
-              .withCssClass("govuk-summary-list__value govuk-!-width-one-third"),
+              .withCssClass(
+                "govuk-summary-list__value govuk-!-width-one-third"
+              ),
             actions = Seq(
               ActionItemViewModel(
                 Text(messages("site.change")),
-                CheckYourAnswersController.onPageLoad(agentReferenceNumber = Some(agentDetails.agentResourceReference)).url
+                CheckYourAnswersController
+                  .onPageLoad(agentReferenceNumber =
+                    Some(agentDetails.agentResourceReference)
+                  )
+                  .url
               )
                 .withVisuallyHiddenText(agentDetails.name),
               ActionItemViewModel(
                 Text(messages("site.remove")),
-                RemoveAgentController.onPageLoad(agentDetails.agentResourceReference).url
+                RemoveAgentController
+                  .onPageLoad(agentDetails.agentResourceReference)
+                  .url
               )
                 .withVisuallyHiddenText(messages(agentDetails.name))
             ),
@@ -87,8 +117,9 @@ trait PaginationHelper {
     )
   }
 
-  def generatePagination(paginationIndex: Int, numberOfPages: Int)
-                        (implicit messages: Messages): Option[Pagination] =
+  def generatePagination(paginationIndex: Int, numberOfPages: Int)(implicit
+      messages: Messages
+  ): Option[Pagination] =
     if (numberOfPages < 2) None
     else
       Some(
@@ -102,7 +133,10 @@ trait PaginationHelper {
         )
       )
 
-  def generatePaginationItems(paginationIndex: Int, numberOfPages: Int): Seq[PaginationItem] =
+  def generatePaginationItems(
+      paginationIndex: Int,
+      numberOfPages: Int
+  ): Seq[PaginationItem] =
     Range
       .inclusive(1, numberOfPages)
       .map(pageIndex =>
@@ -116,8 +150,9 @@ trait PaginationHelper {
         )
       )
 
-  def generatePreviousLink(paginationIndex: Int, numberOfPages: Int)
-                          (implicit messages: Messages): Option[PaginationLink] =
+  def generatePreviousLink(paginationIndex: Int, numberOfPages: Int)(implicit
+      messages: Messages
+  ): Option[PaginationLink] =
     if (paginationIndex == 1) None
     else {
       Some(
@@ -129,8 +164,9 @@ trait PaginationHelper {
       )
     }
 
-  def generateNextLink(paginationIndex: Int, numberOfPages: Int)
-                      (implicit messages: Messages): Option[PaginationLink] =
+  def generateNextLink(paginationIndex: Int, numberOfPages: Int)(implicit
+      messages: Messages
+  ): Option[PaginationLink] =
     if (paginationIndex == numberOfPages) None
     else {
       Some(

@@ -23,23 +23,30 @@ import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
 import utils.manageAgents.AgentDetailsTestUtil
 
-class RemoveAgentFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class RemoveAgentFormProviderSpec
+    extends OptionFieldBehaviours
+    with StringFieldBehaviours
+    with AgentDetailsTestUtil
+    with GuiceOneAppPerSuite {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
-  val formProvider =  new RemoveAgentFormProvider
-
+  val formProvider = new RemoveAgentFormProvider
 
   val form = formProvider(testAgentDetails)
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = messages("manageAgents.removeAgent.error.required", testAgentDetails.name)
+    val requiredKey =
+      messages("manageAgents.removeAgent.error.required", testAgentDetails.name)
 
     behave like optionsField[RemoveAgent](
       form,
       fieldName,
-      validValues  = RemoveAgent.values,
+      validValues = RemoveAgent.values,
       invalidError = FormError(fieldName, "error.invalid")
     )
 

@@ -22,19 +22,28 @@ import play.api.mvc.Call
 
 trait AgentDetailsTestUtil {
 
-  lazy val agentNameRequestRoute: String = controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode).url
-  
+  lazy val agentNameRequestRoute: String =
+    controllers.manageAgents.routes.AgentNameController
+      .onPageLoad(NormalMode)
+      .url
+
   val MAX_AGENTS = 25
 
   object AgentNamePageUtils {
-    val agentNameOnwardRoute: Mode => Call = mode => controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
-    val agentNameDuplicateNameRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
+    val agentNameOnwardRoute: Mode => Call = mode =>
+      controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
+    val agentNameDuplicateNameRoute: Mode => Call = mode =>
+      controllers.manageAgents.routes.WarningAgentNameController
+        .onPageLoad(mode)
   }
-  
-  object AgentNamePageWarningUtils {
-    val WarningAgentNameRequestRoute: Mode => Call = mode => controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(mode)
 
-    val onwardRoute: Mode => Call = mode =>  controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
+  object AgentNamePageWarningUtils {
+    val WarningAgentNameRequestRoute: Mode => Call = mode =>
+      controllers.manageAgents.routes.WarningAgentNameController
+        .onPageLoad(mode)
+
+    val onwardRoute: Mode => Call = mode =>
+      controllers.manageAgents.routes.AddressLookupController.onPageLoad(mode)
   }
 
   private def agent(i: Int): CreatedAgent =

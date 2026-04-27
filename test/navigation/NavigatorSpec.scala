@@ -20,8 +20,13 @@ import base.SpecBase
 import controllers.routes
 import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage,
-  AgentNamePage, ConfirmAgentContactDetailsPage}
+import pages.manageAgents.{
+  AgentAddressPage,
+  AgentContactDetailsPage,
+  AgentNameDuplicateWarningPage,
+  AgentNamePage,
+  ConfirmAgentContactDetailsPage
+}
 
 class NavigatorSpec extends SpecBase {
 
@@ -34,32 +39,57 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the route map to Index" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(
+          UnknownPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe routes.IndexController.onPageLoad()
       }
 
       "must go from AgentNamePage to AgentNameController.onPageLoad(NormalMode)" in {
         navigator.nextPage(AgentNamePage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
+          controllers.manageAgents.routes.AgentNameController
+            .onPageLoad(NormalMode)
       }
 
       "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
+        navigator.nextPage(
+          AgentNameDuplicateWarningPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.WarningAgentNameController
+            .onPageLoad(NormalMode)
       }
 
       "must go from AgentAddressPage to AddressLookupController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(AgentAddressPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
+        navigator.nextPage(
+          AgentAddressPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.AddressLookupController
+            .onPageLoad(NormalMode)
       }
 
       "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(AgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(NormalMode)
+        navigator.nextPage(
+          AgentContactDetailsPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.AgentContactDetailsController
+            .onPageLoad(NormalMode)
       }
 
       "must go from ConfirmAgentContactDetailsPage to ConfirmAgentContactDetailsController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad()
+        navigator.nextPage(
+          ConfirmAgentContactDetailsPage,
+          NormalMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.ConfirmAgentContactDetailsController
+            .onPageLoad()
       }
     }
 
@@ -68,23 +98,35 @@ class NavigatorSpec extends SpecBase {
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id"))mustBe
-          controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(None)
+        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe
+          controllers.manageAgents.routes.CheckYourAnswersController
+            .onPageLoad(None)
       }
 
       "must go from AgentNamePage to AgentNameController.onPageLoad(CheckMode) in Check mode" in {
         navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
+          controllers.manageAgents.routes.AgentNameController
+            .onPageLoad(CheckMode)
       }
 
       "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
+        navigator.nextPage(
+          AgentNameDuplicateWarningPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.WarningAgentNameController
+            .onPageLoad(CheckMode)
       }
 
       "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentContactDetailsPage, CheckMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode)
+        navigator.nextPage(
+          AgentContactDetailsPage,
+          CheckMode,
+          UserAnswers("id")
+        ) mustBe
+          controllers.manageAgents.routes.AgentContactDetailsController
+            .onPageLoad(CheckMode)
       }
 
     }

@@ -59,8 +59,11 @@ class ParagraphSpec extends SpecBase with Matchers {
   }
 
   trait Setup {
-    val app: Application              = applicationBuilder().build()
-    implicit val messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+    val app: Application = applicationBuilder().build()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
     val paragraph: Paragraph = app.injector.instanceOf[Paragraph]
     val paragraphText: String = "test paragraph text"
     val extraClasses = "govuk-link--inverse govuk-link--no-underline"

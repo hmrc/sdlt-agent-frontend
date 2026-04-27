@@ -40,21 +40,34 @@ import utils.manageAgents.AgentDetailsTestUtil
 
 import scala.concurrent.Future
 
-class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class RemoveAgentControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with AgentDetailsTestUtil
+    with GuiceOneAppPerSuite {
 
   private val agentReferenceNumber: String = "ARN001"
 
-  def agentNameOnwardRoute: Call = controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
+  def agentNameOnwardRoute: Call =
+    controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1)
 
-  lazy val postAction: Call = controllers.manageAgents.routes.RemoveAgentController.onSubmit(agentReferenceNumber)
+  lazy val postAction: Call =
+    controllers.manageAgents.routes.RemoveAgentController
+      .onSubmit(agentReferenceNumber)
 
-  lazy val removeAgentRequestRoute: String = controllers.manageAgents.routes.RemoveAgentController.onPageLoad(agentReferenceNumber).url
+  lazy val removeAgentRequestRoute: String =
+    controllers.manageAgents.routes.RemoveAgentController
+      .onPageLoad(agentReferenceNumber)
+      .url
 
   val formProvider = new RemoveAgentFormProvider()
-  
+
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = play.api.i18n.MessagesImpl(
+    play.api.i18n.Lang.defaultLang,
+    app.injector.instanceOf[play.api.i18n.MessagesApi]
+  )
 
   val testAgentResponse: CreatedAgent = CreatedAgent(
     storn = testStorn,
@@ -71,7 +84,6 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
     dxAddress = None,
     agentResourceReference = agentReferenceNumber
   )
-
 
   val form: Form[RemoveAgent] = formProvider(testAgentResponse)
 
@@ -97,7 +109,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val view = application.injector.instanceOf[RemoveAgentView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, postAction, testAgentDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          form,
+          postAction,
+          testAgentDetails
+        )(request, messages(application)).toString
       }
     }
 
@@ -119,7 +135,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -141,7 +159,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
 
@@ -163,7 +185,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -185,7 +209,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
 
@@ -218,7 +246,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.manageAgents.routes.AgentOverviewController
+          .onPageLoad(1)
+          .url
         flash(result).get("agentRemoved") mustBe Some("Harborview Estates")
         verify(service, times(1)).deletePredefinedAgent(any())(any())
       }
@@ -250,7 +282,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.manageAgents.routes.AgentOverviewController.onPageLoad(1).url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.manageAgents.routes.AgentOverviewController
+          .onPageLoad(1)
+          .url
       }
     }
 
@@ -278,7 +314,11 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, postAction, testAgentDetails)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          boundForm,
+          postAction,
+          testAgentDetails
+        )(request, messages(application)).toString
       }
     }
 
@@ -300,7 +340,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -319,7 +361,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
 
@@ -346,7 +390,9 @@ class RemoveAgentControllerSpec extends SpecBase with MockitoSugar with AgentDet
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
   }

@@ -32,7 +32,11 @@ import utils.PaginationHelper
 import utils.manageAgents.{AgentDetailsTestUtil, ViewSpecBase}
 import views.html.manageAgents.AgentOverviewView
 
-class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTestUtil with PaginationHelper {
+class AgentOverviewViewSpec
+    extends SpecBase
+    with ViewSpecBase
+    with AgentDetailsTestUtil
+    with PaginationHelper {
 
   "AgentOverviewView" - {
 
@@ -43,7 +47,10 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
       displaysCorrectTitle(doc, "manageAgents.agentOverview.title")
       displaysCorrectHeading(doc, "manageAgents.agentDetails.heading")
       displaysCorrectCaption(doc, "manageAgents.caption")
-      displaysCorrectSubHeading(doc, "manageAgents.agentDetails.addAnotherAgent" )
+      displaysCorrectSubHeading(
+        doc,
+        "manageAgents.agentDetails.addAnotherAgent"
+      )
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasContinueLink(doc)
       hasBackLink(doc)
@@ -76,7 +83,8 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
       private val pagination = generatePagination(1, 3)
       private val paginationText = getPaginationInfoText(1, twentyTwoAgents)
 
-      val html: Html = view(form, agentSummary, pagination, paginationText, paginationIndex)
+      val html: Html =
+        view(form, agentSummary, pagination, paginationText, paginationIndex)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, true)
@@ -88,11 +96,29 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     "must render the page with success flashes" in new Setup {
       private val requestWithFlash =
         FakeRequest()
-          .withFlash("agentUpdated" -> messages("manageAgents.agentDetails.updateAgent.notification", "testName"))
-          .withFlash("agentRemoved" -> messages("manageAgents.agentDetails.removeAgent.notification", "testName"))
-          .withFlash("agentCreated" -> messages("manageAgents.agentDetails.submitAgent.notification", "testName"))
+          .withFlash(
+            "agentUpdated" -> messages(
+              "manageAgents.agentDetails.updateAgent.notification",
+              "testName"
+            )
+          )
+          .withFlash(
+            "agentRemoved" -> messages(
+              "manageAgents.agentDetails.removeAgent.notification",
+              "testName"
+            )
+          )
+          .withFlash(
+            "agentCreated" -> messages(
+              "manageAgents.agentDetails.submitAgent.notification",
+              "testName"
+            )
+          )
 
-      val html: Html = view(form, None, None, None, paginationIndex)(requestWithFlash, messages)
+      val html: Html = view(form, None, None, None, paginationIndex)(
+        requestWithFlash,
+        messages
+      )
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysFlashes(
@@ -108,9 +134,16 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     "must render the page with error flash when agent limit is reached" in new Setup {
       private val requestWithFlash =
         FakeRequest()
-          .withFlash("agentsLimitReached" -> messages("manageAgents.agentDetails.limitReached"))
+          .withFlash(
+            "agentsLimitReached" -> messages(
+              "manageAgents.agentDetails.limitReached"
+            )
+          )
 
-      val html: Html = view(form, None, None, None, paginationIndex)(requestWithFlash, messages)
+      val html: Html = view(form, None, None, None, paginationIndex)(
+        requestWithFlash,
+        messages
+      )
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
 
       displaysErrorSummary(
@@ -123,55 +156,88 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     "must render the error summary when no Yes or No option is not selected for Do you want to add agent?" in new Setup {
       val formWithErrors: Form[Boolean] = form.bind(Map.empty[String, String])
       val html: Html = view(formWithErrors, None, None, None, paginationIndex)
-      val doc:Document = Jsoup.parse(html.toString())
-      
-      displaysErrorSummary(doc, Seq("manageAgents.agentOverview.error.required"))
+      val doc: Document = Jsoup.parse(html.toString())
+
+      displaysErrorSummary(
+        doc,
+        Seq("manageAgents.agentOverview.error.required")
+      )
     }
   }
 
   trait Setup {
-    val app: Application             = applicationBuilder().build()
+    val app: Application = applicationBuilder().build()
     implicit def request: Request[?] = FakeRequest()
-    implicit def messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: AgentOverviewView      = app.injector.instanceOf[AgentOverviewView]
-    val formProvider                 = new AddAnotherAgentFormProvider()
-    val form: Form[Boolean]          = formProvider()
-    val paginationIndex              = 1
+    implicit def messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: AgentOverviewView = app.injector.instanceOf[AgentOverviewView]
+    val formProvider = new AddAnotherAgentFormProvider()
+    val form: Form[Boolean] = formProvider()
+    val paginationIndex = 1
   }
 
   private def hasContinueLink(doc: Document)(implicit messages: Messages) = {
-    doc.select("button[type=submit]").text mustBe messages("manageAgents.agentDetails.addAgentButtonText")
+    doc.select("button[type=submit]").text mustBe messages(
+      "manageAgents.agentDetails.addAgentButtonText"
+    )
   }
 
-  private def displaysCorrectInfoText(doc: Document, agentsExist: Boolean)(implicit messages: Messages) = {
+  private def displaysCorrectInfoText(doc: Document, agentsExist: Boolean)(
+      implicit messages: Messages
+  ) = {
     if (agentsExist) {
-      doc.select("p.govuk-body").get(0).text mustBe messages("manageAgents.agentOverview.nonZeroAgents.info.text")
+      doc.select("p.govuk-body").get(0).text mustBe messages(
+        "manageAgents.agentOverview.nonZeroAgents.info.text"
+      )
     } else {
-      doc.select("p.govuk-body").get(0).text mustBe messages("manageAgents.agentOverview.noAgents.info.text")
+      doc.select("p.govuk-body").get(0).text mustBe messages(
+        "manageAgents.agentOverview.noAgents.info.text"
+      )
     }
   }
 
-  private def displaysNoAgentsListedText(doc: Document)(implicit messages: Messages) = {
-    doc.select("p.govuk-body").get(1).text mustBe messages("manageAgents.agentOverview.noAgents.text")
+  private def displaysNoAgentsListedText(
+      doc: Document
+  )(implicit messages: Messages) = {
+    doc.select("p.govuk-body").get(1).text mustBe messages(
+      "manageAgents.agentOverview.noAgents.text"
+    )
   }
 
-  private def displaysCorrectPaginationInfoText(doc: Document, numOfAgents: Int)(implicit messages: Messages) = {
-    doc.select("p.govuk-body").get(1).text mustBe s"Showing 1 to 10 of $numOfAgents records"
+  private def displaysCorrectPaginationInfoText(
+      doc: Document,
+      numOfAgents: Int
+  )(implicit messages: Messages) = {
+    doc
+      .select("p.govuk-body")
+      .get(1)
+      .text mustBe s"Showing 1 to 10 of $numOfAgents records"
   }
 
-  private def displaysSummaryListWithCorrectRowsAndValues(doc:Document, agents: List[CreatedAgent]) = {
+  private def displaysSummaryListWithCorrectRowsAndValues(
+      doc: Document,
+      agents: List[CreatedAgent]
+  ) = {
     doc.select(".govuk-summary-list").size() mustBe 1
 
     val rows = doc.select(".govuk-summary-list__row")
-    val expectedRows = if(agents.size > 10) 10 else agents.size
+    val expectedRows = if (agents.size > 10) 10 else agents.size
     rows.size() mustBe expectedRows
 
     val firstAgent = agents.head
 
     doc.select(".govuk-summary-list__key").text() must include(firstAgent.name)
-    doc.select(".govuk-summary-list__value").text() must include(firstAgent.getAddressLine1AndAddressLine2)
-    doc.select(".govuk-summary-list__actions-list-item").text() must include("Change")
-    doc.select(".govuk-summary-list__actions-list-item").text() must include("Remove")
+    doc.select(".govuk-summary-list__value").text() must include(
+      firstAgent.getAddressLine1AndAddressLine2
+    )
+    doc.select(".govuk-summary-list__actions-list-item").text() must include(
+      "Change"
+    )
+    doc.select(".govuk-summary-list__actions-list-item").text() must include(
+      "Remove"
+    )
   }
 
   private def paginationDoesNotExist(doc: Document) = {
@@ -186,10 +252,14 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     paginationLinks must contain allOf ("1", "2", "3", "Next")
   }
 
-  private def displaysFlashes(doc: Document, flashKeys: Seq[String])(implicit messages: Messages): Unit = {
+  private def displaysFlashes(doc: Document, flashKeys: Seq[String])(implicit
+      messages: Messages
+  ): Unit = {
     val flashes = doc.select(".govuk-notification-banner")
 
-    doc.select("h2.govuk-notification-banner__title").text must include("Success")
+    doc.select("h2.govuk-notification-banner__title").text must include(
+      "Success"
+    )
 
     flashKeys.foreach { key =>
       flashes.text must include(messages(flashKeys, "testName"))

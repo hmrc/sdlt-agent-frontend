@@ -32,18 +32,24 @@ class AccessDeniedControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
       when(mockAppConfig.govUKUrl).thenReturn("https://localhost:9280/account")
 
       running(application) {
-        val request = FakeRequest(GET, routes.AccessDeniedController.onPageLoad().url)
+        val request =
+          FakeRequest(GET, routes.AccessDeniedController.onPageLoad().url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[AccessDeniedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, mockAppConfig, messages(application)).toString
+        contentAsString(result) mustEqual view()(
+          request,
+          mockAppConfig,
+          messages(application)
+        ).toString
       }
     }
   }

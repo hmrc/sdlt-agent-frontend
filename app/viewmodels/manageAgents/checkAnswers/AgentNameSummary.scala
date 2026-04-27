@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object AgentNameSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentNamePage).map { answer =>
       SummaryListRowViewModel(
         key = "manageAgents.agentName.checkYourAnswersLabel",
@@ -34,14 +36,16 @@ object AgentNameSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AgentNameController
+              .onPageLoad(CheckMode)
+              .url
           )
-            .withVisuallyHiddenText(messages("manageAgents.agentName.change.hidden"))
+            .withVisuallyHiddenText(
+              messages("manageAgents.agentName.change.hidden")
+            )
             .withAttribute("id" -> "change-agent-name")
         )
       )
     }
   }
 }
-
-

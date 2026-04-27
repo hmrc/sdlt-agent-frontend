@@ -29,7 +29,7 @@ import views.html.components.Link
 class LinkSpec extends SpecBase with Matchers {
 
   "Link" - {
-    
+
     "must render the link text inside an anchor" in new Setup {
       val html: Html = link(linkText, linkUrl)
 
@@ -129,11 +129,15 @@ class LinkSpec extends SpecBase with Matchers {
   }
 
   trait Setup {
-    val app: Application              = applicationBuilder().build()
-    implicit val messages: Messages   = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+    val app: Application = applicationBuilder().build()
+    implicit val messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
     val link: Link = app.injector.instanceOf[Link]
     val linkText: String = "testLinkText"
-    val linkUrl = "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
+    val linkUrl =
+      "https://www.gov.uk/find-hmrc-contacts/technical-support-with-hmrc-online-services"
     val prefixText = "testPrefixText"
     val suffixText = "testSuffixText"
     val extraClasses = "govuk-link--inverse govuk-link--no-underline"

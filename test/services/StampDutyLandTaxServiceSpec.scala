@@ -18,7 +18,11 @@ package services
 
 import connectors.StampDutyLandTaxConnector
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import models.responses.{
+  CreatePredefinedAgentResponse,
+  DeletePredefinedAgentResponse,
+  UpdatePredefinedAgentResponse
+}
 import models.requests.DeletePredefinedAgentRequest
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.ScalaFutures
@@ -32,13 +36,20 @@ import viewmodels.InputWidth.Fixed2
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Matchers {
+class StampDutyLandTaxServiceSpec
+    extends AnyWordSpec
+    with ScalaFutures
+    with Matchers {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   trait Fixture {
-    val connector: StampDutyLandTaxConnector = mock(classOf[StampDutyLandTaxConnector])
-    val service: StampDutyLandTaxService = new StampDutyLandTaxService(connector)
+    val connector: StampDutyLandTaxConnector = mock(
+      classOf[StampDutyLandTaxConnector]
+    )
+    val service: StampDutyLandTaxService = new StampDutyLandTaxService(
+      connector
+    )
 
     val storn = "SN001"
     val agentReferenceNumber = "ARN001"
@@ -87,24 +98,37 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
   "deletePredefinedAgent" should {
 
     "delegate to connector with the given valid DeletePredefinedAgentRequest and return the payload" in new Fixture {
-      val deletePredefinedAgentRequest = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
+      val deletePredefinedAgentRequest =
+        DeletePredefinedAgentRequest(storn, agentReferenceNumber)
       val deletePredefinedAgentResponse = DeletePredefinedAgentResponse(true)
 
-      when(connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier]))
+      when(
+        connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future(deletePredefinedAgentResponse))
 
-      val result: DeletePredefinedAgentResponse = service.deletePredefinedAgent(deletePredefinedAgentRequest).futureValue
+      val result: DeletePredefinedAgentResponse =
+        service.deletePredefinedAgent(deletePredefinedAgentRequest).futureValue
       result mustBe deletePredefinedAgentResponse
 
-      verify(connector).deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier])
+      verify(connector).deletePredefinedAgent(
+        eqTo(deletePredefinedAgentRequest)
+      )(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
 
     "propagate failures from the connector" in new Fixture {
-      val deletePredefinedAgentRequest = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
+      val deletePredefinedAgentRequest =
+        DeletePredefinedAgentRequest(storn, agentReferenceNumber)
       val deletePredefinedAgentResponse = DeletePredefinedAgentResponse(true)
 
-      when(connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(any[HeaderCarrier]))
+      when(
+        connector.deletePredefinedAgent(eqTo(deletePredefinedAgentRequest))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
@@ -156,15 +180,24 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         phone = Some("02079460000"),
         email = Some("info@acmeagents.co.uk")
       )
-      val response = CreatePredefinedAgentResponse(agentResourceRef = "ARN-001", agentId = "1234")
+      val response = CreatePredefinedAgentResponse(
+        agentResourceRef = "ARN-001",
+        agentId = "1234"
+      )
 
-      when(connector.submitAgentDetails(eqTo(createPreAgentRequest))(any[HeaderCarrier]))
+      when(
+        connector.submitAgentDetails(eqTo(createPreAgentRequest))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.successful(response))
 
       val result = service.submitAgentDetails(createPreAgentRequest).futureValue
       result mustBe response
 
-      verify(connector).submitAgentDetails(eqTo(createPreAgentRequest))(any[HeaderCarrier])
+      verify(connector).submitAgentDetails(eqTo(createPreAgentRequest))(
+        any[HeaderCarrier]
+      )
       verifyNoMoreInteractions(connector)
     }
 
@@ -182,7 +215,11 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         email = Some("info@acmeagents.co.uk")
       )
 
-      when(connector.submitAgentDetails(eqTo(createPreAgentRequest))(any[HeaderCarrier]))
+      when(
+        connector.submitAgentDetails(eqTo(createPreAgentRequest))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
@@ -212,18 +249,28 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
     "delegate to connector with the given AgentDetails" in new Fixture {
 
-      when(connector.updateAgentDetails(eqTo(updatePredefinedAgent))(any[HeaderCarrier]))
+      when(
+        connector.updateAgentDetails(eqTo(updatePredefinedAgent))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future(UpdatePredefinedAgentResponse(true)))
 
       val result = service.updateAgentDetails(updatePredefinedAgent).futureValue
       result mustBe UpdatePredefinedAgentResponse(true)
 
-      verify(connector).updateAgentDetails(eqTo(updatePredefinedAgent))(any[HeaderCarrier])
+      verify(connector).updateAgentDetails(eqTo(updatePredefinedAgent))(
+        any[HeaderCarrier]
+      )
       verifyNoMoreInteractions(connector)
     }
     "propagate failures from the connector" in new Fixture {
 
-      when(connector.updateAgentDetails(eqTo(updatePredefinedAgent))(any[HeaderCarrier]))
+      when(
+        connector.updateAgentDetails(eqTo(updatePredefinedAgent))(
+          any[HeaderCarrier]
+        )
+      )
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val ex = intercept[RuntimeException] {
@@ -240,7 +287,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
           .thenReturn(Future.successful(payload))
 
-        val result = service.isDuplicate(storn, "Smith & Co Solicitors").futureValue
+        val result =
+          service.isDuplicate(storn, "Smith & Co Solicitors").futureValue
 
         result mustBe true
 
@@ -253,7 +301,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
           .thenReturn(Future.successful(payload))
 
-        val result = service.isDuplicate(storn, "SMITH & CO SOLICITORS").futureValue
+        val result =
+          service.isDuplicate(storn, "SMITH & CO SOLICITORS").futureValue
 
         result mustBe true
 
@@ -293,7 +342,8 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
         when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
           .thenReturn(Future.successful(payload))
 
-        val result: Boolean = service.isDuplicate(storn, "   SMITH & COSOLICITORS     ").futureValue
+        val result: Boolean =
+          service.isDuplicate(storn, "   SMITH & COSOLICITORS     ").futureValue
 
         result mustBe false
 
@@ -305,20 +355,19 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
   }
 
-
   "getAgentDetails" should {
     "call connector and handle result correctly" in new Fixture {
 
       when(connector.getSdltOrganisation(eqTo(storn))(any[HeaderCarrier]))
         .thenReturn(Future.successful(payload))
 
-      val result: Option[CreatedAgent] = service.getAgentDetails(storn, agentReferenceNumber).futureValue
+      val result: Option[CreatedAgent] =
+        service.getAgentDetails(storn, agentReferenceNumber).futureValue
       result mustBe Some(payload.agents.head)
 
       verify(connector).getSdltOrganisation(eqTo(storn))(any[HeaderCarrier])
       verifyNoMoreInteractions(connector)
     }
-
 
     "propagate failures from the connector" in new Fixture {
 
@@ -331,7 +380,6 @@ class StampDutyLandTaxServiceSpec extends AnyWordSpec with ScalaFutures with Mat
 
       ex.getMessage must include("boom")
     }
-
 
   }
 }

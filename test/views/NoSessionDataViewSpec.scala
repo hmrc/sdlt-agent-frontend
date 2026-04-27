@@ -39,7 +39,10 @@ class NoSessionDataViewSpec extends SpecBase with ViewSpecBase {
 
       displaysCorrectTitle(doc, "noSessionData.title")
       displaysCorrectHeading(doc, "noSessionData.heading")
-      displaysCorrectLabels(doc, Seq("noSessionData.fileNewReturn", "noSessionData.manageStampTaxes"))
+      displaysCorrectLabels(
+        doc,
+        Seq("noSessionData.fileNewReturn", "noSessionData.manageStampTaxes")
+      )
       displaysCorrectHint(doc, "noSessionData.hint")
       hasCorrectNumOfItems(doc, ".govuk-radios__item", 2)
       hasSubmitButton(doc, "site.continue")
@@ -61,11 +64,14 @@ class NoSessionDataViewSpec extends SpecBase with ViewSpecBase {
   }
 
   trait Setup {
-    val app: Application                      = applicationBuilder().build()
-    val formProvider                          = new NoSessionDataFormProvider()
-    val form: Form[?]                         = formProvider()
-    implicit def request: Request[?]          = FakeRequest()
-    implicit def messages: Messages           = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-    val view: NoSessionDataView               = app.injector.instanceOf[NoSessionDataView]
+    val app: Application = applicationBuilder().build()
+    val formProvider = new NoSessionDataFormProvider()
+    val form: Form[?] = formProvider()
+    implicit def request: Request[?] = FakeRequest()
+    implicit def messages: Messages = play.api.i18n.MessagesImpl(
+      play.api.i18n.Lang.defaultLang,
+      app.injector.instanceOf[play.api.i18n.MessagesApi]
+    )
+    val view: NoSessionDataView = app.injector.instanceOf[NoSessionDataView]
   }
 }

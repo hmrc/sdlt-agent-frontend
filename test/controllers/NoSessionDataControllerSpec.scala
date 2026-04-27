@@ -26,11 +26,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.NoSessionDataView
 
-
 class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
 
-  private lazy val noSessionDataRoute = routes.NoSessionDataController.onPageLoad().url
-  private lazy val noSessionDataSubmitRoute = routes.NoSessionDataController.onSubmit().url
+  private lazy val noSessionDataRoute =
+    routes.NoSessionDataController.onPageLoad().url
+  private lazy val noSessionDataSubmitRoute =
+    routes.NoSessionDataController.onSubmit().url
 
   val formProvider = new NoSessionDataFormProvider()
   val form: Form[NoSessionData] = formProvider()
@@ -38,7 +39,8 @@ class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
   "NoSessionDataController" - {
 
     "must return OK and the correct view for a GET" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, noSessionDataRoute)
@@ -46,16 +48,22 @@ class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[NoSessionDataView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form)(request, messages(application)).toString()
+        contentAsString(result) mustEqual view(form)(
+          request,
+          messages(application)
+        ).toString()
       }
     }
 
     "must redirect to sdlt-filing-service when FileNewReturn is selected" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, noSessionDataSubmitRoute)
-          .withFormUrlEncodedBody(("value", NoSessionData.FileNewReturn.toString))
+          .withFormUrlEncodedBody(
+            ("value", NoSessionData.FileNewReturn.toString)
+          )
 
         val result = route(application, request).value
         val config = application.injector.instanceOf[FrontendAppConfig]
@@ -66,11 +74,14 @@ class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must redirect to sdlt-management-service when ManageStampTaxes is selected" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, noSessionDataSubmitRoute)
-          .withFormUrlEncodedBody(("value", NoSessionData.ManageStampTaxes.toString))
+          .withFormUrlEncodedBody(
+            ("value", NoSessionData.ManageStampTaxes.toString)
+          )
 
         val result = route(application, request).value
         val config = application.injector.instanceOf[FrontendAppConfig]
@@ -81,7 +92,8 @@ class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
       running(application) {
         val request = FakeRequest(POST, noSessionDataSubmitRoute)
@@ -94,7 +106,10 @@ class NoSessionDataControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }

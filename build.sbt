@@ -7,6 +7,7 @@ lazy val appName: String = "sdlt-agent-frontend"
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / scalafmtOnCompile := true
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)

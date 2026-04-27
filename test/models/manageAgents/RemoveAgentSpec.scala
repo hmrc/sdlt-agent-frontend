@@ -28,7 +28,11 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import play.api.test.Helpers.stubMessages
 
-class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
+class RemoveAgentSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues {
 
   "RemoveAgent" - {
 
@@ -36,21 +40,24 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = Gen.oneOf(RemoveAgent.values)
 
-      forAll(gen) {
-        removeAgent =>
-
-          JsString(removeAgent.toString).validate[RemoveAgent].asOpt.value mustEqual removeAgent
+      forAll(gen) { removeAgent =>
+        JsString(removeAgent.toString)
+          .validate[RemoveAgent]
+          .asOpt
+          .value mustEqual removeAgent
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!RemoveAgent.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!RemoveAgent.values
+        .map(_.toString)
+        .contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[RemoveAgent] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[RemoveAgent] mustEqual JsError(
+          "error.invalid"
+        )
       }
     }
 
@@ -58,10 +65,8 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = Gen.oneOf(RemoveAgent.values)
 
-      forAll(gen) {
-        removeAgent =>
-
-          Json.toJson(removeAgent) mustEqual JsString(removeAgent.toString)
+      forAll(gen) { removeAgent =>
+        Json.toJson(removeAgent) mustEqual JsString(removeAgent.toString)
       }
     }
     "options" - {
@@ -101,7 +106,10 @@ class RemoveAgentSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
         val radios = RemoveAgent.options
 
-        radios.map(_.value) mustEqual Seq(Some(RemoveAgent.Option1.toString), Some(RemoveAgent.Option2.toString))
+        radios.map(_.value) mustEqual Seq(
+          Some(RemoveAgent.Option1.toString),
+          Some(RemoveAgent.Option2.toString)
+        )
       }
     }
   }

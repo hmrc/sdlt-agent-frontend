@@ -23,17 +23,15 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.manageAgents.UnauthorisedOrgView
 
-
 @Singleton
 class UnauthorisedOrganisationAffinityController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  view: UnauthorisedOrgView
+    val controllerComponents: MessagesControllerComponents,
+    view: UnauthorisedOrgView
 )(implicit appConfig: FrontendAppConfig)
-  extends FrontendBaseController
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
   }
 }
-

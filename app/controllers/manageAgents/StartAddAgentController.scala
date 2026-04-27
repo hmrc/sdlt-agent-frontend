@@ -34,14 +34,16 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class StartAddAgentController @Inject()(
-                                     val controllerComponents: MessagesControllerComponents,
-                                     identify: IdentifierAction,
-                                     stampDutyLandTaxService: StampDutyLandTaxService,
-                                     sessionRepository: SessionRepository,
-                                     navigator: Navigator
-                                   )(implicit appConfig: FrontendAppConfig,
-                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class StartAddAgentController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    identify: IdentifierAction,
+    stampDutyLandTaxService: StampDutyLandTaxService,
+    sessionRepository: SessionRepository,
+    navigator: Navigator
+)(implicit appConfig: FrontendAppConfig, executionContext: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
@@ -54,10 +56,13 @@ class StartAddAgentController @Inject()(
           val userAnswers = UserAnswers(id = request.userId)
 
           for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-                         _ <- sessionRepository.set(updatedAnswers)
+            updatedAnswers <- Future.fromTry(
+              userAnswers.set(StornPage, request.storn)
+            )
+            _ <- sessionRepository.set(updatedAnswers)
           } yield Redirect(
-            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers))
+            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers)
+          )
             .flashing("agentsLimitReached" -> "true")
 
         case _ =>
@@ -65,13 +70,19 @@ class StartAddAgentController @Inject()(
           val emptiedUserAnswers = UserAnswers(id = request.userId)
 
           for {
-            updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers))
-      } recover {
-      case ex =>
-        logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
-        Redirect(controllers.routes.SystemErrorController.onPageLoad())
+            updatedAnswers <- Future.fromTry(
+              emptiedUserAnswers.set(StornPage, request.storn)
+            )
+            _ <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(
+            navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers)
+          )
+      } recover { case ex =>
+      logger.error(
+        "[StartAddAgentController][onPageLoad] Unexpected failure",
+        ex
+      )
+      Redirect(controllers.routes.SystemErrorController.onPageLoad())
     }
   }
 }

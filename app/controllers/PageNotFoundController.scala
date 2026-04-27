@@ -25,9 +25,11 @@ import views.html.PageNotFoundView
 import javax.inject.Inject
 
 class PageNotFoundController @Inject() (
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: PageNotFoundView
-                                       )(implicit appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
+    val controllerComponents: MessagesControllerComponents,
+    view: PageNotFoundView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())

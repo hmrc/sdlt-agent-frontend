@@ -33,7 +33,10 @@ import views.html.manageAgents.AgentOverviewView
 
 import scala.concurrent.Future
 
-class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
+class AgentOverviewControllerSpec
+    extends SpecBase
+    with MockitoSugar
+    with AgentDetailsTestUtil {
 
   "AgentOverviewController.onPageLoad()" - {
 
@@ -44,20 +47,19 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         val view = application.injector.instanceOf[AgentOverviewView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual
           view(
-            form               = formProvider,
-            maybeSummaryList   = None,
-            pagination         = None,
+            form = formProvider,
+            maybeSummaryList = None,
+            pagination = None,
             paginationInfoText = None,
-            paginationIndex    = 1
-          )
-          (request, messages(application)).toString
+            paginationIndex = 1
+          )(request, messages(application)).toString
       }
     }
 
@@ -68,7 +70,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 1))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual OK
         val body = contentAsString(result)
@@ -92,7 +94,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 0))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual agentOverviewUrl(page = 1)
@@ -105,7 +107,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
       running(application) {
         val request = FakeRequest(GET, agentOverviewUrl(page = 99))
-        val result  = route(application, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual agentOverviewUrl(page = 1)
@@ -122,73 +124,76 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
   }
 
   "AgentOverviewController.onSubmit()" - {
     "must return BadRequest and the correct view for a POST when there are no agents with the form has errors" in new Setup {
-        when(service.getAllAgentDetails(any())(any()))
-          .thenReturn(Future.successful(Nil))
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.successful(Nil))
 
-        running(application) {
-          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
-            .withFormUrlEncodedBody(("value", ""))
-          val result = route(application, request).value
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+          .withFormUrlEncodedBody(("value", ""))
+        val result = route(application, request).value
 
-          val view = application.injector.instanceOf[AgentOverviewView]
+        val view = application.injector.instanceOf[AgentOverviewView]
 
-          status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual
-            view(
-              form = formWithErrors,
-              maybeSummaryList = None,
-              pagination = None,
-              paginationInfoText = None,
-              paginationIndex = 1
-            )
-            (request, messages(application)).toString
-        }
+        status(result) mustEqual BAD_REQUEST
+        contentAsString(result) mustEqual
+          view(
+            form = formWithErrors,
+            maybeSummaryList = None,
+            pagination = None,
+            paginationInfoText = None,
+            paginationIndex = 1
+          )(request, messages(application)).toString
       }
+    }
     "must return BadRequest and render a summary and pagination when there are agents (valid first page) when form has errors" in new Setup {
-        when(service.getAllAgentDetails(any())(any()))
-          .thenReturn(Future.successful(agents22))
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.successful(agents22))
 
-        running(application) {
-          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
-            .withFormUrlEncodedBody(("value", ""))
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+          .withFormUrlEncodedBody(("value", ""))
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
-          val body = contentAsString(result)
+        status(result) mustEqual BAD_REQUEST
+        val body = contentAsString(result)
 
-          body must include("Agent 1")
-          body must include("Agent 10")
-          body must not include "Agent 11"
+        body must include("Agent 1")
+        body must include("Agent 10")
+        body must not include "Agent 11"
 
-          body must include(s"""href="${agentOverviewOnSubmitUrl(page =1)}"""")
+        body must include(s"""href="${agentOverviewOnSubmitUrl(page = 1)}"""")
 
-          body must include("pagination")
-          body must include("Next")
-          body must include("paginationIndex=2")
-        }
+        body must include("pagination")
+        body must include("Next")
+        body must include("paginationIndex=2")
       }
+    }
     "must redirect to StartAddAgentController when user select yes(true) option" in new Setup {
-        when(service.getAllAgentDetails(any())(any()))
-          .thenReturn(Future.successful(agents22))
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.successful(agents22))
 
-        running(application) {
-          val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
-            .withFormUrlEncodedBody(("value", "true"))
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 1))
+          .withFormUrlEncodedBody(("value", "true"))
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual startAddAgentRouteUrl
-        }
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual startAddAgentRouteUrl
       }
+    }
     "must redirect to managementUrl when user select no(false) option" in new Setup {
       when(service.getAllAgentDetails(any())(any()))
         .thenReturn(Future.successful(agents22))
@@ -200,8 +205,9 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
             bind[StampDutyLandTaxService].toInstance(service),
-            bind[FrontendAppConfig].toInstance(mockConfig))
-            .build()
+            bind[FrontendAppConfig].toInstance(mockConfig)
+          )
+          .build()
 
       running(application) {
         val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 12))
@@ -221,7 +227,9 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentOverviewOnSubmitUrl(page = 1)
+        redirectLocation(result).value mustEqual agentOverviewOnSubmitUrl(page =
+          1
+        )
       }
     }
 
@@ -234,7 +242,9 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual agentOverviewOnSubmitUrl(page = 1)
+        redirectLocation(result).value mustEqual agentOverviewOnSubmitUrl(page =
+          1
+        )
       }
     }
     "must redirect to JourneyRecoveryController when StampDutyLandTaxService fails unexpectedly" in new Setup {
@@ -246,7 +256,11 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+        redirectLocation(
+          result
+        ).value mustEqual controllers.routes.SystemErrorController
+          .onPageLoad()
+          .url
       }
     }
   }
@@ -264,22 +278,25 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
 
     val formProvider = new AddAnotherAgentFormProvider()()
 
-    val formWithErrors: Form[Boolean] = formProvider.bind(Map.empty[String, String])
+    val formWithErrors: Form[Boolean] =
+      formProvider.bind(Map.empty[String, String])
 
     val testManagementHomePageUrl = "http://localhost:1234/test-management-url"
 
     val paginationIndex: Int = 1
 
     def agentOverviewUrl(page: Int): String =
-      controllers.manageAgents.routes.AgentOverviewController.onPageLoad(page).url
+      controllers.manageAgents.routes.AgentOverviewController
+        .onPageLoad(page)
+        .url
 
     def agentOverviewOnSubmitUrl(page: Int): String =
       controllers.manageAgents.routes.AgentOverviewController.onSubmit(page).url
 
-    def startAddAgentRouteUrl: String = controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
+    def startAddAgentRouteUrl: String =
+      controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
 
     val agents22 = getAgentList(22)
 
   }
 }
-

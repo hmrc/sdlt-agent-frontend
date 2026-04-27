@@ -29,22 +29,25 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 identify: IdentifierAction,
-                                 sessionRepository: SessionRepository,
-                                 navigator: Navigator
-                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class IndexController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    identify: IdentifierAction,
+    sessionRepository: SessionRepository,
+    navigator: Navigator
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
-
     val userAnswers = UserAnswers(id = request.userId)
 
     for {
-      updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-      _              <- sessionRepository.set(updatedAnswers)
-    } yield Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers))
+      updatedAnswers <- Future.fromTry(
+        userAnswers.set(StornPage, request.storn)
+      )
+      _ <- sessionRepository.set(updatedAnswers)
+    } yield Redirect(
+      navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers)
+    )
   }
 }

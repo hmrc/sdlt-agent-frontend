@@ -18,12 +18,11 @@ package models.responses
 
 import play.api.libs.json.{Json, OFormat}
 
-
 case class UpdatePredefinedAgentResponse(
-                                          updated: Boolean
-                                        )
+    updated: Boolean
+)
 
 object UpdatePredefinedAgentResponse {
-  implicit val format: OFormat[UpdatePredefinedAgentResponse] = Json.format[UpdatePredefinedAgentResponse]
+  implicit val format: OFormat[UpdatePredefinedAgentResponse] =
+    Json.format[UpdatePredefinedAgentResponse]
 }
-

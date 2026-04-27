@@ -18,15 +18,15 @@ package models.responses.organisation
 
 import play.api.libs.json.*
 
-
 case class SdltOrganisationResponse(
-                                     storn                   : String,
-                                     version                 : Option[String],
-                                     isReturnUser            : Option[String],
-                                     doNotDisplayWelcomePage : Option[String],
-                                     agents                  : Seq[CreatedAgent]
-                                   )
+    storn: String,
+    version: Option[String],
+    isReturnUser: Option[String],
+    doNotDisplayWelcomePage: Option[String],
+    agents: Seq[CreatedAgent]
+)
 
 object SdltOrganisationResponse {
-  implicit val format: OFormat[SdltOrganisationResponse] = Json.format[SdltOrganisationResponse]
+  implicit val format: OFormat[SdltOrganisationResponse] =
+    Json.format[SdltOrganisationResponse]
 }

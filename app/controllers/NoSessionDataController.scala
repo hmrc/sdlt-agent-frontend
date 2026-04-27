@@ -17,7 +17,12 @@
 package controllers
 
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  StornRequiredAction
+}
 import forms.NoSessionDataFormProvider
 import models.NoSessionData
 import play.api.data.Form
@@ -30,37 +35,42 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class NoSessionDataController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       stornRequiredAction: StornRequiredAction,
-                                       formProvider: NoSessionDataFormProvider,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: NoSessionDataView
-                                     )(implicit appConfig: FrontendAppConfig) extends FrontendBaseController with I18nSupport {
+class NoSessionDataController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    stornRequiredAction: StornRequiredAction,
+    formProvider: NoSessionDataFormProvider,
+    val controllerComponents: MessagesControllerComponents,
+    view: NoSessionDataView
+)(implicit appConfig: FrontendAppConfig)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form: Form[NoSessionData] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) {
-    implicit request =>
-      Ok(view(form))
-  }
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction) {
+      implicit request =>
+        Ok(view(form))
+    }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData andThen stornRequiredAction)
+      .async { implicit request =>
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors))),
+            {
+              case NoSessionData.FileNewReturn =>
+                Future.successful(Redirect(appConfig.startNewReturnUrl))
 
-        {
-          case NoSessionData.FileNewReturn =>
-            Future.successful(Redirect(appConfig.startNewReturnUrl))
-
-          case NoSessionData.ManageStampTaxes =>
-            Future.successful(Redirect(appConfig.managementAtAGlanceUrl))
-        }
-      )
-  }
+              case NoSessionData.ManageStampTaxes =>
+                Future.successful(Redirect(appConfig.managementAtAGlanceUrl))
+            }
+          )
+      }
 }

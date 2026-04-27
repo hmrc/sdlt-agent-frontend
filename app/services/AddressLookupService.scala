@@ -32,32 +32,42 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddressLookupService @Inject()(
-                                      addressLookUpConnector: AddressLookupConnector,
-                                      sessionRepository: SessionRepository,
-                                    )(implicit ec: ExecutionContext) {
+class AddressLookupService @Inject() (
+    addressLookUpConnector: AddressLookupConnector,
+    sessionRepository: SessionRepository
+)(implicit ec: ExecutionContext) {
 
   // Step 1: Init AL journey
-  def initJourney(userAnswers: UserAnswers, storn: String, mode: Mode)
-                 (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
+  def initJourney(userAnswers: UserAnswers, storn: String, mode: Mode)(implicit
+      hc: HeaderCarrier,
+      messages: Messages,
+      rh: RequestHeader
+  ): Future[AddressLookupResponse] = {
     logInfo(s"[AddressLookupService][initJourney]")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))
-      initJourneyRes <- addressLookUpConnector.initJourney(agentName, mode) // set agentName as empty if nothing found
+      initJourneyRes <- addressLookUpConnector.initJourney(
+        agentName,
+        mode
+      ) // set agentName as empty if nothing found
     } yield initJourneyRes
   }
 
   // Step 2: extract and save AddressDetails
-  private def saveAddressDetails(userAnswers: UserAnswers,
-                                 addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
+  private def saveAddressDetails(
+      userAnswers: UserAnswers,
+      addressDetailsMaybe: Option[JourneyResultAddressModel]
+  ): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
         userAnswers.set(AgentAddressPage, addressDetails).toEither match {
           case Right(updatedAnswers) =>
-            sessionRepository.set(updatedAnswers)
+            sessionRepository
+              .set(updatedAnswers)
               .map(res =>
                 logDebug(s"[AddressLookupService] - UpdateStatus: $res")
-                Right(updatedAnswers)) // assume will always succeed
+                Right(updatedAnswers)
+              ) // assume will always succeed
           case Left(ex) =>
             Future.successful(Left(Error("Failed to update user session")))
         }
@@ -66,14 +76,17 @@ class AddressLookupService @Inject()(
     }
   }
 
-  def getJourneyOutcome(id: String, userAnswers: UserAnswers)
-                       (implicit hc: HeaderCarrier): Future[Either[Throwable, UserAnswers]] = {
+  def getJourneyOutcome(id: String, userAnswers: UserAnswers)(implicit
+      hc: HeaderCarrier
+  ): Future[Either[Throwable, UserAnswers]] = {
     {
       logInfo(s"[AddressLookupService][getJourneyOutcome]")
       for {
         addressDetails <- EitherT(addressLookUpConnector.getJourneyOutcome(id))
         res <- EitherT({
-          logInfo(s"[AddressLookupService][getJourneyOutcome] - addressDetails: ${addressDetails}")
+          logInfo(
+            s"[AddressLookupService][getJourneyOutcome] - addressDetails: ${addressDetails}"
+          )
           saveAddressDetails(userAnswers, addressDetails)
         })
       } yield res

@@ -27,15 +27,23 @@ import scala.concurrent.{ExecutionContext, Future}
 class StornRequiredActionSpec extends SpecBase {
 
   class StornFake extends StornRequiredActionImpl {
-    def transform[A](request: DataRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
+    def transform[A](
+        request: DataRequest[A]
+    ): Future[Either[Result, DataRequest[A]]] = refine(request)
   }
 
   "StornRequiredAction" - {
 
     "process request with no Storn" in {
-      val dataRequest = DataRequest(request = FakeRequest(), userId = "id", userAnswers = emptyUserAnswersWithNoStorn, storn = "STORN")
+      val dataRequest = DataRequest(
+        request = FakeRequest(),
+        userId = "id",
+        userAnswers = emptyUserAnswersWithNoStorn,
+        storn = "STORN"
+      )
       val action = new StornFake()
-      val result: Either[Result, DataRequest[_]] = action.transform(dataRequest).futureValue
+      val result: Either[Result, DataRequest[_]] =
+        action.transform(dataRequest).futureValue
       result.isLeft mustBe true
     }
 
