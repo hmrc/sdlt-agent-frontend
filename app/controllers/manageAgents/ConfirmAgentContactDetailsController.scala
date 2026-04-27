@@ -82,7 +82,7 @@ class ConfirmAgentContactDetailsController @Inject()(
                       logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User Selected `No` going back in the journey after previously selecting `Yes`")
                       Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedUserAnswers)))
                     case Left(error) =>
-                      logError(s"[ConfirmAgentContactDetailsController][onSubmit]:User Selected`No`but there are some issues, Redirect to JourneyRecoveryController")
+                      logError(s"[ConfirmAgentContactDetailsController][onSubmit]: User Selected`No` but there are some issues, Redirect to JourneyRecoveryController:$error")
                       Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                   }
                   case None =>
