@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,36 +20,35 @@ import models.{CheckMode, UserAnswers}
 import pages.manageAgents.AgentContactDetailsPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ContactPhoneNumberSummary {
+object AgentContactDetailsSummary {
 
   def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    val maybePhone: Option[String] =
-      answers.get(AgentContactDetailsPage).flatMap(_.phone)
-
-    val value =
-      ValueViewModel(
-        HtmlFormat.escape(maybePhone.getOrElse("")).toString
-      )
-
-    Some(
+    answers.get(AgentContactDetailsPage).map { agentContactDetails =>
       SummaryListRowViewModel(
-        key = "manageAgents.contactTelephoneNumber.checkYourAnswersLabel",
-        value = value,
+        key = messages("manageAgents.agentContactDetailsSummary.checkYourAnswersLabel"),
+        value = ValueViewModel(
+          HtmlContent(
+            s"""
+               |${messages("manageAgents.agentContactDetailsSummary.value.telephone")}: ${HtmlFormat.escape(agentContactDetails.phone.getOrElse("")).toString}<br>
+               |${messages("manageAgents.agentContactDetailsSummary.value.email")}: ${HtmlFormat.escape(agentContactDetails.email.getOrElse("")).toString}
+               |""".stripMargin
+          )
+        ),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
             controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
           )
-            .withVisuallyHiddenText(messages(s"manageAgents.contactTelephoneNumber.change.hidden"))
+            .withVisuallyHiddenText(messages(s"manageAgents.agentContactDetailsSummary.change.hidden"))
             .withAttribute("id" -> "change-agent-contact-details")
         )
       )
-    )
+    }
   }
+
 }
-
-

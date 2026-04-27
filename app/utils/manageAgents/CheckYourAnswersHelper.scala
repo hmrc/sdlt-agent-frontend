@@ -18,23 +18,32 @@ package utils.manageAgents
 
 import controllers.routes.NoSessionDataController
 import models.UserAnswers
-import pages.manageAgents.{AgentAddressPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import viewmodels.govuk.all.SummaryListViewModel
-import viewmodels.manageAgents.checkAnswers.{AddressSummary, AgentNameSummary, ContactEmailSummary, ContactPhoneNumberSummary}
+import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, AddressSummary, AgentContactDetailsSummary, AgentNameSummary}
 
 object CheckYourAnswersHelper {
 
   def getSummaryListRows(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = SummaryListViewModel(
-    rows = Seq(
-      AgentNameSummary.row(userAnswers),
-      AddressSummary.row(userAnswers),
-      ContactPhoneNumberSummary.row(userAnswers),
-      ContactEmailSummary.row(userAnswers)
-    ).flatten
+    if(userAnswers.get(AgentContactDetailsPage).isDefined) {
+      Seq(
+        AgentNameSummary.row(userAnswers),
+        AddressSummary.row(userAnswers),
+        AddContactDetailsYesNoSummary.row(userAnswers),
+        AgentContactDetailsSummary.row(userAnswers)
+      ).flatten
+    }
+    else {
+      Seq(
+        AgentNameSummary.row(userAnswers),
+        AddressSummary.row(userAnswers),
+        AddContactDetailsYesNoSummary.row(userAnswers),
+      ).flatten
+    }
   )
 
   def validateUserAnswers(userAnswers: UserAnswers)(implicit messages: Messages): Either[Result, SummaryList] = {
@@ -48,4 +57,5 @@ object CheckYourAnswersHelper {
         Left(Redirect(NoSessionDataController.onPageLoad()))
     }
   }
+
 }

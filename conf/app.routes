@@ -22,7 +22,7 @@ POST        /manage-agents/agent-overview                controllers.manageAgent
 GET         /manage-agents/start-add-agent               controllers.manageAgents.StartAddAgentController.onPageLoad()
 
 GET         /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/agent-name                    controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
+POST        /manage-agents/agent-name                     controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/change-agent-name              controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/change-agent-name              controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
 GET         /manage-agents/agent-name-warning            controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = NormalMode)
@@ -34,16 +34,16 @@ GET         /manage-agents/find-address                  controllers.manageAgent
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)
 
 GET         /manage-agents/change-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
-GET         /manage-agents/save-address-lookup           controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
+GET         /manage-agents/save-address-lookup             controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/add-contact-details   controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad()
-POST        /manage-agents/add-contact-details   controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit()
-GET         /manage-agents/enter-contact-details         controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/enter-contact-details         controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad()
+POST        /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit()
+GET         /manage-agents/enter-contact-details          controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/enter-contact-details          controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/change-enter-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/change-enter-contact-details   controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/check-answers            controllers.manageAgents.CheckYourAnswersController.onPageLoad(agentReferenceNumber: Option[String])
+GET         /manage-agents/check-answers                 controllers.manageAgents.CheckYourAnswersController.onPageLoad(agentReferenceNumber: Option[String])
 POST        /create/predefined-agent                     controllers.manageAgents.CheckYourAnswersController.onSubmit(agentReferenceNumber: Option[String])
 
 GET         /manage-agents/remove-agent                  controllers.manageAgents.RemoveAgentController.onPageLoad(agentReferenceNumber: String)

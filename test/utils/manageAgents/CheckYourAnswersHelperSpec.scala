@@ -18,12 +18,13 @@ package utils.manageAgents
 
 import base.SpecBase
 import models.UserAnswers
+import models.manageAgents.AgentContactDetails
 import org.scalatest.matchers.must.Matchers
-import pages.manageAgents.{AgentAddressPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
 import play.api.Application
 import play.api.i18n.Messages
-import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.manageAgents.CheckYourAnswersHelper.*
 
@@ -40,10 +41,34 @@ class CheckYourAnswersHelperSpec extends Matchers with SpecBase {
       val ua: UserAnswers = UserAnswers("id")
         .set(AgentNamePage, "Haborview Estates").success.value
         .set(AgentAddressPage, testAgentAddress).success.value
+        .set(AgentContactDetailsPage, AgentContactDetails(None, None)).success.value
 
       val result: SummaryList = CheckYourAnswersHelper.getSummaryListRows(ua)
       result.rows.length mustBe 4
     }
+
+    "include all rows when AgentContactDetailsPage is defined" in new Setup {
+      
+      val userAnswersWithAgentContactDetailsPage: UserAnswers = populatedUserAnswers
+        .set(AgentContactDetailsPage, testAgentContactDetails).success.value
+
+      val summaryList: SummaryList = CheckYourAnswersHelper.getSummaryListRows(userAnswersWithAgentContactDetailsPage)
+
+      summaryList.rows.length mustBe 4
+    }
+
+    "exclude AgentContactDetailsSummary when AgentContactDetailsPage is not defined" in new Setup {
+
+      val userAnswersWithOutAgentContactDetailsPage: UserAnswers = UserAnswers("id")
+        .set(AgentNamePage, "Haborview Estates").success.value
+        .set(AgentAddressPage, testAgentAddress).success.value
+
+      val summaryList: SummaryList = CheckYourAnswersHelper.getSummaryListRows(userAnswersWithOutAgentContactDetailsPage)
+
+      summaryList.rows.length mustBe 3
+
+    }
+
   }
 
   "validateUserAnswers" - {
@@ -79,6 +104,7 @@ class CheckYourAnswersHelperSpec extends Matchers with SpecBase {
 
   trait Setup {
     val app: Application = applicationBuilder().build()
+    val testAgentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
     implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val noSessionDataUrl: String = controllers.routes.NoSessionDataController.onPageLoad().url
   }
