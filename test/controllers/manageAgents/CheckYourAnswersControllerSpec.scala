@@ -21,7 +21,10 @@ import controllers.routes
 import models.manageAgents.AgentContactDetails
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
-import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import models.responses.{
+  CreatePredefinedAgentResponse,
+  UpdatePredefinedAgentResponse
+}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
@@ -35,32 +38,68 @@ import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 import viewmodels.govuk.SummaryListFluency
-import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, AddressSummary, AgentContactDetailsSummary, AgentNameSummary}
+import viewmodels.manageAgents.checkAnswers.{
+  AddContactDetailsYesNoSummary,
+  AddressSummary,
+  AgentContactDetailsSummary,
+  AgentNameSummary
+}
 import views.html.manageAgents.CheckYourAnswersView
 
 import scala.concurrent.Future
 import scala.util.Try
 
-class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency with AgentDetailsTestUtil with MockitoSugar {
+class CheckYourAnswersControllerSpec
+    extends SpecBase
+    with SummaryListFluency
+    with AgentDetailsTestUtil
+    with MockitoSugar {
 
-  private lazy val checkYourAnswersUrl: Option[String] => String = agentReferenceNumber =>
-    controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(agentReferenceNumber).url
+  private lazy val checkYourAnswersUrl: Option[String] => String =
+    agentReferenceNumber =>
+      controllers.manageAgents.routes.CheckYourAnswersController
+        .onPageLoad(agentReferenceNumber)
+        .url
 
-  private lazy val submitAnswerUrl: Option[String] => String = agentReferenceNumber =>
-    controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(agentReferenceNumber).url
+  private lazy val submitAnswerUrl: Option[String] => String =
+    agentReferenceNumber =>
+      controllers.manageAgents.routes.CheckYourAnswersController
+        .onSubmit(agentReferenceNumber)
+        .url
 
-  private def convertToUserAnswer(agentDetails: CreatedAgent): Try[UserAnswers] = {
-      for {
-        userAnswersTwo <- emptyUserAnswers.set(AgentNamePage, agentDetails.name)
-        addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
-        userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
-        userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
-        userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
-      } yield userAnswersFive
+  private def convertToUserAnswer(
+      agentDetails: CreatedAgent
+  ): Try[UserAnswers] = {
+    for {
+      userAnswersTwo <- emptyUserAnswers.set(AgentNamePage, agentDetails.name)
+      addressLines = Seq(
+        agentDetails.address1,
+        agentDetails.address2.getOrElse(""),
+        agentDetails.address3.getOrElse(""),
+        agentDetails.address4.getOrElse("")
+      )
+      userAnswersThree <- userAnswersTwo.set(
+        AgentAddressPage,
+        JourneyResultAddressModel(
+          "",
+          Address(addressLines, agentDetails.postcode)
+        )
+      )
+      userAnswersFour <- userAnswersThree.set(
+        AgentContactDetailsPage,
+        AgentContactDetails(agentDetails.phone, agentDetails.email)
+      )
+      userAnswersFive <- userAnswersFour.set(
+        AgentReferenceNumberPage,
+        agentDetails.agentResourceReference
+      )
+    } yield userAnswersFive
   }
 
-  private def convertToUserAnswerAndFail(agentDetails: CreatedAgent): Try[UserAnswers] = {
-    Try{
+  private def convertToUserAnswerAndFail(
+      agentDetails: CreatedAgent
+  ): Try[UserAnswers] = {
+    Try {
       throw new Error("ConversionFailed")
     }
   }
@@ -70,7 +109,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
       "must return OK and the correct view for a GET with all SummaryListRows when all pages are populated " in {
 
-        val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+        val ua = UserAnswers("id", testUserAnswers)
+          .set(StornPage, testStorn)
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(ua)).build()
 
@@ -93,16 +135,24 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
                   AgentContactDetailsSummary.row(ua)(messages(application))
                 ).flatten
               ),
-              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+              postAction =
+                controllers.manageAgents.routes.CheckYourAnswersController
+                  .onSubmit(None)
             )(request, messages(application)).toString
         }
       }
       "must return OK and the correct view for a GET without AgentContactDetailsSummary row when AgentContactDetails is not populated " in {
-        val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+        val ua = UserAnswers("id", testUserAnswers)
+          .set(StornPage, testStorn)
+          .success
+          .value
 
-        val userAnswersWithoutAgentContactDetailsPage = ua.remove(AgentContactDetailsPage).success.value
+        val userAnswersWithoutAgentContactDetailsPage =
+          ua.remove(AgentContactDetailsPage).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutAgentContactDetailsPage)).build()
+        val application = applicationBuilder(userAnswers =
+          Some(userAnswersWithoutAgentContactDetailsPage)
+        ).build()
 
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersUrl(None))
@@ -117,12 +167,20 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             view(
               list = SummaryListViewModel(
                 Seq(
-                  AgentNameSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
-                  AddressSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
-                  AddContactDetailsYesNoSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application))
+                  AgentNameSummary.row(
+                    userAnswersWithoutAgentContactDetailsPage
+                  )(messages(application)),
+                  AddressSummary.row(userAnswersWithoutAgentContactDetailsPage)(
+                    messages(application)
+                  ),
+                  AddContactDetailsYesNoSummary.row(
+                    userAnswersWithoutAgentContactDetailsPage
+                  )(messages(application))
                 ).flatten
               ),
-              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+              postAction =
+                controllers.manageAgents.routes.CheckYourAnswersController
+                  .onSubmit(None)
             )(request, messages(application)).toString
         }
       }
@@ -137,7 +195,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
     }
@@ -148,9 +208,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(None))
@@ -160,7 +221,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(service, times(1)).getAgentDetails(any(), any())(any())
         }
@@ -170,9 +233,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.failed(new RuntimeException("boom")))
@@ -182,7 +246,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.routes.SystemErrorController
+            .onPageLoad()
+            .url
         }
       }
 
@@ -206,10 +274,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           agentResourceReference = testArn
         )
 
-
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
@@ -232,7 +300,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           body must include("B2 4ND")
           body must include("01214567890")
           body must include("info@harborviewestates.co.uk")
-          body must include(s"""action="${controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some(testArn)).url}"""")
+          body must include(
+            s"""action="${controllers.manageAgents.routes.CheckYourAnswersController
+                .onSubmit(Some(testArn))
+                .url}""""
+          )
         }
       }
 
@@ -256,10 +328,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           agentResourceReference = testArn
         )
 
-
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
@@ -275,7 +347,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val body = contentAsString(result)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
 
@@ -283,9 +357,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         val service = mock[StampDutyLandTaxService]
 
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         running(application) {
           val request = FakeRequest(GET, checkYourAnswersUrl(None))
@@ -302,8 +377,8 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
     }
 
     "Check Your Answers Controller (with different value of `storedARN` an `urlARN`)" - {
-      //storedARN means the ARN(AgentReferenceNumber stored in AgentReferencePage) in session
-      //urlARN means the ARN in the query parameter in the URL
+      // storedARN means the ARN(AgentReferenceNumber stored in AgentReferencePage) in session
+      // urlARN means the ARN in the query parameter in the URL
 
       val testAgentResponse: CreatedAgent = CreatedAgent(
         storn = testStorn,
@@ -343,10 +418,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswers))
+              .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
 
           when(mockSessionRepository.set(any()))
             .thenReturn(Future.successful(true))
@@ -376,10 +454,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+              .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
 
           when(mockSessionRepository.set(any()))
             .thenReturn(Future.successful(true))
@@ -406,10 +487,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswers))
+              .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
 
           when(mockSessionRepository.set(any()))
             .thenReturn(Future.successful(true))
@@ -439,10 +523,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val mockService = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+              .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
+              .overrides(
+                bind[SessionRepository].toInstance(mockSessionRepository)
+              )
+              .build()
 
           running(application) {
             val request = FakeRequest(GET, checkYourAnswersUrl(None))
@@ -459,7 +546,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
         "must redirect when required answers are missing from session" in {
           val userAnswers = emptyUserAnswers
-            .set(AgentReferenceNumberPage, "A").success.value
+            .set(AgentReferenceNumberPage, "A")
+            .success
+            .value
 
           val mockSessionRepository = mock[SessionRepository]
 
@@ -467,7 +556,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           val application = applicationBuilder(userAnswers = Some(userAnswers))
             .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-            .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+            .overrides(
+              bind[SessionRepository].toInstance(mockSessionRepository)
+            )
             .build()
 
           running(application) {
@@ -476,11 +567,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             val result = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.NoSessionDataController.onPageLoad().url
+            redirectLocation(
+              result
+            ).value mustEqual routes.NoSessionDataController.onPageLoad().url
 
             verify(mockSessionRepository, never()).set(any())
             verify(mockService, never()).getAgentDetails(any(), any())(any())
-            
+
           }
         }
       }
@@ -492,7 +585,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       "must redirect to Journey Recovery Controller when agentName is missing from userAnswers " in {
 
         val service = mock[StampDutyLandTaxService]
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithoutAgentName))
+        val application = applicationBuilder(userAnswers =
+          Some(populatedUserAnswersWithoutAgentName)
+        )
           .overrides(bind[StampDutyLandTaxService].toInstance(service))
           .build()
 
@@ -505,22 +600,28 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
+          redirectLocation(result).value mustEqual routes.SystemErrorController
+            .onPageLoad()
+            .url
 
           verify(service, times(0)).submitAgentDetails(any())(any())
-
 
         }
       }
       "must redirect to AgentOverviewPage with flash after successfully submitting agentDetails to StampDutyLandTaxService.submitAgentDetails in BE" in {
         val navigator = new Navigator
         val service = mock[StampDutyLandTaxService]
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.submitAgentDetails(any())(any()))
-          .thenReturn(Future.successful(CreatePredefinedAgentResponse("agentResourceRef", "agentId")))
+          .thenReturn(
+            Future.successful(
+              CreatePredefinedAgentResponse("agentResourceRef", "agentId")
+            )
+          )
 
         running(application) {
           val request = FakeRequest(POST, submitAnswerUrl(None))
@@ -528,7 +629,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual navigator.nextPage(AgentOverviewPage, NormalMode, emptyUserAnswers).url
+          redirectLocation(result).value mustEqual navigator
+            .nextPage(AgentOverviewPage, NormalMode, emptyUserAnswers)
+            .url
 
           flash(result).get("agentCreated") mustBe Some("John")
 
@@ -538,12 +641,15 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       }
       "must throw and exception after getting error response from StampDutyLandTaxService.submitAgentDetails" in {
         val service = mock[StampDutyLandTaxService]
-        val application = applicationBuilder(userAnswers = Some(populatedUserAnswers))
-          .overrides(bind[StampDutyLandTaxService].toInstance(service))
-          .build()
+        val application =
+          applicationBuilder(userAnswers = Some(populatedUserAnswers))
+            .overrides(bind[StampDutyLandTaxService].toInstance(service))
+            .build()
 
         when(service.submitAgentDetails(any())(any()))
-          .thenReturn(Future.failed(new RuntimeException("An unexpected error occurred")))
+          .thenReturn(
+            Future.failed(new RuntimeException("An unexpected error occurred"))
+          )
 
         running(application) {
           val request = FakeRequest(POST, submitAnswerUrl(None))
@@ -551,7 +657,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
           status(result) mustEqual SEE_OTHER
 
-          redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+          redirectLocation(
+            result
+          ).value mustEqual controllers.routes.SystemErrorController
+            .onPageLoad()
+            .url
 
           verify(service, times(1)).submitAgentDetails(any())(any())
 
@@ -579,7 +689,13 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             status(result) mustEqual SEE_OTHER
 
             redirectLocation(result).value mustEqual
-              navigator.nextPage(AgentOverviewPage, NormalMode, populatedUserAnswersWithArn).url
+              navigator
+                .nextPage(
+                  AgentOverviewPage,
+                  NormalMode,
+                  populatedUserAnswersWithArn
+                )
+                .url
 
             flash(result).get("agentUpdated") mustBe Some("John")
 
@@ -590,7 +706,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         "must redirect to Journey Recovery Controller when required fields are missing from userAnswers " in {
 
           val service = mock[StampDutyLandTaxService]
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithoutAgentName))
+          val application = applicationBuilder(userAnswers =
+            Some(populatedUserAnswersWithoutAgentName)
+          )
             .overrides(bind[StampDutyLandTaxService].toInstance(service))
             .build()
 
@@ -603,7 +721,9 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
+            redirectLocation(
+              result
+            ).value mustEqual routes.SystemErrorController.onPageLoad().url
 
             verify(service, times(0)).updateAgentDetails(any())(any())
           }
@@ -611,9 +731,10 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         "must redirect to Journey Recovery controller when ARN is not found " in {
           val service = mock[StampDutyLandTaxService]
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(emptyUserAnswersWithStorn))
+              .overrides(bind[StampDutyLandTaxService].toInstance(service))
+              .build()
 
           running(application) {
             val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
@@ -621,18 +742,25 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual routes.SystemErrorController.onPageLoad().url
+            redirectLocation(
+              result
+            ).value mustEqual routes.SystemErrorController.onPageLoad().url
 
           }
         }
         "must throw and exception after getting error response from StampDutyLandTaxService.updateAgentDetails" in {
           val service = mock[StampDutyLandTaxService]
-          val application = applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
-            .overrides(bind[StampDutyLandTaxService].toInstance(service))
-            .build()
+          val application =
+            applicationBuilder(userAnswers = Some(populatedUserAnswersWithArn))
+              .overrides(bind[StampDutyLandTaxService].toInstance(service))
+              .build()
 
           when(service.updateAgentDetails(any())(any()))
-            .thenReturn(Future.failed(new RuntimeException("An unexpected error occurred")))
+            .thenReturn(
+              Future.failed(
+                new RuntimeException("An unexpected error occurred")
+              )
+            )
 
           running(application) {
             val request = FakeRequest(POST, submitAnswerUrl(Some(testArn)))
@@ -640,7 +768,11 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual SEE_OTHER
 
-            redirectLocation(result).value mustEqual controllers.routes.SystemErrorController.onPageLoad().url
+            redirectLocation(
+              result
+            ).value mustEqual controllers.routes.SystemErrorController
+              .onPageLoad()
+              .url
 
             verify(service, times(1)).updateAgentDetails(any())(any())
 

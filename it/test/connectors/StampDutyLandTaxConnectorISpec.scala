@@ -16,10 +16,25 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, equalTo, get, post, stubFor, urlPathEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{
+  aResponse,
+  equalTo,
+  get,
+  post,
+  stubFor,
+  urlPathEqualTo
+}
 import itutil.ApplicationWithWiremock
-import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import models.requests.{
+  CreatePredefinedAgentRequest,
+  DeletePredefinedAgentRequest,
+  UpdatePredefinedAgent
+}
+import models.responses.{
+  CreatePredefinedAgentResponse,
+  DeletePredefinedAgentResponse,
+  UpdatePredefinedAgentResponse
+}
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -27,15 +42,17 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status.*
 import uk.gov.hmrc.http.HeaderCarrier
 
-class StampDutyLandTaxConnectorISpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with ApplicationWithWiremock {
+class StampDutyLandTaxConnectorISpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with ApplicationWithWiremock {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val connector: StampDutyLandTaxConnector = app.injector.instanceOf[StampDutyLandTaxConnector]
+  val connector: StampDutyLandTaxConnector =
+    app.injector.instanceOf[StampDutyLandTaxConnector]
 
   private val storn = "STN001"
 
@@ -43,7 +60,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   "getSdltOrganisation" should {
 
-    val allAgentDetailsUrl = s"/stamp-duty-land-tax/manage-agents/get-sdlt-organisation"
+    val allAgentDetailsUrl =
+      s"/stamp-duty-land-tax/manage-agents/get-sdlt-organisation"
 
     "return a list of AgentDetails when BE returns 200 with valid JSON" in {
       stubFor(
@@ -136,7 +154,6 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           )
         )
 
-
       val result = connector.getSdltOrganisation(storn).futureValue
 
       result mustBe expected
@@ -176,7 +193,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
   }
 
   "updateAgentDetails" should {
-    val updateAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/update/predefined-agent"
+    val updateAgentDetailsUrl =
+      "/stamp-duty-land-tax/manage-agents/update/predefined-agent"
 
     val updateAgentDetails = UpdatePredefinedAgent(
       agentResourceReference = Some("REF"),
@@ -218,10 +236,10 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           )
       )
 
-        val ex = intercept[Exception] {
-          connector.updateAgentDetails(updateAgentDetails).futureValue
-        }
-        ex.getMessage must include("returned 500")
+      val ex = intercept[Exception] {
+        connector.updateAgentDetails(updateAgentDetails).futureValue
+      }
+      ex.getMessage must include("returned 500")
     }
   }
 
@@ -247,13 +265,18 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody("""{ "agentResourceRef": "ARN4324234", "agentId" : "1234" }""")
+              .withBody(
+                """{ "agentResourceRef": "ARN4324234", "agentId" : "1234" }"""
+              )
           )
       )
 
       val result = connector.submitAgentDetails(agentDetails).futureValue
 
-      result mustBe CreatePredefinedAgentResponse(agentResourceRef = "ARN4324234", agentId = "1234")
+      result mustBe CreatePredefinedAgentResponse(
+        agentResourceRef = "ARN4324234",
+        agentId = "1234"
+      )
     }
 
     "fail when BE returns 200 with invalid JSON" in {
@@ -291,7 +314,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
 
   "deletePredefinedAgent" should {
 
-    val removeAgentDetailsUrl = "/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
+    val removeAgentDetailsUrl =
+      "/stamp-duty-land-tax/manage-agents/delete/predefined-agent"
     val req = DeletePredefinedAgentRequest(storn, agentReferenceNumber)
 
     "return JSON Boolean when BE returns 200 with valid JSON" in {
@@ -306,7 +330,8 @@ class StampDutyLandTaxConnectorISpec extends AnyWordSpec
           )
       )
 
-      val result: DeletePredefinedAgentResponse = connector.deletePredefinedAgent(req).futureValue
+      val result: DeletePredefinedAgentResponse =
+        connector.deletePredefinedAgent(req).futureValue
 
       result mustBe DeletePredefinedAgentResponse(true)
     }

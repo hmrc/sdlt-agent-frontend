@@ -32,14 +32,16 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
   "AgentContactDetailsSummary.row" - {
     "when userAnswer is empty" - {
       "must not return SummaryListRow" in new Setup {
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(emptyUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(emptyUserAnswers)
         summaryListRow mustBe None
       }
     }
 
     "when userAnswer is populated" - {
       "must render the correct key in SummaryListRow" in new Setup {
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(populatedUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(populatedUserAnswers)
 
         val keyInSummaryListRow: Key = summaryListRow.value.key
 
@@ -48,14 +50,16 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
       }
 
       "must render correct value when email and phone both are defined in SummaryListRow" in new Setup {
-        val userAnswerWithBothPhoneAndEmail: UserAnswers = createUserAnswersWithEmailAndPhone(
-          populatedUserAnswers,
-          Some(phone),
-          Some(email)
-        )
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(userAnswerWithBothPhoneAndEmail)
+        val userAnswerWithBothPhoneAndEmail: UserAnswers =
+          createUserAnswersWithEmailAndPhone(
+            populatedUserAnswers,
+            Some(phone),
+            Some(email)
+          )
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(userAnswerWithBothPhoneAndEmail)
 
-        val actualValue: String =s"""
+        val actualValue: String = s"""
              |$telephoneKey: $phone<br>
              |$emailKey: $email
              |""".stripMargin
@@ -68,12 +72,14 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
 
       "must render only email when phone is not defined in SummaryListRow" in new Setup {
 
-        val userAnswerWithOnlyEmail: UserAnswers = createUserAnswersWithEmailAndPhone(
-          populatedUserAnswers,
-          None,
-          Some(email)
-        )
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(userAnswerWithOnlyEmail)
+        val userAnswerWithOnlyEmail: UserAnswers =
+          createUserAnswersWithEmailAndPhone(
+            populatedUserAnswers,
+            None,
+            Some(email)
+          )
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(userAnswerWithOnlyEmail)
 
         val actualValue: String =
           s"""
@@ -89,12 +95,14 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
 
       "must render only phone in SummaryListRow value when email is not defined in SummaryListRow" in new Setup {
 
-        val userAnswerWithOnlyPhone: UserAnswers = createUserAnswersWithEmailAndPhone(
-          populatedUserAnswers,
-          Some(phone),
-          None
-        )
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(userAnswerWithOnlyPhone)
+        val userAnswerWithOnlyPhone: UserAnswers =
+          createUserAnswersWithEmailAndPhone(
+            populatedUserAnswers,
+            Some(phone),
+            None
+          )
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(userAnswerWithOnlyPhone)
 
         val actualValue: String =
           s"""
@@ -110,9 +118,11 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
 
       "must render correct content and navigate to correct action in SummaryListRow" in new Setup {
 
-        val summaryListRow: Option[SummaryListRow] = AgentContactDetailsSummary.row(populatedUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AgentContactDetailsSummary.row(populatedUserAnswers)
 
-        val actionInSummaryListRow: Option[Actions] = summaryListRow.value.actions
+        val actionInSummaryListRow: Option[Actions] =
+          summaryListRow.value.actions
 
         val actionItem: ActionItem = actionInSummaryListRow.value.items.head
 
@@ -129,20 +139,36 @@ class AgentContactDetailsSummarySpec extends SpecBase with Matchers {
 
     implicit val messages: Messages = stubMessages()
 
-    def createUserAnswersWithEmailAndPhone(userAnswers: UserAnswers, phone: Option[String] = None, email: Option[String] = None): UserAnswers = {
+    def createUserAnswersWithEmailAndPhone(
+        userAnswers: UserAnswers,
+        phone: Option[String] = None,
+        email: Option[String] = None
+    ): UserAnswers = {
       val testAgentContactDetails = AgentContactDetails(phone, email)
-      userAnswers.set(AgentContactDetailsPage, testAgentContactDetails).success.value
+      userAnswers
+        .set(AgentContactDetailsPage, testAgentContactDetails)
+        .success
+        .value
     }
 
     val email = "john@example.com"
     val phone = "07123456789"
 
-    val actualKey: String = messages("manageAgents.agentContactDetailsSummary.checkYourAnswersLabel")
-    val emailKey: String = messages("manageAgents.agentContactDetailsSummary.value.email")
-    val telephoneKey: String = messages("manageAgents.agentContactDetailsSummary.value.telephone")
+    val actualKey: String = messages(
+      "manageAgents.agentContactDetailsSummary.checkYourAnswersLabel"
+    )
+    val emailKey: String = messages(
+      "manageAgents.agentContactDetailsSummary.value.email"
+    )
+    val telephoneKey: String = messages(
+      "manageAgents.agentContactDetailsSummary.value.telephone"
+    )
 
     val siteChangeKey: String = messages("site.change")
-    val route: String = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+    val route: String =
+      controllers.manageAgents.routes.AgentContactDetailsController
+        .onPageLoad(CheckMode)
+        .url
 
   }
 

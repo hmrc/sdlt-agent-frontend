@@ -21,7 +21,13 @@ import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
+import pages.manageAgents.{
+  AgentAddressPage,
+  AgentContactDetailsPage,
+  AgentNameDuplicateWarningPage,
+  AgentNamePage,
+  AgentReferenceNumberPage
+}
 import play.api.mvc.AnyContent
 import repositories.SessionRepository
 import utils.LoggerUtil.logError
@@ -32,20 +38,42 @@ import scala.util.Try
 trait UserAnswersHelper {
 
   // Try to convert createdAgent object to UserAnswers
-  def updateUserAnswers(agentDetails: CreatedAgent)
-                       (implicit request: DataRequest[_]): Try[UserAnswers] = {
+  def updateUserAnswers(
+      agentDetails: CreatedAgent
+  )(implicit request: DataRequest[_]): Try[UserAnswers] = {
     for {
-      userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
+      userAnswersOne <- request.userAnswers.remove(
+        AgentNameDuplicateWarningPage
+      )
       userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
-      addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
-      userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
-      userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
-      userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
+      addressLines = Seq(
+        agentDetails.address1,
+        agentDetails.address2.getOrElse(""),
+        agentDetails.address3.getOrElse(""),
+        agentDetails.address4.getOrElse("")
+      )
+      userAnswersThree <- userAnswersTwo.set(
+        AgentAddressPage,
+        JourneyResultAddressModel(
+          "",
+          Address(addressLines, agentDetails.postcode)
+        )
+      )
+      userAnswersFour <- userAnswersThree.set(
+        AgentContactDetailsPage,
+        AgentContactDetails(agentDetails.phone, agentDetails.email)
+      )
+      userAnswersFive <- userAnswersFour.set(
+        AgentReferenceNumberPage,
+        agentDetails.agentResourceReference
+      )
     } yield userAnswersFive
   }
 
   // Attempt to extract agentName from request.userAnswer
-  def getAgentName(implicit request: DataRequest[AnyContent]): Either[Throwable, String] = {
+  def getAgentName(implicit
+      request: DataRequest[AnyContent]
+  ): Either[Throwable, String] = {
     request.userAnswers.get(AgentNamePage) match {
       case Some(name) =>
         Right(name)
@@ -53,21 +81,27 @@ trait UserAnswersHelper {
         Left(Error("Couldn't find agent in user answers"))
     }
   }
-  
+
   // Attempt to remove AgentContactDetailsPage and update UserAnswers in session repository
-  def removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswers: UserAnswers, sessionRepository: SessionRepository)
-                                                       (implicit ec: ExecutionContext): Future[Either[Throwable, UserAnswers]] = {
+  def removeAgentContactDetailsPageAndUpdateUserAnswers(
+      userAnswers: UserAnswers,
+      sessionRepository: SessionRepository
+  )(implicit ec: ExecutionContext): Future[Either[Throwable, UserAnswers]] = {
     {
       for {
-        updatedUserAnswersEither <- Future.successful(userAnswers.remove(AgentContactDetailsPage).toEither)
+        updatedUserAnswersEither <- Future.successful(
+          userAnswers.remove(AgentContactDetailsPage).toEither
+        )
       } yield updatedUserAnswersEither match {
         case Right(updatedUserAnswers) =>
-          Try {sessionRepository.set(updatedUserAnswers)}.toEither match {
+          Try { sessionRepository.set(updatedUserAnswers) }.toEither match {
             case Right(_) => Future.successful(Right(updatedUserAnswers))
             case Left(ex) => Future.successful(Left(ex))
           }
         case Left(ex) =>
-          logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
+          logError(
+            s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage"
+          )
           Future.successful(Left(ex))
       }
     }.flatten

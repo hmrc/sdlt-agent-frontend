@@ -26,7 +26,9 @@ import viewmodels.implicits.*
 
 object AddContactDetailsYesNoSummary {
 
-  private def isAgentContactDetailsPageDefined(answers: UserAnswers)(implicit messages: Messages): String = {
+  private def isAgentContactDetailsPageDefined(
+      answers: UserAnswers
+  )(implicit messages: Messages): String = {
     answers.get(AgentContactDetailsPage) match {
       case Some(_) =>
         messages("manageAgents.agentContactDetailsSummary.value.yes")
@@ -34,22 +36,34 @@ object AddContactDetailsYesNoSummary {
         messages("manageAgents.agentContactDetailsSummary.value.no")
     }
   }
-  
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
-    answers.get(AgentNamePage).map { agentName =>
 
-        SummaryListRowViewModel(
-          key = messages("manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel", agentName),
-          value = ValueViewModel(HtmlFormat.escape(isAgentContactDetailsPageDefined(answers)).toString),
-          actions = Seq(
-            ActionItemViewModel(
-              "site.change",
-              controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
-            )
-              .withVisuallyHiddenText(messages(s"manageAgents.addContactDetailsYesNoSummary.change.hidden"))
-              .withAttribute("id" -> "change-agent-contact-details")
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
+    answers.get(AgentNamePage).map { agentName =>
+      SummaryListRowViewModel(
+        key = messages(
+          "manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel",
+          agentName
+        ),
+        value = ValueViewModel(
+          HtmlFormat.escape(isAgentContactDetailsPageDefined(answers)).toString
+        ),
+        actions = Seq(
+          ActionItemViewModel(
+            "site.change",
+            controllers.manageAgents.routes.AgentContactDetailsController
+              .onPageLoad(CheckMode)
+              .url
           )
+            .withVisuallyHiddenText(
+              messages(
+                s"manageAgents.addContactDetailsYesNoSummary.change.hidden"
+              )
+            )
+            .withAttribute("id" -> "change-agent-contact-details")
         )
+      )
     }
 
   }

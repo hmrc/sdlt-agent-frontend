@@ -17,8 +17,10 @@
 package models
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import models.responses.addresslookup.JourneyOutcomeResponse.{AddressLookupJourneyOutcome,
-  getAddressLookupDetailsHttpReads}
+import models.responses.addresslookup.JourneyOutcomeResponse.{
+  AddressLookupJourneyOutcome,
+  getAddressLookupDetailsHttpReads
+}
 import org.scalatest.EitherValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.matchers.must.Matchers
@@ -29,13 +31,14 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class JourneyOutcomeResponseISpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with HttpClientV2Support
-  with WireMockSupport
-  with EitherValues {
+class JourneyOutcomeResponseISpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with HttpClientV2Support
+    with WireMockSupport
+    with EitherValues {
 
   "Json to object conversion" should {
 
@@ -43,15 +46,15 @@ class JourneyOutcomeResponseISpec extends AnyWordSpec
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val jsonStr =
-              """
+        """
                 |{"auditRef":"ref","address":{"lines":["line 1"],"postcode":"SE19 2WE"}}
                 |""".stripMargin
       stubFor(
-        get(
-          urlEqualTo("/addressLookUp"))
-          .willReturn(aResponse()
-            .withStatus(200)
-            .withBody(jsonStr)
+        get(urlEqualTo("/addressLookUp"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(jsonStr)
           )
       )
       val parsingOutCome = httpClientV2
@@ -71,16 +74,16 @@ class JourneyOutcomeResponseISpec extends AnyWordSpec
       implicit val hc: HeaderCarrier = HeaderCarrier()
 
       val jsonStrWrong =
-          """
+        """
             |{}
             |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUp"))
-          .willReturn(aResponse()
-            .withStatus(200)
-            .withBody(jsonStrWrong)
+        get(urlEqualTo("/addressLookUp"))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(jsonStrWrong)
           )
       )
       val parsingOutCome = httpClientV2
@@ -105,11 +108,11 @@ class JourneyOutcomeResponseISpec extends AnyWordSpec
           |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUp"))
-          .willReturn(aResponse()
-            .withStatus(404)
-            .withBody(jsonStrWrong)
+        get(urlEqualTo("/addressLookUp"))
+          .willReturn(
+            aResponse()
+              .withStatus(404)
+              .withBody(jsonStrWrong)
           )
       )
       val parsingOutCome = httpClientV2
@@ -134,11 +137,11 @@ class JourneyOutcomeResponseISpec extends AnyWordSpec
           |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUp"))
-          .willReturn(aResponse()
-            .withStatus(500)
-            .withBody(jsonStrWrong)
+        get(urlEqualTo("/addressLookUp"))
+          .willReturn(
+            aResponse()
+              .withStatus(500)
+              .withBody(jsonStrWrong)
           )
       )
       val parsingOutCome = httpClientV2

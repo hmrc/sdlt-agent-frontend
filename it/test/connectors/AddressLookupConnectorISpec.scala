@@ -16,12 +16,14 @@
 
 package connectors
 
-
 import config.FrontendAppConfig
 import itutil.ApplicationWithWiremock
 import mocks.MockHttpV2
 import models.{CheckMode, NormalMode}
-import models.responses.addresslookup.JourneyInitResponse.{JourneyInitFailureResponse, JourneyInitSuccessResponse}
+import models.responses.addresslookup.JourneyInitResponse.{
+  JourneyInitFailureResponse,
+  JourneyInitSuccessResponse
+}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import org.scalatest.BeforeAndAfterEach
@@ -38,20 +40,22 @@ import play.api.test.Helpers.stubMessages
 
 import scala.concurrent.ExecutionContext
 
-class AddressLookupConnectorISpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with ApplicationWithWiremock
-  with MockHttpV2
-  with BeforeAndAfterEach {
+class AddressLookupConnectorISpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with ApplicationWithWiremock
+    with MockHttpV2
+    with BeforeAndAfterEach {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val messagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val messages: Messages = stubMessages()
-  implicit val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+  implicit val appConfig: FrontendAppConfig =
+    app.injector.instanceOf[FrontendAppConfig]
   implicit val request: RequestHeader = FakeRequest("GET", "/dummy-url")
 
   private val agentName: Option[String] = Some("agentName")
@@ -64,24 +68,31 @@ class AddressLookupConnectorISpec extends AnyWordSpec
     reset(mockRequestBuilder)
   }
 
-  object TestAddressLookupConnector extends AddressLookupConnector(appConfig, mockHttpClient, messagesApi)
+  object TestAddressLookupConnector
+      extends AddressLookupConnector(appConfig, mockHttpClient, messagesApi)
 
   "Initiate Address Lookup Journey" should {
     "return location details on success" in {
-      Seq(NormalMode, CheckMode).foreach{ mode =>
-        setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+      Seq(NormalMode, CheckMode).foreach { mode =>
+        setupMockHttpPost(
+          TestAddressLookupConnector.addressLookupInitializeUrl
+        )(
           Right(JourneyInitSuccessResponse(Some("Some location")))
         )
-        val result = TestAddressLookupConnector.initJourney(agentName, mode).futureValue
+        val result =
+          TestAddressLookupConnector.initJourney(agentName, mode).futureValue
         result mustBe Right(JourneyInitSuccessResponse(Some("Some location")))
       }
     }
     "return failure when attempt on error" in {
       Seq(NormalMode, CheckMode).foreach { mode =>
-        setupMockHttpPost(TestAddressLookupConnector.addressLookupInitializeUrl)(
+        setupMockHttpPost(
+          TestAddressLookupConnector.addressLookupInitializeUrl
+        )(
           Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
         )
-        val result = TestAddressLookupConnector.initJourney(agentName, mode).futureValue
+        val result =
+          TestAddressLookupConnector.initJourney(agentName, mode).futureValue
         result mustBe Left(JourneyInitFailureResponse(INTERNAL_SERVER_ERROR))
       }
     }
@@ -90,7 +101,8 @@ class AddressLookupConnectorISpec extends AnyWordSpec
   "Extract Address Details upon Journey completion" should {
     "return address details on success" in {
       val expectedJourneyResultAddressModel =
-        JourneyResultAddressModel(auditRef = "auditRef",
+        JourneyResultAddressModel(
+          auditRef = "auditRef",
           address = Address(lines = Seq.empty, postcode = Some("Z9 3WW"))
         )
       setupMockHttpGet(TestAddressLookupConnector.addressLookupOutcomeUrl(id))(
@@ -100,10 +112,13 @@ class AddressLookupConnectorISpec extends AnyWordSpec
       result mustBe Right(Some(expectedJourneyResultAddressModel))
     }
     "return error details on failure" in {
-      setupMockHttpGet(TestAddressLookupConnector.addressLookupOutcomeUrl(errorId))(
+      setupMockHttpGet(
+        TestAddressLookupConnector.addressLookupOutcomeUrl(errorId)
+      )(
         Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))
       )
-      val result = TestAddressLookupConnector.getJourneyOutcome(errorId).futureValue
+      val result =
+        TestAddressLookupConnector.getJourneyOutcome(errorId).futureValue
       result mustBe Left(UnexpectedGetStatusFailure(INTERNAL_SERVER_ERROR))
     }
 

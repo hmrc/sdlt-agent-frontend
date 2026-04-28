@@ -26,14 +26,14 @@ import uk.gov.hmrc.http.test.{HttpClientV2Support, WireMockSupport}
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
-class JourneyInitResponseISpec extends AnyWordSpec
-  with Matchers
-  with ScalaFutures
-  with IntegrationPatience
-  with HttpClientV2Support
-  with WireMockSupport
-  with EitherValues {
+class JourneyInitResponseISpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with IntegrationPatience
+    with HttpClientV2Support
+    with WireMockSupport
+    with EitherValues {
 
   "Json to object conversion" should {
 
@@ -46,11 +46,11 @@ class JourneyInitResponseISpec extends AnyWordSpec
           |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUpInit"))
-          .willReturn(aResponse()
-            .withStatus(202)
-            .withBody(jsonStr)
+        get(urlEqualTo("/addressLookUpInit"))
+          .willReturn(
+            aResponse()
+              .withStatus(202)
+              .withBody(jsonStr)
           )
       )
       val parsingOutCome = httpClientV2
@@ -75,12 +75,12 @@ class JourneyInitResponseISpec extends AnyWordSpec
           |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUpInit"))
-          .willReturn(aResponse()
-            .withHeader("location", "someLocation")
-            .withStatus(202)
-            .withBody(jsonStr)
+        get(urlEqualTo("/addressLookUpInit"))
+          .willReturn(
+            aResponse()
+              .withHeader("location", "someLocation")
+              .withStatus(202)
+              .withBody(jsonStr)
           )
       )
       val parsingOutCome = httpClientV2
@@ -105,12 +105,12 @@ class JourneyInitResponseISpec extends AnyWordSpec
           |""".stripMargin
 
       stubFor(
-        get(
-          urlEqualTo("/addressLookUpInit"))
-          .willReturn(aResponse()
-            .withHeader("location", "someLocation")
-            .withStatus(404)
-            .withBody(jsonStr)
+        get(urlEqualTo("/addressLookUpInit"))
+          .willReturn(
+            aResponse()
+              .withHeader("location", "someLocation")
+              .withStatus(404)
+              .withBody(jsonStr)
           )
       )
       val parsingOutCome = httpClientV2
@@ -129,4 +129,3 @@ class JourneyInitResponseISpec extends AnyWordSpec
   }
 
 }
-

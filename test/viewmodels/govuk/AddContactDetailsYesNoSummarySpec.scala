@@ -23,7 +23,11 @@ import org.scalatest.matchers.must.Matchers
 import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{
+  ActionItem,
+  Actions,
+  SummaryListRow
+}
 import viewmodels.manageAgents.checkAnswers.AddContactDetailsYesNoSummary
 
 class AddContactDetailsYesNoSummarySpec extends SpecBase with Matchers {
@@ -31,16 +35,21 @@ class AddContactDetailsYesNoSummarySpec extends SpecBase with Matchers {
   "AddContactDetailsYesNoSummary.row" - {
     "when user answer is empty" - {
       "must not return SummaryListRow" in new Setup {
-        val summaryListRow: Option[SummaryListRow] = AddContactDetailsYesNoSummary.row(emptyUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AddContactDetailsYesNoSummary.row(emptyUserAnswers)
         summaryListRow mustBe None
       }
     }
 
     "when user answer is populated" - {
       "must render agent name in the key of SummaryListRow" in new Setup {
-        val summaryListRow: Option[SummaryListRow] = AddContactDetailsYesNoSummary.row(populatedUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AddContactDetailsYesNoSummary.row(populatedUserAnswers)
 
-        val keyValue: String = messages("manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel", agentName)
+        val keyValue: String = messages(
+          "manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel",
+          agentName
+        )
 
         val row: SummaryListRow = summaryListRow.value
 
@@ -49,27 +58,44 @@ class AddContactDetailsYesNoSummarySpec extends SpecBase with Matchers {
 
       "must return row with value `Yes` when a user answers Yes and AgentContactDetailsPage is defined" in new Setup {
 
-        val testAgentContactDetails: AgentContactDetails = AgentContactDetails(Some("123456789"), Some("test@email.com"))
+        val testAgentContactDetails: AgentContactDetails =
+          AgentContactDetails(Some("123456789"), Some("test@email.com"))
 
-        val userAnswersWithAddContactDetailsYesNoPage: UserAnswers = populatedUserAnswers
-          .set(AgentContactDetailsPage, testAgentContactDetails).success.value
+        val userAnswersWithAddContactDetailsYesNoPage: UserAnswers =
+          populatedUserAnswers
+            .set(AgentContactDetailsPage, testAgentContactDetails)
+            .success
+            .value
 
-        val summaryListRow: Option[SummaryListRow] = AddContactDetailsYesNoSummary.row(userAnswersWithAddContactDetailsYesNoPage)
+        val summaryListRow: Option[SummaryListRow] =
+          AddContactDetailsYesNoSummary.row(
+            userAnswersWithAddContactDetailsYesNoPage
+          )
 
-        summaryListRow.value.value.content.asHtml.toString must equal(yesValueKey)
+        summaryListRow.value.value.content.asHtml.toString must equal(
+          yesValueKey
+        )
       }
       "must return row with value `No` when user answers No and AgentContactDetailsPage is not defined" in new Setup {
-        val userAnswersWithoutAddContactDetailsYesNoPage: UserAnswers = populatedUserAnswers.remove(AgentContactDetailsPage).success.value
+        val userAnswersWithoutAddContactDetailsYesNoPage: UserAnswers =
+          populatedUserAnswers.remove(AgentContactDetailsPage).success.value
 
-        val summaryListRow: Option[SummaryListRow] = AddContactDetailsYesNoSummary.row(userAnswersWithoutAddContactDetailsYesNoPage)
+        val summaryListRow: Option[SummaryListRow] =
+          AddContactDetailsYesNoSummary.row(
+            userAnswersWithoutAddContactDetailsYesNoPage
+          )
 
-        summaryListRow.value.value.content.asHtml.toString must equal(noValueKey)
+        summaryListRow.value.value.content.asHtml.toString must equal(
+          noValueKey
+        )
       }
       "must render correct content and navigate to correct action in SummaryListRow" in new Setup {
 
-        val summaryListRow: Option[SummaryListRow] = AddContactDetailsYesNoSummary.row(populatedUserAnswers)
+        val summaryListRow: Option[SummaryListRow] =
+          AddContactDetailsYesNoSummary.row(populatedUserAnswers)
 
-        val actionInSummaryListRow: Option[Actions] = summaryListRow.value.actions
+        val actionInSummaryListRow: Option[Actions] =
+          summaryListRow.value.actions
 
         val actionItem: ActionItem = actionInSummaryListRow.value.items.head
 
@@ -83,13 +109,21 @@ class AddContactDetailsYesNoSummarySpec extends SpecBase with Matchers {
 
   trait Setup {
     lazy implicit val messages: Messages = stubMessages()
-    
-    val agentName: String = populatedUserAnswers.get(AgentNamePage).getOrElse("")
-    val yesValueKey: String = messages("manageAgents.agentContactDetailsSummary.value.yes")
-    val noValueKey: String = messages("manageAgents.agentContactDetailsSummary.value.no")
+
+    val agentName: String =
+      populatedUserAnswers.get(AgentNamePage).getOrElse("")
+    val yesValueKey: String = messages(
+      "manageAgents.agentContactDetailsSummary.value.yes"
+    )
+    val noValueKey: String = messages(
+      "manageAgents.agentContactDetailsSummary.value.no"
+    )
 
     val siteChangeKey: String = messages("site.change")
-    val route: String = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+    val route: String =
+      controllers.manageAgents.routes.AgentContactDetailsController
+        .onPageLoad(CheckMode)
+        .url
   }
 
 }

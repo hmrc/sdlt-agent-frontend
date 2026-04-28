@@ -27,24 +27,40 @@ import viewmodels.implicits.*
 
 object AgentContactDetailsSummary {
 
-  def row(answers: UserAnswers)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(
+      answers: UserAnswers
+  )(implicit messages: Messages): Option[SummaryListRow] = {
     answers.get(AgentContactDetailsPage).map { agentContactDetails =>
       SummaryListRowViewModel(
-        key = messages("manageAgents.agentContactDetailsSummary.checkYourAnswersLabel"),
+        key = messages(
+          "manageAgents.agentContactDetailsSummary.checkYourAnswersLabel"
+        ),
         value = ValueViewModel(
           HtmlContent(
             s"""
-               |${messages("manageAgents.agentContactDetailsSummary.value.telephone")}: ${HtmlFormat.escape(agentContactDetails.phone.getOrElse("")).toString}<br>
-               |${messages("manageAgents.agentContactDetailsSummary.value.email")}: ${HtmlFormat.escape(agentContactDetails.email.getOrElse("")).toString}
+               |${messages(
+                "manageAgents.agentContactDetailsSummary.value.telephone"
+              )}: ${HtmlFormat
+                .escape(agentContactDetails.phone.getOrElse(""))
+                .toString}<br>
+               |${messages(
+                "manageAgents.agentContactDetailsSummary.value.email"
+              )}: ${HtmlFormat
+                .escape(agentContactDetails.email.getOrElse(""))
+                .toString}
                |""".stripMargin
           )
         ),
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+            controllers.manageAgents.routes.AgentContactDetailsController
+              .onPageLoad(CheckMode)
+              .url
           )
-            .withVisuallyHiddenText(messages(s"manageAgents.agentContactDetailsSummary.change.hidden"))
+            .withVisuallyHiddenText(
+              messages(s"manageAgents.agentContactDetailsSummary.change.hidden")
+            )
             .withAttribute("id" -> "change-agent-contact-details")
         )
       )

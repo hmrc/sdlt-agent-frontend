@@ -28,12 +28,17 @@ class WireMock:
   val stubPort = 11111
   val stubHost = "localhost"
 
-  var wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(WireMockConstants.stubPort))
+  var wireMockServer: WireMockServer = new WireMockServer(
+    wireMockConfig().port(WireMockConstants.stubPort)
+  )
 
   def start(): Unit =
     if !wireMockServer.isRunning then
       wireMockServer.start()
-      WireMockClient.configureFor(WireMockConstants.stubHost, WireMockConstants.stubPort)
+      WireMockClient.configureFor(
+        WireMockConstants.stubHost,
+        WireMockConstants.stubPort
+      )
 
   def stop(): Unit =
     wireMockServer.stop()

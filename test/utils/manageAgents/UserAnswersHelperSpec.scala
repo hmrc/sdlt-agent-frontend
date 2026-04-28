@@ -28,15 +28,16 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.{
+  AgentAddressPage,
+  AgentContactDetailsPage,
+  AgentNamePage
+}
 import repositories.SessionRepository
 
 import scala.concurrent.Future
 
-class UserAnswersHelperSpec
-  extends SpecBase
-    with MockitoSugar
-    with TryValues {
+class UserAnswersHelperSpec extends SpecBase with MockitoSugar with TryValues {
 
   object Helper extends UserAnswersHelper
 
@@ -46,14 +47,19 @@ class UserAnswersHelperSpec
     req
   }
 
-  private val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
+  private val agentContactDetails: AgentContactDetails =
+    AgentContactDetails(Some("phone"), Some("email"))
 
   val userAnswersWithAgentContactDetailsPage: UserAnswers = Some(
     emptyUserAnswers
-      .set(AgentNamePage, "John Doe").success.value
-      .set(AgentContactDetailsPage, agentContactDetails).success.value
+      .set(AgentNamePage, "John Doe")
+      .success
+      .value
+      .set(AgentContactDetailsPage, agentContactDetails)
+      .success
+      .value
   ).value
-  
+
   "UserAnswersHelper.updateUserAnswers" - {
 
     "should populate AgentName, Address (with missing optional lines), and ContactDetails" in {
@@ -76,7 +82,6 @@ class UserAnswersHelperSpec
           agentResourceReference = testArn
         )
 
-
       implicit val dr: DataRequest[_] = mockDataRequest(startUa)
 
       val updated = Helper.updateUserAnswers(be).success.value
@@ -86,12 +91,15 @@ class UserAnswersHelperSpec
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.auditRef mustBe "" // helper hardcodes empty auditRef
       addr.address mustBe Address(
-        lines    = Seq("42 Queensway", "", "Birmingham", ""),
+        lines = Seq("42 Queensway", "", "Birmingham", ""),
         postcode = Some("B2 4ND")
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
+        AgentContactDetails(
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk")
+        )
     }
 
     "should populate Address when all address lines are present" in {
@@ -122,12 +130,16 @@ class UserAnswersHelperSpec
 
       val addr: JourneyResultAddressModel = updated.get(AgentAddressPage).value
       addr.address mustBe Address(
-        lines    = Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
+        lines =
+          Seq("8B Baker Street", "Marylebone", "London", "Greater London"),
         postcode = Some("NW1 6XE")
       )
 
       updated.get(AgentContactDetailsPage).value mustBe
-        AgentContactDetails(phone = Some("01214567890"), email = Some("info@harborviewestates.co.uk"))
+        AgentContactDetails(
+          phone = Some("01214567890"),
+          email = Some("info@harborviewestates.co.uk")
+        )
     }
 
   }
@@ -138,12 +150,18 @@ class UserAnswersHelperSpec
 
       val mockSessionRepo: SessionRepository = mock[SessionRepository]
 
-      val userAnswersWithOutAgentContactDetailsPage: UserAnswers = userAnswersWithAgentContactDetailsPage
-        .remove(AgentContactDetailsPage).success.value
+      val userAnswersWithOutAgentContactDetailsPage: UserAnswers =
+        userAnswersWithAgentContactDetailsPage
+          .remove(AgentContactDetailsPage)
+          .success
+          .value
 
       when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
+      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(
+        userAnswersWithAgentContactDetailsPage,
+        mockSessionRepo
+      )
 
       result.futureValue mustBe Right(userAnswersWithOutAgentContactDetailsPage)
     }
@@ -156,7 +174,10 @@ class UserAnswersHelperSpec
 
       when(mockSessionRepo.set(any())).thenThrow(exception)
 
-      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
+      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(
+        userAnswersWithAgentContactDetailsPage,
+        mockSessionRepo
+      )
 
       result.futureValue mustBe Left(exception)
 
