@@ -17,7 +17,7 @@
 package viewmodels.govuk
 
 import base.SpecBase
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import org.scalatest.matchers.must.Matchers
 import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
@@ -89,7 +89,7 @@ class AddContactDetailsYesNoSummarySpec extends SpecBase with Matchers {
     val noValueKey: String = messages("manageAgents.agentContactDetailsSummary.value.no")
 
     val siteChangeKey: String = messages("site.change")
-    val route: String = controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+    val route: String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
   }
 
 }

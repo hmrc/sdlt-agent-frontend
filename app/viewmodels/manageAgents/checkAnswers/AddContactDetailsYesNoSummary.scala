@@ -16,7 +16,7 @@
 
 package viewmodels.manageAgents.checkAnswers
 
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -44,7 +44,7 @@ object AddContactDetailsYesNoSummary {
           actions = Seq(
             ActionItemViewModel(
               "site.change",
-              controllers.manageAgents.routes.AgentContactDetailsController.onPageLoad(CheckMode).url
+              controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
             )
               .withVisuallyHiddenText(messages(s"manageAgents.addContactDetailsYesNoSummary.change.hidden"))
               .withAttribute("id" -> "change-agent-contact-details")
