@@ -14,7 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import viewmodels.InputWidth.*
+@import views.html.components.Caption
+@import viewmodels.LabelSize.Large
 
 @this(
         layout: templates.Layout,
@@ -22,7 +24,7 @@
         govukInput: GovukInput,
         govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
-        hmrcPageHeading: HmrcPageHeading
+        caption: Caption
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -35,18 +37,15 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.agentName.heading"),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l"),
-            section        = Some(messages("manageAgents.caption"))
-        ))
+        @caption(messages("manageAgents.caption"), "govuk-caption-l")
 
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("manageAgents.agentName.tip"))
+                label = LabelViewModel(messages("manageAgents.agentName.heading")).asPageHeading(size = Large)
             )
+            .withHint(HintViewModel(HtmlContent(Html(messages("manageAgents.agentName.tip"))))
+            .withCssClass("govuk-!-margin-top-6 govuk-body-s"))
         )
 
         @govukButton(Button(
