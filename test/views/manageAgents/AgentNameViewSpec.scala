@@ -37,11 +37,15 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
     "must render the page with correct html elements" in new Setup {
       val html: Html = view(form, NormalMode)
       val doc: Document = Jsoup.parse(html.toString())
+      val heading = doc.select("h1.govuk-label-wrapper")
+      val caption = doc.select("h2.govuk-caption-l").first()
+      val hint = doc.select("div.govuk-hint")
+
+      heading.text() mustBe messages("manageAgents.agentName.heading")
+      caption.ownText() mustBe messages("manageAgents.caption")
+      hint.text() mustBe messages("manageAgents.agentName.tip")
 
       displaysCorrectTitle(doc, "manageAgents.agentName.title")
-      displaysCorrectHeading(doc, "manageAgents.agentName.heading")
-      displaysCorrectCaption(doc, "manageAgents.caption")
-      displaysCorrectLabels(doc, Seq("manageAgents.agentName.tip"))
       hasCorrectNumOfItems(doc, "input", 1)
       hasSubmitButton(doc, "site.continue")
       hasBackLink(doc)

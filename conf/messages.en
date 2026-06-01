@@ -11,6 +11,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.section.prefix = This section is
 
 pagination.previous = Previous
 pagination.next     = Next
