@@ -60,6 +60,8 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
     def yesOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/enter-contact-details")
 
+    def yesOnwardRouteCheckMode: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/change-enter-contact-details")
+
     val journeyRecoveryRoute: String = controllers.routes.JourneyRecoveryController.onPageLoad().url
 
     val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
@@ -173,7 +175,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual yesOnwardRoute.url
+        redirectLocation(result).value mustEqual yesOnwardRouteCheckMode.url
       }
     }
 
