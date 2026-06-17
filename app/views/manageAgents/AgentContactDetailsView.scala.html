@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import views.html.components._
 
 @this(
         layout: templates.Layout,
@@ -23,7 +23,8 @@
         govukErrorSummary: GovukErrorSummary,
         govukInput: GovukInput,
         govukButton: GovukButton,
-        hmrcPageHeading: HmrcPageHeading
+        caption: Caption,
+        h1: H1
 
 )
 
@@ -37,13 +38,8 @@
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
-
-        @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.agentContactDetails.heading", agentName),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l"),
-            section        = Some(messages("manageAgents.caption"))
-        ))
+        @caption(messages("manageAgents.caption"), "govuk-caption-l")
+        @h1(messages("manageAgents.agentContactDetails.heading", agentName))
 
         @govukInput(
             InputViewModel(

@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 @import views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 
@@ -27,7 +26,8 @@
         govukRadios : GovukRadios,
         p: Paragraph,
         formHelper: FormWithCSRF,
-        hmrcPageHeading: HmrcPageHeading,
+        h1: H1,
+        caption: Caption,
         successNotificationBanner: SuccessNotificationBanner
 )
 @(      form:               Form[Boolean],
@@ -73,12 +73,8 @@
                 @govukErrorSummary(ErrorSummaryViewModel(form))
             }
 
-            @hmrcPageHeading(PageHeading(
-                text = messages("manageAgents.agentDetails.heading"),
-                headingClasses = Some("govuk-heading-l"),
-                captionClasses = Some("govuk-caption-l"),
-                section = Some(messages("manageAgents.caption"))
-            ))
+            @caption(messages("manageAgents.caption"), "govuk-caption-l")
+            @h1(messages("manageAgents.agentDetails.heading"))
 
             @{
                 maybeSummaryList match {

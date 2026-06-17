@@ -18,14 +18,14 @@ package navigation
 
 import base.SpecBase
 import controllers.routes
-import pages.*
 import models.*
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage,
-  AgentNamePage, ConfirmAgentContactDetailsPage}
+import pages.*
+import pages.manageAgents.*
 
 class NavigatorSpec extends SpecBase {
 
   val navigator = new Navigator
+  
 
   "Navigator" - {
 
@@ -59,7 +59,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from ConfirmAgentContactDetailsPage to ConfirmAgentContactDetailsController.onPageLoad(NormalMode)" in {
         navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad()
+          controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad(NormalMode)
       }
     }
 
@@ -76,7 +76,13 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(AgentNamePage, CheckMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.AgentNameController.onPageLoad(CheckMode)
       }
-
+      
+      "must go from ConfirmAgentContactDetailsController to CheckYourAnswersController.onPageLoad(agentReferenceNumber) in Check mode" in {
+        
+        val userAnswersWithArn = emptyUserAnswers.set(AgentReferenceNumberPage, "arn").success.value
+        navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, userAnswersWithArn) mustBe
+          controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(Some("arn"))
+      }
       "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(CheckMode) in Check mode" in {
         navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)

@@ -18,10 +18,9 @@ package controllers.manageAgents
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, StornRequiredAction}
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
-import models.manageAgents.ConfirmAgentContactDetails
-import models.{NormalMode, UserAnswers}
+import models.Mode
 import navigation.Navigator
-import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage}
+import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, ConfirmAgentContactDetailsPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +33,7 @@ import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 @Singleton
 class ConfirmAgentContactDetailsController @Inject()(
@@ -49,47 +49,50 @@ class ConfirmAgentContactDetailsController @Inject()(
                                                       stampDutyLandTaxService: StampDutyLandTaxService,
                                                       view: ConfirmAgentContactDetailsView
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
-
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  
+  val form: Form[Boolean] = formProvider()
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       stampDutyLandTaxService.getAgentName match {
         case Left(error) =>
           logError(s"Couldn't find agent in user answers: $error")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Right(agentName) =>
-          val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
-          Ok(view(form, agentName))
+          val preparedForm = request.userAnswers.get(ConfirmAgentContactDetailsPage) match  {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
+          Ok(view(preparedForm, agentName, mode))
       }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async {
     implicit request =>
       stampDutyLandTaxService.getAgentName match {
         case Right(agentName) =>
-          val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)
           form.bindFromRequest().fold(
             formWithErrors =>
-              Future.successful(BadRequest(view(formWithErrors, agentName))),
-            {
-              case ConfirmAgentContactDetails.Option1 =>
-                logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `Yes` Redirect to AgentContactDetailsController onPageLoad()")
-                Future.successful(Redirect(navigator.nextPage(AgentContactDetailsPage, NormalMode, request.userAnswers)))
-
-              case ConfirmAgentContactDetails.Option2 =>
-                request.userAnswers.get(AgentContactDetailsPage) match {
-                  case Some(page) => stampDutyLandTaxService.removeAgentContactDetailsPageAndUpdateUserAnswers(request.userAnswers, sessionRepository).flatMap{
-                    case Right(updatedUserAnswers) =>
-                      logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User Selected `No` going back in the journey after previously selecting `Yes`")
-                      Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, updatedUserAnswers)))
-                    case Left(error) =>
-                      logError(s"[ConfirmAgentContactDetailsController][onSubmit]: User Selected`No` but there are some issues, Redirect to JourneyRecoveryController:$error")
-                      Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-                  }
-                  case None =>
-                    logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` First time in the journey")
-                    Future.successful(Redirect(navigator.nextPage(AgentCheckYourAnswersPage, NormalMode, request.userAnswers)))
+              Future.successful(BadRequest(view(formWithErrors, agentName, mode))),
+            value =>
+              for {
+                updatedUserAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAgentContactDetailsPage, value))
+                latestUserAnswers <- Future.fromTry {
+                  if !value then
+                    logInfo(s"[ConfirmAgentContactDetailsController][onSubmit][Removing previously filled contact details] User Selected `No` going back in the journey after previously selecting `Yes`")
+                    updatedUserAnswers.remove(AgentContactDetailsPage)
+                  else Success(updatedUserAnswers)
                 }
-            }
+                _ <- sessionRepository.set(latestUserAnswers)
+              } yield {
+                if(value){
+                  logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `Yes` Redirect to AgentContactDetailsController onPageLoad()")
+                  Redirect(navigator.nextPage(AgentContactDetailsPage, mode, latestUserAnswers))
+                }
+                else {
+                  logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` First time in the journey")
+                  Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, latestUserAnswers))
+                }
+              }
           )
         case Left(error) =>
           logError(s"Couldn't find agent in user answers: $error")
