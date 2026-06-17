@@ -21,12 +21,9 @@ import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.organisation.CreatedAgent
-import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNameDuplicateWarningPage, AgentNamePage, AgentReferenceNumberPage}
+import pages.manageAgents.*
 import play.api.mvc.AnyContent
-import repositories.SessionRepository
-import utils.LoggerUtil.logError
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 trait UserAnswersHelper {
@@ -52,25 +49,5 @@ trait UserAnswersHelper {
       case None =>
         Left(Error("Couldn't find agent in user answers"))
     }
-  }
-  
-  // Attempt to remove AgentContactDetailsPage and update UserAnswers in session repository
-  def removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswers: UserAnswers, sessionRepository: SessionRepository)
-                                                       (implicit ec: ExecutionContext): Future[Either[Throwable, UserAnswers]] = {
-    {
-      for {
-        updatedUserAnswersEither <- Future.successful(userAnswers.remove(AgentContactDetailsPage).toEither)
-      } yield updatedUserAnswersEither match {
-        case Right(updatedUserAnswers) =>
-          Try {sessionRepository.set(updatedUserAnswers)}.toEither match {
-            case Right(_) => Future.successful(Right(updatedUserAnswers))
-            case Left(ex) => Future.successful(Left(ex))
-          }
-        case Left(ex) =>
-          logError(s"[ConfirmAgentContactDetailsController][onSubmit] Couldn't remove AgentContactDetailsPage")
-          Future.successful(Left(ex))
-      }
-    }.flatten
-
   }
 }

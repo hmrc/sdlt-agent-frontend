@@ -32,6 +32,12 @@ trait ViewSpecBase {
     heading.size() mustBe 1
     heading.text mustBe messages(messageKey, args: _*)
   }
+  
+  protected def displaysCorrectLegendAsHeading(doc: Document, messageKey: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
+    val heading = doc.select(".govuk-fieldset__heading")
+    heading.size() mustBe 1
+    heading.text mustBe messages(messageKey, args: _*)
+  }
   protected def displaysCorrectSubHeading(doc: Document, messageKey: String, args: Seq[Any] = Seq.empty)(implicit messages: Messages): Assertion = {
     val subHeading = doc.select(".govuk-fieldset__legend--m")
     subHeading.size() mustBe 1
@@ -39,7 +45,7 @@ trait ViewSpecBase {
   }
 
   protected def displaysCorrectCaption(doc: Document, messageKey: String)(implicit messages: Messages): Assertion = {
-    val caption = doc.select("p.govuk-caption-l")
+    val caption = doc.select(".govuk-caption-l")
     caption.size() mustBe 1
     caption.text mustBe s"This section is ${messages(messageKey)}"
   }

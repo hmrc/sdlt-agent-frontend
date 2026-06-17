@@ -18,6 +18,7 @@ package views.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
+import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.Application
@@ -34,11 +35,11 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
   "ConfirmAgentContactDetailsView" - {
 
     "must render the page with correct html elements" in new Setup {
-      val html: Html = view(form, testAgentName)
+      val html: Html = view(form, testAgentName, NormalMode)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.confirmAgentContactDetails.title", Seq(testAgentName))
-      displaysCorrectHeading(doc, "manageAgents.confirmAgentContactDetails.heading", Seq(testAgentName))
+      displaysCorrectLegendAsHeading(doc, "manageAgents.confirmAgentContactDetails.heading", Seq(testAgentName))
       displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectHint(doc, "manageAgents.confirmAgentContactDetails.hint", Seq(testAgentName))
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
@@ -51,7 +52,7 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
       val errorForm: Form[?] = form
         .withError("value", "manageAgents.confirmAgentContactDetails.error.required")
 
-      val html: Html = view(errorForm, testAgentName)
+      val html: Html = view(errorForm, testAgentName, NormalMode)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
@@ -66,7 +67,7 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
   trait Setup {
     val app: Application                     = applicationBuilder().build()
     val formProvider                         = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[?]                        = formProvider("agentName")
+    val form: Form[Boolean]                  = formProvider()
     implicit def request: Request[?]         = FakeRequest()
     implicit def messages: Messages          = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: ConfirmAgentContactDetailsView = app.injector.instanceOf[ConfirmAgentContactDetailsView]

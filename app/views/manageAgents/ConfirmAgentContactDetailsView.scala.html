@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
+@import viewmodels.LegendSize.Large
+@import views.html.components._
 
 
 @this(
@@ -23,12 +24,12 @@
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
         govukButton: GovukButton,
-        hmrcPageHeading: HmrcPageHeading
+        caption: Caption
 )
-
 @(
         form: Form[_],
-        agentName: String
+        agentName: String,
+        mode: Mode
 )(
         implicit request: Request[_],
         messages: Messages
@@ -36,23 +37,18 @@
 
 @layout(pageTitle = title(form, messages("manageAgents.confirmAgentContactDetails.title", agentName))) {
 
-    @formHelper(action = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.confirmAgentContactDetails.heading", agentName),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l"),
-            section        = Some(messages("manageAgents.caption"))
-        ))
+        @caption(messages("manageAgents.caption"), "govuk-caption-l")
 
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                legend = Legend(),
+                legend = LegendViewModel(messages("manageAgents.confirmAgentContactDetails.heading", agentName)).asPageHeading(size = Large),
                 items = Seq(
                     RadioItem(
                         value = Some("true"),
