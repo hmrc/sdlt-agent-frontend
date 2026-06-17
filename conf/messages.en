@@ -47,15 +47,15 @@ index.guidance = Welcome to your new frontend. Please see the README file for a 
 manageAgents.caption = Agent details
 
 manageAgents.agentName.checkYourAnswersLabel = Agent name
-manageAgents.agentName.change.hidden = 
-manageAgents.address.checkYourAnswersLabel = Address
-manageAgents.address.change.hidden =
+manageAgents.agentName.change.hidden = Agent name
+manageAgents.address.checkYourAnswersLabel = Agent address
+manageAgents.address.change.hidden = Agent address
 manageAgents.addContactDetailsYesNoSummary.checkYourAnswersLabel = Do you want to add contact details for {0}?
-manageAgents.addContactDetailsYesNoSummary.change.hidden =
+manageAgents.addContactDetailsYesNoSummary.change.hidden = Do you want to add contact details for the agent?
 manageAgents.agentContactDetailsSummary.value.yes = Yes
 manageAgents.agentContactDetailsSummary.value.no = No
 manageAgents.agentContactDetailsSummary.checkYourAnswersLabel = Agent contact details
-manageAgents.agentContactDetailsSummary.change.hidden =
+manageAgents.agentContactDetailsSummary.change.hidden = Agent contact details
 manageAgents.agentContactDetailsSummary.value.telephone = Tel
 manageAgents.agentContactDetailsSummary.value.email = Email
 

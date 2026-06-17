@@ -16,31 +16,38 @@
 
 package forms.manageAgents
 
-import forms.behaviours.{OptionFieldBehaviours, StringFieldBehaviours}
-import models.manageAgents.ConfirmAgentContactDetails
+import forms.behaviours.{BooleanFieldBehaviours, OptionFieldBehaviours, StringFieldBehaviours}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.FormError
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.test.Helpers.stubMessages
 import utils.manageAgents.AgentDetailsTestUtil
 
-class ConfirmAgentContactDetailsFormProviderSpec extends OptionFieldBehaviours with StringFieldBehaviours with AgentDetailsTestUtil with GuiceOneAppPerSuite {
+class ConfirmAgentContactDetailsFormProviderSpec extends BooleanFieldBehaviours {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  private implicit val messages: Messages = stubMessages()
 
-  val formProvider =  new ConfirmAgentContactDetailsFormProvider
+  val requiredKey = "manageAgents.confirmAgentContactDetails.error.required"
+  val invalidKey = "error.boolean"
   val agentName = "Harborview Estates"
 
-  val form = formProvider(agentName)
+  val formProvider = new ConfirmAgentContactDetailsFormProvider()
+
+  val form = formProvider()
+ 
   ".value" - {
 
     val fieldName = "value"
-    val requiredKey = messages("manageAgents.confirmAgentContactDetails.error.required", agentName)
 
-    behave like optionsField[ConfirmAgentContactDetails](
+    "must bind true and false values correctly" in {
+      form.bind(Map(fieldName -> "true")).get mustBe true
+      form.bind(Map(fieldName -> "false")).get mustBe false
+    }
+
+    behave like booleanField(
       form,
       fieldName,
-      validValues  = ConfirmAgentContactDetails.values,
-      invalidError = FormError(fieldName, "error.invalid")
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

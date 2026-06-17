@@ -36,8 +36,10 @@ GET         /manage-agents/address-lookup                controllers.manageAgent
 GET         /manage-agents/change-address-lookup          controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = CheckMode)
 GET         /manage-agents/save-address-lookup             controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = CheckMode)
 
-GET         /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad()
-POST        /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit()
+GET         /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
+POST        /manage-agents/add-contact-details            controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
+GET         /manage-agents/change-add-contact-details     controllers.manageAgents.ConfirmAgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)
+POST        /manage-agents/change-add-contact-details     controllers.manageAgents.ConfirmAgentContactDetailsController.onSubmit(mode: Mode = CheckMode)
 GET         /manage-agents/enter-contact-details          controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = NormalMode)
 POST        /manage-agents/enter-contact-details          controllers.manageAgents.AgentContactDetailsController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/change-enter-contact-details   controllers.manageAgents.AgentContactDetailsController.onPageLoad(mode: Mode = CheckMode)

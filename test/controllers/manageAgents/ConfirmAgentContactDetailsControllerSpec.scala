@@ -18,12 +18,12 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
-import models.UserAnswers
-import models.manageAgents.{AgentContactDetails, ConfirmAgentContactDetails}
+import models.manageAgents.AgentContactDetails
+import models.{NormalMode, Mode, CheckMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage, ConfirmAgentContactDetailsPage}
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
@@ -42,6 +42,9 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
   trait Fixture {
     val agentName = "John Doe"
 
+    val formProvider = new ConfirmAgentContactDetailsFormProvider()
+    val form: Form[Boolean] = formProvider()
+
     val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
 
     val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
@@ -50,6 +53,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
     val userAnswersWithAgentContactDetails: UserAnswers = Some(emptyUserAnswers
       .set(AgentNamePage, agentName).success.value
+      .set(ConfirmAgentContactDetailsPage, true).success.value
       .set(AgentContactDetailsPage, agentContactDetails).success.value).value
 
     val userAnswersWithOutAgentContactDetails: UserAnswers = userAnswersWithAgentContactDetails.remove(AgentContactDetailsPage).success.value
@@ -61,10 +65,9 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
     val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
     implicit val messages: Messages = messagesApi.preferred(FakeRequest())
 
-    lazy val confirmAgentContactDetailsRoute: String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad().url
-
-    val formProvider = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[ConfirmAgentContactDetails] = formProvider(agentName)(messages)
+    lazy val confirmAgentContactDetailsRoute: String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad(NormalMode).url
+    def confirmAgentContactDetailsOnSubmitRoute(mode: Mode): String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onSubmit(mode).url
+    
 
   }
 
@@ -80,7 +83,26 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         val view = application.injector.instanceOf[ConfirmAgentContactDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, agentName)(request, messages).toString
+        contentAsString(result) mustEqual view(form, agentName, NormalMode)(request, messages).toString
+      }
+    }
+    
+    "must auto fill form correctly when the question has been answered previously" in new Fixture {
+      override val application: Application = applicationBuilder(userAnswers = Some(userAnswersWithAgentContactDetails)).build()
+      
+      running(application) {
+        val request = FakeRequest(GET, confirmAgentContactDetailsRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[ConfirmAgentContactDetailsView]
+        
+        val agentName = userAnswersWithAgentContactDetails.get(AgentNamePage).get
+        
+        val form = formProvider()
+        
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(true), agentName, NormalMode)(request, messages).toString
       }
     }
 
@@ -97,8 +119,27 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+    
+    "must return BadRequest and errors when invalid data is submitted " in new Fixture {
+      val mockSessionRepo: SessionRepository = mock[SessionRepository]
+      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
 
-    "must redirect to the agent contact details page when valid YES option is submitted" in new Fixture {
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
+        .build()
+
+      running(application) {
+
+        val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(NormalMode))
+          .withFormUrlEncodedBody(("value", "malformedBodyRequest"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+      }
+    }
+    
+    "must redirect to the agent contact details page when valid YES option is submitted in NormalMode" in new Fixture {
       val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
       when(mockService.getAgentName(any())).thenReturn(Right(agentName))
@@ -107,8 +148,27 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
 
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+        val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(NormalMode))
+          .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual yesOnwardRoute.url
+      }
+    }
+    
+    "must redirect to the agent contact details page when valid YES option is submitted in CheckMode" in new Fixture {
+      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
+
+      when(mockService.getAgentName(any())).thenReturn(Right(agentName))
+      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
+        .build()
+
+      running(application) {
+
+        val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(CheckMode))
+          .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -117,12 +177,10 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-    "must remove AgentContactDetailsPage and redirect to CheckYourAnswersController when NO is submitted after previously selecting YES " in new Fixture {
+    "must remove AgentContactDetailsPage and redirect to CheckYourAnswersController when selecting No is submitted in CheckMode" in new Fixture {
       val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
       when(mockService.getAgentName(any())).thenReturn(Right(agentName))
-      when(mockService.removeAgentContactDetailsPageAndUpdateUserAnswers(any(), any())(any()))
-        .thenReturn(Future.successful(Right(userAnswersWithOutAgentContactDetails)))
 
       override val application: Application = applicationBuilder(Some(userAnswersWithAgentContactDetails))
         .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
@@ -130,8 +188,8 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
       running(application) {
 
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.tail.head.toString))
+        val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(CheckMode))
+          .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
@@ -141,7 +199,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
       }
     }
 
-      "must redirect to CheckYourAnswersController when user selects NO option and is submitted first time " in new Fixture {
+    "must redirect to CheckYourAnswersController when user selects NO option and is submitted in NormalMode" in new Fixture {
 
         val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
@@ -157,8 +215,8 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
         running(application) {
 
-          val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-            .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
+          val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(NormalMode))
+            .withFormUrlEncodedBody(("value", "false"))
 
           val result = route(application, request).value
 
@@ -166,31 +224,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
           redirectLocation(result).value mustEqual noOnwardRoute.url
         }
       }
-
-    "must redirect to JourneyRecovery controller if user answers couldn't be updated in session repository" in new Fixture {
-      val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
-
-      when(mockService.getAgentName(any())).thenReturn(Right(agentName))
-
-      when(mockService.removeAgentContactDetailsPageAndUpdateUserAnswers(any(), any())(any()))
-        .thenReturn(Future.successful(Left(new RuntimeException("Boom"))))
-
-      override val application: Application = applicationBuilder(Some(userAnswersWithAgentContactDetails))
-        .overrides(bind[StampDutyLandTaxService].toInstance(mockService))
-        .build()
-
-      running(application) {
-
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.last.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual journeyRecoveryRoute
-      }
-    }
-
+    
     "must redirect to journey recovery when fail to extract agentName" in new Fixture {
       val mockService: StampDutyLandTaxService = mock[StampDutyLandTaxService]
       when(mockService.getAgentName(any())) thenReturn Left(Error("Failed to extract agentName"))
@@ -204,8 +238,8 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         .build()
       running(application) {
 
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", ConfirmAgentContactDetails.values.head.toString))
+        val request = FakeRequest(POST, confirmAgentContactDetailsOnSubmitRoute(NormalMode))
+          .withFormUrlEncodedBody(("value", "false"))
 
         val result = route(application, request).value
 
@@ -213,25 +247,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         redirectLocation(result).value mustEqual journeyRecoveryRoute
       }
     }
-
-    "must return BadRequest" in new Fixture {
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
-
-      override val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value))
-        .overrides(bind[SessionRepository].toInstance(mockSessionRepo))
-        .build()
-
-      running(application) {
-
-        val request = FakeRequest(POST, confirmAgentContactDetailsRoute)
-          .withFormUrlEncodedBody(("value", "malformedBodyRequest"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-      }
-    }
+    
   }
 
 }

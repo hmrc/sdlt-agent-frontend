@@ -131,36 +131,4 @@ class UserAnswersHelperSpec
     }
 
   }
-
-  "UserAnswersHelper.removeAgentContactDetailsPageAndUpdateUserAnswers" - {
-
-    "should return Right(true) remove AgentContactDetailsPage and update session Repository with  new users Answers" in {
-
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-
-      val userAnswersWithOutAgentContactDetailsPage: UserAnswers = userAnswersWithAgentContactDetailsPage
-        .remove(AgentContactDetailsPage).success.value
-
-      when(mockSessionRepo.set(any())) thenReturn Future.successful(true)
-
-      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
-
-      result.futureValue mustBe Right(userAnswersWithOutAgentContactDetailsPage)
-    }
-
-    "should return Left(error) when setting the session repository fails" in {
-
-      val exception = new RuntimeException("Boom")
-
-      val mockSessionRepo: SessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepo.set(any())).thenThrow(exception)
-
-      val result = Helper.removeAgentContactDetailsPageAndUpdateUserAnswers(userAnswersWithAgentContactDetailsPage, mockSessionRepo)
-
-      result.futureValue mustBe Left(exception)
-
-    }
-
-  }
 }
