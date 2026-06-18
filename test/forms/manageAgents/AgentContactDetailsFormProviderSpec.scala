@@ -41,17 +41,22 @@ class AgentContactDetailsFormProviderSpec
     "must bind valid phone and email" in {
       val result = form.bind(Map("phone" -> validPhone.get, "email" -> validEmail.get))
       result.errors mustBe empty
-      result.value mustBe Some(AgentContactDetails(validPhone, validEmail))
+      result.value mustBe Some(AgentContactDetails(Some("01234567890"), validEmail))
     }
 
-    "must bind valid phone and ignore whitespace exceeding 14 characters" in {
-      val result = form.bind(Map("phone" -> "0123456789012       ", "email" -> validEmail.get))
+    "must strip spaces, hyphens, and brackets before saving" in {
+      val result = form.bind(Map("phone" -> "(0161) 496-0123", "email" -> validEmail.get))
       result.errors mustBe empty
-      result.value mustBe Some(AgentContactDetails(Some("0123456789012"), validEmail))
+      result.value mustBe Some(AgentContactDetails(Some("01614960123"), validEmail))
     }
 
-    "must not bind phone longer than 14 characters" in {
+    "must not bind phone longer than 14 characters after stripping" in {
       val result = form.bind(Map("phone" -> "0123456789012345", "email" -> validEmail.get))
+      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneLength", agentName)) mustBe true
+    }
+
+    "must not bind phone longer than 14 digits even with formatting characters" in {
+      val result = form.bind(Map("phone" -> "(0123) 456-7890 1234", "email" -> validEmail.get))
       result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneLength", agentName)) mustBe true
     }
 

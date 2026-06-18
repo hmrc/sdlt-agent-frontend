@@ -37,13 +37,13 @@ class AgentContactDetailsFormProvider @Inject(){
     Form(
       mapping(
         "phone" -> optional(text)
-          .transform[Option[String]](_.map(_.trim), identity)
+          .transform[Option[String]](_.map(_.replaceAll("[ \\-()]", "")), identity)
           .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName),
             _.forall(_.matches(phoneInvalidRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName),
             _.forall(_.matches(phoneInvalidFormatRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.phoneLength", agentName),
-            _.forall(phone => phone.replaceAll("\\s", "").length <= maxAgentPhoneLength)),
+            _.forall(_.length <= maxAgentPhoneLength)),
 
         "email" -> optional(text)
           .verifying(messages("manageAgents.agentContactDetails.error.emailInvalid", agentName),
