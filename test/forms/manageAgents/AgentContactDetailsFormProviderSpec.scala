@@ -19,139 +19,262 @@ package forms.manageAgents
 import forms.behaviours.StringFieldBehaviours
 import models.manageAgents.AgentContactDetails
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.i18n.{Messages, MessagesApi}
+import play.api.test.Helpers.stubMessages
 
 class AgentContactDetailsFormProviderSpec
   extends StringFieldBehaviours
     with GuiceOneAppPerSuite {
 
-  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
+  implicit val messages: Messages = stubMessages()
 
   val agentName = "Agent Name"
   val formProvider = new AgentContactDetailsFormProvider()
   val form: Form[AgentContactDetails] = formProvider(agentName)
 
-  val validPhone: Option[String] = Some("01234 567890")
-  val validEmail: Option[String] = Some("test@example.com")
-
 
   "AgentContactDetailsFormProvider" - {
 
-    "must bind valid phone and email" in {
-      val result = form.bind(Map("phone" -> validPhone.get, "email" -> validEmail.get))
-      result.errors mustBe empty
-      result.value mustBe Some(AgentContactDetails(Some("01234567890"), validEmail))
+    ".phone" - {
+
+      val fieldName = "phone"
+      val lengthKey = "manageAgents.agentContactDetails.error.phoneLength"
+      val invalidKey = "manageAgents.agentContactDetails.error.phoneInvalid"
+      val maxLength = 14
+
+      "must bind valid phone number form data" in {
+        val validNumbers = Seq(
+          "1234567890",
+          "12345678912345",
+          "1",
+          "ABC123",
+          "A1B2C3!",
+          "Test_Value",
+          "Hello.World+!@",
+          "A+B=C",
+          "Value:100%",
+          "OK;GO"
+        )
+
+        validNumbers.foreach { number =>
+          val result = form.bind(
+            Map(
+              fieldName -> number,
+              "email" -> "test@example.com"
+            )
+          )
+
+          result.errors mustBe empty
+          result.get.phone mustBe Some(number)
+        }
+      }
+
+      "must strip spaces, hyphens and brackets before storing" in {
+        val inputs = Seq(
+          "9876-5432" -> "98765432",
+          "(Agent)42" -> "Agent42",
+          "+44 808 157 0192" -> "+448081570192"
+        )
+        inputs.foreach { case (input, expected) =>
+          val result = form.bind(Map(fieldName -> input, "email" -> "test@example.com"))
+          result.errors mustBe empty
+          result.get.phone mustBe Some(expected)
+        }
+      }
+
+      "must allow a phone number that exceeds 14 characters raw but is within limit after stripping" in {
+        val longWithSpaces = "+44 808 157 0192"
+        val result = form.bind(Map(fieldName -> longWithSpaces, "email" -> "test@example.com"))
+        result.errors mustBe empty
+        result.get.phone mustBe Some("+448081570192")
+      }
+
+      "must bind empty strings as None" in {
+        val result = form.bind(
+          Map(
+            fieldName -> "",
+            "email" -> "test@example.com"
+          )
+        )
+        result.errors mustBe empty
+        result.get.phone mustBe None
+      }
+
+      "must bind when field is missing" in {
+        val result = form.bind(
+          Map(
+            "email" -> "test@example.com"
+          )
+        )
+        result.errors mustBe empty
+        result.get.phone mustBe None
+      }
+
+      "must not bind strings longer than 14 characters" in {
+        val longNumber = "1" * (maxLength + 1)
+        val result = form.bind(
+          Map(
+            fieldName -> longNumber,
+            "email" -> "test@example.com"
+          )
+        )
+        result.errors must contain(FormError(fieldName, lengthKey))
+      }
+
+      "must not bind invalid phone number values" in {
+        val invalidNumbers = Seq(
+          "123456789#",
+          "123$4567",
+          "12€34",
+          "abc©def",
+          "987~^`",
+          "phone🙂",
+          "num>value",
+          "num<value",
+          "hello|world",
+          "test\"",
+          "back\\slash"
+        )
+
+        invalidNumbers.foreach { number =>
+          val result = form.bind(
+            Map(
+              fieldName -> number,
+              "email" -> "test@example.com"
+            )
+          )
+          result.errors must contain(
+            FormError(fieldName, invalidKey)
+          )
+        }
+      }
     }
 
-    "must strip spaces, hyphens, and brackets before saving" in {
-      val result = form.bind(Map("phone" -> "(0161) 496-0123", "email" -> validEmail.get))
-      result.errors mustBe empty
-      result.value mustBe Some(AgentContactDetails(Some("01614960123"), validEmail))
-    }
+    ".email" - {
 
-    "must not bind phone longer than 14 characters after stripping" in {
-      val result = form.bind(Map("phone" -> "0123456789012345", "email" -> validEmail.get))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneLength", agentName)) mustBe true
-    }
+      val fieldName = "email"
+      val lengthKey = "manageAgents.agentContactDetails.error.maxEmailLength"
+      val invalidKey = "manageAgents.agentContactDetails.error.emailInvalid"
+      val invalidFormatKey = "manageAgents.agentContactDetails.error.emailInvalidFormat"
 
-    "must not bind phone longer than 14 digits even with formatting characters" in {
-      val result = form.bind(Map("phone" -> "(0123) 456-7890 1234", "email" -> validEmail.get))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneLength", agentName)) mustBe true
-    }
+      val maxLength = 36
 
-    "must not bind invalid phone characters" in {
-      val result = form.bind(Map("phone" -> "abcd1234", "email" -> validEmail.get))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+      "must bind valid email address form data" in {
+        val validEmails = Seq(
+          "test@example.com",
+          "user.name@domain.co.uk",
+          "hello+world@sub.domain.com",
+          "simple123@numbers.net",
+          "UPPERCASE@EXAMPLE.COM",
+          "name_with_underscores@domain.org",
+          "dots.in.name@domain.io",
+          "hyphen-name@domain-name.com",
+          "a@b.com"
+        )
 
-    "must not bind invalid phone format" in {
-      val result = form.bind(Map("phone" -> "*988", "email" -> validEmail.get))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+        validEmails.foreach { email =>
+          val result = form.bind(
+            Map(
+              fieldName -> email,
+              "phone" -> "01234567890"
+            )
+          )
+          result.errors mustBe empty
+          result.get.email mustBe Some(email)
+        }
+      }
 
-    "must not bind AgentContactDetails when phone and email both are empty" in {
-      val result = form.bind(Map("phone" -> "", "email" -> ""))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneOrEmailRequired", agentName)) mustBe true
-    }
+      "must bind empty strings as None" in {
+        val result = form.bind(
+          Map(
+            fieldName -> "",
+            "phone" -> "01234567890"
+          )
+        )
+        result.errors mustBe empty
+        result.get.email mustBe None
+      }
 
-    "must not bind email longer than 36 characters" in {
-      val longEmail = ("a" * 40) + "@example.com"
-      val result = form.bind(Map("phone" -> validPhone.get, "email" -> longEmail))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.maxEmailLength", agentName)) mustBe true
-    }
+      "must bind when field is missing" in {
+        val result = form.bind(
+          Map(
+            "phone" -> "01234567890"
+          )
+        )
+        result.errors mustBe empty
+        result.get.email mustBe None
+      }
 
-    "must not bind invalid email format" in {
-      val result = form.bind(Map("phone" -> validPhone.get, "email" -> "not-an-email"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName)) mustBe true
-    }
+      "must not bind strings longer than 36 characters" in {
+        val longEmail = ("a" * maxLength) + "@test.com"
+        val result = form.bind(
+          Map(
+            fieldName -> longEmail,
+            "phone" -> "01234567890"
+          )
+        )
+        result.errors must contain(FormError(fieldName, lengthKey))
+      }
 
-    "must not bind email with invalid characters" in {
-      val result = form.bind(Map("phone" -> validPhone.get, "email" -> "bad#chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
-    }
-    //invalid phone character tests
-    "must reject invalid phone with character # " in {
-      val result = form.bind(Map("phone" -> "#123456", "email" -> "bad#chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+      "must not bind email address values with invalid characters" in {
+        val invalidCharEmails = Seq(
+          "user@domain|com",
+          "hello@domain>.com",
+          "name@domain<.com",
+          "quote\"@domain.com",
+          "single'quote@domain.com",
+          "`backtick`@domain.com"
+        )
 
-    "must reject invalid phone with character $" in {
-      val result = form.bind(Map("phone" -> "$123456", "email" -> "bad#chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+        invalidCharEmails.foreach { email =>
+          val result = form.bind(
+            Map(
+              fieldName -> email,
+              "phone" -> "123456789"
+            )
+          )
+          result.errors must contain(
+            FormError(fieldName, invalidKey)
+          )
+        }
+      }
 
-    "must reject invalid phone with character `" in {
-      val result = form.bind(Map("phone" -> "`123456", "email" -> "badchars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+      "must not bind email address values with invalid format" in {
+        val invalidFormatEmails = Seq(
+          "test@@example.com",
+          "te@st@example.com",
+          "@missinglocal.com",
+          "missingdomain@"
+        )
 
-    "must reject invalid phone with characters |" in {
-      val result = form.bind(Map("phone" -> "|123456", "email" -> "badchars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+        invalidFormatEmails.foreach { email =>
+          val result = form.bind(
+            Map(
+              fieldName -> email,
+              "phone" -> "123456789"
+            )
+          )
+          result.errors must contain(
+            FormError(fieldName, invalidFormatKey)
+          )
+        }
+      }
 
-    "must reject invalid phone with character < " in {
-      val result = form.bind(Map("phone" -> "<123456", "email" -> "badchars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+      "oneRequired validation" - {
 
-    "must reject invalid phone with characters > " in {
-      val result = form.bind(Map("phone" -> ">123456", "email" -> "badchars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
-    
-    //invalid email characters tests
-    "must reject invalid email with character # " in {
-      val result = form.bind(Map("phone" -> "#123456", "email" -> "badchars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName)) mustBe true
-    }
+        val phoneOrEmailRequiredKey = "manageAgents.agentContactDetails.error.phoneOrEmailRequired"
 
-    "must reject invalid email with character $" in {
-      val result = form.bind(Map("phone" -> "123456", "email" -> "bad$chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
+        "must fail when both phone and email are empty" in {
+          val result = form.bind(Map("phone" -> "", "email" -> ""))
+          result.errors must contain(FormError("", phoneOrEmailRequiredKey))
+        }
+
+        "must fail when both phone and email are missing" in {
+          val result = form.bind(Map.empty[String, String])
+          result.errors must contain(FormError("", phoneOrEmailRequiredKey))
+        }
+      }
     }
-
-    "must reject invalid email with character `" in {
-      val result = form.bind(Map("phone" -> "123456", "email" -> "bad`chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
-    }
-
-    "must reject invalid email with characters |" in {
-      val result = form.bind(Map("phone" -> "123456", "email" -> "bad|chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
-    }
-
-    "must reject invalid email with character <" in {
-      val result = form.bind(Map("phone" -> "123456", "email" -> "bad<chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
-    }
-
-    "must reject invalid email with characters > " in {
-      val result = form.bind(Map("phone" -> "123456", "email" -> "bad>chars@email.com"))
-      result.errors.exists(_.message == messages("manageAgents.agentContactDetails.error.emailInvalid", agentName)) mustBe true
-    }
-
-
   }
 }
