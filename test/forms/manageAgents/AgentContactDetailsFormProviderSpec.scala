@@ -27,8 +27,6 @@ class AgentContactDetailsFormProviderSpec
   extends StringFieldBehaviours
     with GuiceOneAppPerSuite {
 
-//  implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
-
   implicit val messages: Messages = stubMessages()
 
   val agentName = "Agent Name"
