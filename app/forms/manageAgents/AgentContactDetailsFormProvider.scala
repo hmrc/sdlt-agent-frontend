@@ -24,12 +24,10 @@ import javax.inject.Inject
 
 class AgentContactDetailsFormProvider @Inject(){
 
-  private val phoneInvalidRegex = "^[0-9+\\s\\-()]+$"
-  private val phoneInvalidFormatRegex = "[A-Za-z0-9 ~!@%\\&\\'()*+,\\-\\.\\/\\:\\=?\\[\\]^_{\\}\\;]*"
-  private val emailInvalidFormatRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
-  private val emailInvalidRegex = "^[A-Za-z0-9&'@\\/.\\-? ]+$"
+  private val phoneInvalidRegex = "[A-Za-z0-9 ~!@%&'()*+,\\-./:=?\\[\\]^_{}\\;]*"
+  private val emailInvalidFormatRegex = "^[^@|<>\"'`]+@[^@|<>\"'`]+$"
+  private val emailInvalidRegex = "^[^|<>\"'`]+$"
   private val maxAgentPhoneLength = 14
-  private val minAgentEmailLength = 3
   private val maxAgentEmailLength = 36
 
   def apply(agentName: String)(implicit messages: Messages): Form[AgentContactDetails] =
@@ -40,8 +38,6 @@ class AgentContactDetailsFormProvider @Inject(){
           .transform[Option[String]](_.map(_.replaceAll("[ \\-()]", "")), identity)
           .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalid", agentName),
             _.forall(_.matches(phoneInvalidRegex)))
-          .verifying(messages("manageAgents.agentContactDetails.error.phoneInvalidFormat", agentName),
-            _.forall(_.matches(phoneInvalidFormatRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.phoneLength", agentName),
             _.forall(_.length <= maxAgentPhoneLength)),
 
@@ -50,8 +46,6 @@ class AgentContactDetailsFormProvider @Inject(){
             _.forall(_.matches(emailInvalidRegex)))
           .verifying(messages("manageAgents.agentContactDetails.error.emailInvalidFormat", agentName),
             _.forall(_.matches(emailInvalidFormatRegex)))
-          .verifying(messages("manageAgents.agentContactDetails.error.minEmailLength", agentName),
-            _.forall(_.length >= minAgentEmailLength))
           .verifying(messages("manageAgents.agentContactDetails.error.maxEmailLength", agentName),
             _.forall(_.length <= maxAgentEmailLength))
 
