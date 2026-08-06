@@ -49,6 +49,7 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   private def setJourneyOptions(mode: Mode): Seq[(String, JsValue)] = {
     Seq(
       "continueUrl" -> JsString(continueUrl(mode)),
+      "useNewGovUkServiceNavigation" -> JsBoolean(true),
       "signOutHref" -> JsString(appConfig.signOutUrlForAddressLookupFrontend),
       "ukMode" -> JsBoolean(true),
       "disableTranslations" -> JsBoolean(true),
