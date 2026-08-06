@@ -38,7 +38,7 @@ class RemoveAgentViewSpec extends SpecBase with ViewSpecBase with AgentDetailsTe
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.removeAgent.title")
-      displaysCorrectHeading(doc, "manageAgents.removeAgent.heading", Seq(testAgentDetails.name))
+      displaysCorrectLegendAsHeading(doc, "manageAgents.removeAgent.heading", Seq(testAgentDetails.name))
       displaysCorrectCaption(doc, "manageAgents.caption")
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasCorrectNumOfItems(doc, ".govuk-radios__item", 2)
