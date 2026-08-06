@@ -16,7 +16,8 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcPageHeading, PageHeading}
 @import models.responses.organisation.CreatedAgent
-
+@import viewmodels.LegendSize.Large
+@import views.html.components.Caption
 
 @this(
         layout: templates.Layout,
@@ -24,7 +25,8 @@
         govukErrorSummary: GovukErrorSummary,
         govukRadios: GovukRadios,
         govukButton: GovukButton,
-        hmrcPageHeading: HmrcPageHeading
+        hmrcPageHeading: HmrcPageHeading,
+        caption: Caption
 )
 
 @(
@@ -44,17 +46,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @hmrcPageHeading(PageHeading(
-            text           = messages("manageAgents.removeAgent.heading", agentDetails.name),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l"),
-            section        = Some(messages("manageAgents.caption"))
-        ))
+        @caption(messages("manageAgents.caption"), "govuk-caption-l")
 
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                legend = Legend(),
+                legend = LegendViewModel(messages("manageAgents.removeAgent.heading", agentDetails.name)).asPageHeading(size = Large),
                 items = Seq(
                     RadioItem(
                         value = Some("true"),
