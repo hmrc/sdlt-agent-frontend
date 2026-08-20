@@ -55,7 +55,8 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
             maybeSummaryList   = None,
             pagination         = None,
             paginationInfoText = None,
-            paginationIndex    = 1
+            paginationIndex    = 1,
+            limitReached       = false
           )
           (request, messages(application)).toString
       }
@@ -128,6 +129,27 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
   }
 
   "AgentOverviewController.onSubmit()" - {
+    "must redirect to management-frontend for a POST when limitReached = true" in new Setup {
+      when(service.getAllAgentDetails(any())(any()))
+        .thenReturn(Future.successful(agents25))
+
+      when(mockConfig.managementAtAGlanceUrl)
+        .thenReturn(testManagementHomePageUrl)
+
+      override val application: Application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service),
+            bind[FrontendAppConfig].toInstance(mockConfig))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, agentOverviewOnSubmitUrl(page = 3))
+        val result = route(application, request).value
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testManagementHomePageUrl
+      }
+    }
     "must return BadRequest and the correct view for a POST when there are no agents with the form has errors" in new Setup {
         when(service.getAllAgentDetails(any())(any()))
           .thenReturn(Future.successful(Nil))
@@ -146,7 +168,8 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
               maybeSummaryList = None,
               pagination = None,
               paginationInfoText = None,
-              paginationIndex = 1
+              paginationIndex = 1,
+              limitReached = false
             )
             (request, messages(application)).toString
         }
@@ -279,6 +302,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
     def startAddAgentRouteUrl: String = controllers.manageAgents.routes.StartAddAgentController.onPageLoad().url
 
     val agents22 = getAgentList(22)
+    val agents25 = getAgentList(25)
 
   }
 }
