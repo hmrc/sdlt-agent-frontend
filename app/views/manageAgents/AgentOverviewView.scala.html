@@ -24,6 +24,7 @@
         govukPagination: GovukPagination,
         govukErrorSummary: GovukErrorSummary,
         govukRadios : GovukRadios,
+        govukNotificationBanner: GovukNotificationBanner,
         p: Paragraph,
         formHelper: FormWithCSRF,
         h1: H1,
@@ -34,14 +35,16 @@
         maybeSummaryList:   Option[SummaryList],
         pagination:         Option[Pagination],
         paginationInfoText: Option[String],
-        paginationIndex:    Int
+        paginationIndex:    Int,
+        limitReached:       Boolean
 )(
         implicit request: Request[_],
         messages: Messages
 )
 
     @layout(
-        pageTitle = titleNoForm(messages("manageAgents.agentOverview.title"))
+        pageTitle = titleNoForm(messages("manageAgents.agentOverview.title")),
+        showBackLink = false
     ) {
 
         @request.flash.get("agentUpdated").map { agentName =>
@@ -54,15 +57,10 @@
             @successNotificationBanner("manageAgents.agentDetails.submitAgent.notification", agentName)
         }
 
-        @request.flash.get("agentsLimitReached").map { _ =>
-            @govukErrorSummary(
-                ErrorSummary(
-                    title = Text(messages("error.summary.title")),
-                    errorList = Seq(
-                        ErrorLink(
-                            content = Text(messages("manageAgents.agentDetails.limitReached"))
-                        )
-                    )
+        @if(limitReached) {
+            @govukNotificationBanner(
+                NotificationBanner(
+                    content = Text(messages("manageAgents.agentDetails.limitReached"))
                 )
             )
         }
@@ -88,24 +86,24 @@
             @{
                 maybeSummaryList match {
                     case Some(summary) => govukSummaryList(summary)
-                    case None => p(messages("manageAgents.agentOverview.noAgents.text"))
+                    case _ => None
                 }
             }
 
             @pagination.map(govukPagination(_))
 
-            @govukRadios(
-                RadiosViewModel.yesNo(
-                    field = form("value"),
-                    legend = LegendViewModel(messages("manageAgents.agentDetails.addAnotherAgent")).asPageSubHeading()
+            @if(!limitReached){
+                @govukRadios(
+                    RadiosViewModel.yesNo(
+                        field = form("value"),
+                        legend = LegendViewModel(messages("manageAgents.agentDetails.addAnotherAgent")).asPageSubHeading()
+                    )
                 )
-            )
+            }
 
             @govukButton(
-                ButtonViewModel(messages("manageAgents.agentDetails.addAgentButtonText"))
-                .withCssClass("govuk-!-margin-top-2")
+                ButtonViewModel(messages("site.continue"))
             )
         }
-
 
 }

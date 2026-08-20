@@ -53,8 +53,9 @@ class AgentOverviewController @Inject()(
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn).map {
-        case Nil              => Ok(view(form, None, None, None, paginationIndex))
+        case Nil              => Ok(view(form, None, None, None, paginationIndex, false))
         case agentDetailsList =>
+          val limitReached = agentDetailsList.length >= 25
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
@@ -64,7 +65,7 @@ class AgentOverviewController @Inject()(
               val pagination:     Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
               val paginationText: Option[String]     = getPaginationInfoText(paginationIndex, agentDetailsList)
 
-              Ok(view(form, Some(summary), pagination, paginationText, paginationIndex))
+              Ok(view(form, Some(summary), pagination, paginationText, paginationIndex, limitReached))
             }
       } recover {
         case ex =>
@@ -73,37 +74,46 @@ class AgentOverviewController @Inject()(
     }
   }
 
-  def onSubmit(paginationIndex: Int):Action[AnyContent] = {
+  def onSubmit(paginationIndex: Int): Action[AnyContent] = {
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          stampDutyLandTaxService.getAllAgentDetails(request.storn).map  {
-            case Nil  => BadRequest(view(formWithErrors,None, None, None, paginationIndex))
-            case agentDetailsList =>
-              generateAgentSummary(paginationIndex, agentDetailsList) match {
-                case None => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
-                case Some(summary) =>
-                  val numberOfPages: Int = getNumberOfPages(agentDetailsList)
-                  val pagination: Option[Pagination] = generatePagination(paginationIndex, numberOfPages)
-                  val paginationText: Option[String] = getPaginationInfoText(paginationIndex, agentDetailsList)
-                  BadRequest(view(formWithErrors, Some(summary), pagination, paginationText, paginationIndex))
-              }
-          }recover {
-            case ex =>
-              logger.error("[AgentOverviewController][onPageLoad] Unexpected failure", ex)
-              Redirect(controllers.routes.SystemErrorController.onPageLoad())
-          }
-        },
-        value =>
-          if(value){
-            Future.successful(Redirect(controllers.manageAgents.routes.StartAddAgentController.onPageLoad()))
-          }
-          else {
-            Future.successful(Redirect(appConfig.managementAtAGlanceUrl))
-          }
-      )
+        stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agentDetailsList =>
+          val limitReached = agentDetailsList.length >= 25
 
+          if (limitReached) {
+            Redirect(appConfig.managementAtAGlanceUrl)
+          } else {
+            form.bindFromRequest().fold(
+              formWithErrors => {
+                agentDetailsList match {
+                  case Nil => BadRequest(view(formWithErrors, None, None, None, paginationIndex, limitReached))
+                  case agentDetailsList =>
+                    generateAgentSummary(paginationIndex, agentDetailsList) match {
+                      case None => Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, request.userAnswers))
+
+                      case Some(summary) =>
+                        val numberOfPages = getNumberOfPages(agentDetailsList)
+                        val pagination = generatePagination(paginationIndex, numberOfPages)
+                        val paginationText =getPaginationInfoText(paginationIndex, agentDetailsList)
+
+                        BadRequest(view(formWithErrors, Some(summary), pagination, paginationText, paginationIndex, limitReached))
+                    }
+                }
+              },
+
+              value =>
+                if (value) {
+                  Redirect(controllers.manageAgents.routes.StartAddAgentController.onPageLoad())
+                } else {
+                  Redirect(appConfig.managementAtAGlanceUrl)
+                }
+            )
+          }
+        }.recover {
+          case ex =>
+            logger.error("[AgentOverviewController][onSubmit] Unexpected failure", ex)
+            Redirect(controllers.routes.SystemErrorController.onPageLoad())
+        }
     }
   }
 }
