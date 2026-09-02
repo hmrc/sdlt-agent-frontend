@@ -33,7 +33,7 @@ class ConfirmAgentContactDetailsFormProviderSpec extends BooleanFieldBehaviours 
 
   val formProvider = new ConfirmAgentContactDetailsFormProvider()
 
-  val form = formProvider()
+  val form = formProvider(agentName)
  
   ".value" - {
 

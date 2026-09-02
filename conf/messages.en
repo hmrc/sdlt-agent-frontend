@@ -97,7 +97,7 @@ systemError.heading     = Sorry, there is a problem with this service
 systemError.paragraph1  = Try again later or contact the
 systemError.link        = HMRC Online Services Helpdesk
 
-manageAgents.confirmAgentContactDetails.error.required = Confirm that you want to add agent contact details
+manageAgents.confirmAgentContactDetails.error.required = Select yes if you want to add contact details for {0}
 manageAgents.confirmAgentContactDetails.title = Do you want to add contact details for the agent? – Manage agents
 manageAgents.confirmAgentContactDetails.heading = Do you want to add contact details for {0}?
 manageAgents.confirmAgentContactDetails.hint = We’ll only use these details to contact {0} about this return
@@ -127,7 +127,7 @@ manageAgents.agentName.tip = Include the branch name if there are multiple offic
 manageAgents.agentName.button = Continue
 manageAgents.removeAgent.title = Are you sure you want to remove this agent? – Manage agents
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?
-manageAgents.removeAgent.error.required = Confirm that you want to remove {0}
+manageAgents.removeAgent.error.required = Select yes if you want to remove {0}
 
 manageAgents.agentOverview.noAgents.info.text       = You have no agents listed. Any agents can be linked to a purchaser within ‘About the purchaser’s agent’.
 manageAgents.agentOverview.nonZeroAgents.info.text  = You can add up to 25 agents. Link an agent to a purchaser within ‘About the purchaser’s agent’.

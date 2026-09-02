@@ -18,13 +18,14 @@ package forms.manageAgents
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.i18n.Messages
 
 import javax.inject.Inject
 
 class ConfirmAgentContactDetailsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(agentName: String)(implicit messages: Messages): Form[Boolean] =
     Form(
-      "value" -> boolean("manageAgents.confirmAgentContactDetails.error.required")
+      "value" -> boolean(messages("manageAgents.confirmAgentContactDetails.error.required", agentName))
     )
 }

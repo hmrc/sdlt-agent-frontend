@@ -42,12 +42,15 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
   trait Fixture {
     val agentName = "John Doe"
 
+    val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
+
+    val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
+    implicit val messages: Messages = messagesApi.preferred(FakeRequest())
+
     val formProvider = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[Boolean] = formProvider()
+    val form: Form[Boolean] = formProvider(agentName)(messages)
 
     val agentContactDetails: AgentContactDetails = AgentContactDetails(Some("phone"), Some("email"))
-
-    val application: Application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(AgentNamePage, agentName).success.value)).build()
 
     def noOnwardRoute: Call = Call("GET", "/stamp-duty-land-tax-agent/manage-agents/check-answers")
 
@@ -63,13 +66,8 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
 
     val journeyRecoveryRoute: String = controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-    val messagesApi: MessagesApi = application.injector.instanceOf[MessagesApi]
-    implicit val messages: Messages = messagesApi.preferred(FakeRequest())
-
     lazy val confirmAgentContactDetailsRoute: String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onPageLoad(NormalMode).url
     def confirmAgentContactDetailsOnSubmitRoute(mode: Mode): String = controllers.manageAgents.routes.ConfirmAgentContactDetailsController.onSubmit(mode).url
-    
-
   }
 
   "ConfirmAgentContactDetailsController" - {
@@ -100,7 +98,7 @@ class ConfirmAgentContactDetailsControllerSpec extends SpecBase with MockitoSuga
         
         val agentName = userAnswersWithAgentContactDetails.get(AgentNamePage).get
         
-        val form = formProvider()
+        val form = formProvider(agentName)
         
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form.fill(true), agentName, NormalMode)(request, messages).toString
