@@ -50,7 +50,7 @@ class ConfirmAgentContactDetailsController @Inject()(
                                                       view: ConfirmAgentContactDetailsView
                                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
   
-  val form: Form[Boolean] = formProvider()
+
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       stampDutyLandTaxService.getAgentName match {
@@ -58,6 +58,7 @@ class ConfirmAgentContactDetailsController @Inject()(
           logError(s"Couldn't find agent in user answers: $error")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Right(agentName) =>
+          val form: Form[Boolean] = formProvider(agentName)
           val preparedForm = request.userAnswers.get(ConfirmAgentContactDetailsPage) match  {
             case None => form
             case Some(value) => form.fill(value)
@@ -70,6 +71,7 @@ class ConfirmAgentContactDetailsController @Inject()(
     implicit request =>
       stampDutyLandTaxService.getAgentName match {
         case Right(agentName) =>
+          val form: Form[Boolean] = formProvider(agentName)
           form.bindFromRequest().fold(
             formWithErrors =>
               Future.successful(BadRequest(view(formWithErrors, agentName, mode))),

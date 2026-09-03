@@ -57,21 +57,19 @@ class ConfirmAgentContactDetailsViewSpec extends SpecBase with ViewSpecBase {
 
       displaysErrorSummary(
         doc,
-        Seq(
-          "manageAgents.confirmAgentContactDetails.error.required",
-        )
+        Seq("manageAgents.confirmAgentContactDetails.error.required")
       )
     }
   }
 
   trait Setup {
     val app: Application                     = applicationBuilder().build()
+    val testAgentName                        = "Haborview Estates"
     val formProvider                         = new ConfirmAgentContactDetailsFormProvider()
-    val form: Form[Boolean]                  = formProvider()
+    val form: Form[Boolean]                  = formProvider(testAgentName)
     implicit def request: Request[?]         = FakeRequest()
     implicit def messages: Messages          = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: ConfirmAgentContactDetailsView = app.injector.instanceOf[ConfirmAgentContactDetailsView]
-    val testAgentName                        = "Haborview Estates"
   }
 }
 
