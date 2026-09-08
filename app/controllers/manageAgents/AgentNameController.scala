@@ -19,8 +19,9 @@ package controllers.manageAgents
 import controllers.actions.*
 import forms.manageAgents.AgentNameFormProvider
 import models.Mode
+import models.manageAgents.AgentName
 import navigation.Navigator
-import pages.manageAgents.{AgentAddressPage, AgentNameDuplicateWarningPage, AgentNamePage}
+import pages.manageAgents.{AgentAddressPage, AgentNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -47,31 +48,28 @@ class AgentNameController@Inject()(
                                     navigator: Navigator
                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  lazy val form: Form[String] = formProvider()
+  lazy val form: Form[AgentName] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction) { implicit request =>
-
-    val preparedForm = request.userAnswers.get(AgentNamePage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+    request.userAnswers.get(AgentNamePage) match {
+      case None        => Ok(view(form, mode, false))
+      case Some(value) => Ok(view(form.fill(AgentName(value)), mode, false))
+      }
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
-    
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value =>
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode, false))),
+        agentName =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, value))
-            isDuplicate    <- stampDutyLandTaxService.isDuplicate(request.storn, value)
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AgentNamePage, agentName.value))
+            isDuplicate    <- stampDutyLandTaxService.isDuplicate(request.storn, agentName.value)
             _              <- sessionRepository.set(updatedAnswers)
-          } yield if (isDuplicate) {
-            Redirect(navigator.nextPage(AgentNameDuplicateWarningPage, mode, updatedAnswers))
+          } yield if (isDuplicate && !agentName.continueAnyway) {
+            Ok(view(form.fill(AgentName(agentName.value)), mode, true))
           } else {
             Redirect(navigator.nextPage(AgentAddressPage, mode, updatedAnswers))
           }

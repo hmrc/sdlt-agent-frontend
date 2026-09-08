@@ -25,10 +25,6 @@ GET         /manage-agents/agent-name                    controllers.manageAgent
 POST        /manage-agents/agent-name                     controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = NormalMode)
 GET         /manage-agents/change-agent-name              controllers.manageAgents.AgentNameController.onPageLoad(mode: Mode = CheckMode)
 POST        /manage-agents/change-agent-name              controllers.manageAgents.AgentNameController.onSubmit(mode: Mode = CheckMode)
-GET         /manage-agents/agent-name-warning            controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = NormalMode)
-POST        /manage-agents/agent-name-warning            controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = NormalMode)
-GET         /manage-agents/change-agent-name-warning      controllers.manageAgents.WarningAgentNameController.onPageLoad(mode: Mode = CheckMode)
-POST        /manage-agents/change-agent-name-warning      controllers.manageAgents.WarningAgentNameController.onSubmit(mode: Mode = CheckMode)
 
 GET         /manage-agents/find-address                  controllers.manageAgents.AddressLookupController.onPageLoad(mode: Mode = NormalMode)
 GET         /manage-agents/address-lookup                controllers.manageAgents.AddressLookupController.onSubmit(mode: Mode = NormalMode)

@@ -42,11 +42,6 @@ class NavigatorSpec extends SpecBase {
           controllers.manageAgents.routes.AgentNameController.onPageLoad(NormalMode)
       }
 
-      "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(NormalMode)" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, NormalMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(NormalMode)
-      }
-
       "must go from AgentAddressPage to AddressLookupController.onPageLoad(NormalMode)" in {
         navigator.nextPage(AgentAddressPage, NormalMode, UserAnswers("id")) mustBe
           controllers.manageAgents.routes.AddressLookupController.onPageLoad(NormalMode)
@@ -82,10 +77,6 @@ class NavigatorSpec extends SpecBase {
         val userAnswersWithArn = emptyUserAnswers.set(AgentReferenceNumberPage, "arn").success.value
         navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, userAnswersWithArn) mustBe
           controllers.manageAgents.routes.CheckYourAnswersController.onPageLoad(Some("arn"))
-      }
-      "must go from AgentNameDuplicateWarningPage to WarningAgentNameController.onPageLoad(CheckMode) in Check mode" in {
-        navigator.nextPage(AgentNameDuplicateWarningPage, CheckMode, UserAnswers("id")) mustBe
-          controllers.manageAgents.routes.WarningAgentNameController.onPageLoad(CheckMode)
       }
 
       "must go from AgentContactDetailsPage to AgentContactDetailsController.onPageLoad(CheckMode) in Check mode" in {

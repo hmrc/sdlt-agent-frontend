@@ -1,0 +1,50 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+        govukWarningText : GovukWarningText
+)
+
+@(
+        field: Field,
+        label: String,
+        hint: String,
+        warningText: String,
+        showWarning: Boolean
+)(implicit messages: Messages)
+
+<div class="govuk-form-group">
+ <h1 class="govuk-label-wrapper">
+  <label class="govuk-label govuk-label--l" for="@field.id">
+   @messages(label)
+  </label>
+ </h1>
+
+ @if(showWarning) {
+  @govukWarningText(WarningText(
+   iconFallbackText = Some("Warning"),
+   content = Text(messages(warningText))
+  ))
+ }
+
+ <div id="@field.id-hint" class="govuk-hint govuk-!-margin-top-6 govuk-body-s">
+  @messages(hint)
+ </div>
+
+ <input class="govuk-input" id="@field.id" name="@field.name" type="text" value="@field.value" aria-describedby="@field.id-hint" autocomplete="off">
+</div>
+
+
