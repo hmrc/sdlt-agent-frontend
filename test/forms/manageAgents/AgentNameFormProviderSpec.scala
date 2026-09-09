@@ -17,6 +17,7 @@
 package forms.manageAgents
 
 import forms.behaviours.StringFieldBehaviours
+import models.manageAgents.AgentName
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -25,29 +26,37 @@ class AgentNameFormProviderSpec extends StringFieldBehaviours with GuiceOneServe
 
   implicit val messages: Messages = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
 
-  val form: Form[String] = new AgentNameFormProvider()()
-
+  val form: Form[AgentName] = new AgentNameFormProvider()()
 
   "AgentNameFormProvider" - {
 
     "must bind valid agent name" in {
-      val result = form.bind(Map("value" -> "Agent Name"))
+      val result = form.bind(Map(
+        "value" -> "Agent Name",
+        "continueAnyway" -> "false"
+      ))
 
       result.errors mustBe empty
-      result.value mustBe Some("Agent Name")
+      result.value mustBe Some(AgentName("Agent Name"))
     }
     "must bind valid agentName with all the special characters 12345&@/.-? " in {
-      val result = form.bind(Map("value" -> "Agent, Name12345&@/.-?"))
+      val result = form.bind(Map(
+        "value" -> "Agent, Name12345&@/.-?",
+        "continueAnyway" -> "false"
+      ))
 
       result.errors mustBe empty
-      result.value mustBe Some("Agent, Name12345&@/.-?")
+      result.value mustBe Some(AgentName("Agent, Name12345&@/.-?"))
     }
 
     "must bind valid agentName with all the special characters !%()*+:=[]^_{}; " in {
-      val result = form.bind(Map("value" -> "Agent, Name!%()*+:=[]^_{};"))
+      val result = form.bind(Map(
+        "value" -> "Agent, Name!%()*+:=[]^_{};",
+        "continueAnyway" -> "false"
+      ))
 
       result.errors mustBe empty
-      result.value mustBe Some("Agent, Name!%()*+:=[]^_{};")
+      result.value mustBe Some(AgentName("Agent, Name!%()*+:=[]^_{};"))
     }
 
     "must reject invalid character # " in {
@@ -90,6 +99,5 @@ class AgentNameFormProviderSpec extends StringFieldBehaviours with GuiceOneServe
       result.errors.map(_.message) must contain("manageAgents.agentName.error.length")
     }
   }
-
 
 }

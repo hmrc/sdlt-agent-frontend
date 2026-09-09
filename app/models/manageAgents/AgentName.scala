@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages.manageAgents
+package models.manageAgents
 
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-
-case object AgentNameDuplicateWarningPage extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "agentNameDuplicate"
-}
+case class AgentName(
+                      value: String,
+                      continueAnyway: Boolean = false
+                    )

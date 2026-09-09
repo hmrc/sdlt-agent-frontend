@@ -35,7 +35,7 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
   "AgentNameView" - {
 
     "must render the page with correct html elements" in new Setup {
-      val html: Html = view(form, NormalMode)
+      val html: Html = view(form, NormalMode, false)
       val doc: Document = Jsoup.parse(html.toString())
       val heading = doc.select("h1.govuk-label-wrapper")
       val caption = doc.select("h2.govuk-caption-l").first()
@@ -43,12 +43,21 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
 
       heading.text() mustBe messages("manageAgents.agentName.heading")
       caption.ownText() mustBe messages("manageAgents.caption")
-      hint.text() mustBe messages("manageAgents.agentName.tip")
+      hint.text() mustBe messages("manageAgents.agentName.hint")
 
       displaysCorrectTitle(doc, "manageAgents.agentName.title")
       hasCorrectNumOfItems(doc, "input", 1)
       hasSubmitButton(doc, "site.continue")
       hasBackLink(doc)
+    }
+
+    "must render the warning when duplicate is true" in new Setup {
+      val html: Html = view(form, NormalMode, true)
+      val doc: Document = Jsoup.parse(html.toString())
+
+      val warning = doc.select("strong.govuk-warning-text__text")
+
+      warning.text() mustBe s"Warning ${messages("manageAgents.agentName.warning")}"
     }
 
     "must display error messages when form has errors" in new Setup {
@@ -57,7 +66,7 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
         .withError("value", "manageAgents.agentName.error.invalid")
         .withError("value", "manageAgents.agentName.error.length")
 
-      val html: Html = view(errorForm, NormalMode)
+      val html: Html = view(errorForm, NormalMode, false)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysErrorSummary(
@@ -80,4 +89,3 @@ class AgentNameViewSpec extends SpecBase with ViewSpecBase {
     val view: AgentNameView          = app.injector.instanceOf[AgentNameView]
   }
 }
-

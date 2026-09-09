@@ -14,20 +14,19 @@
  * limitations under the License.
  *@
 
-@import viewmodels.InputWidth.*
-@import views.html.components.Caption
+@import views.html.components.{Caption, InputWithMaybeWarning}
 @import viewmodels.LabelSize.Large
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
-        govukInput: GovukInput,
         govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
-        caption: Caption
+        caption: Caption,
+        inputWithMaybeWarning: InputWithMaybeWarning
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, showDuplicateWarning: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("manageAgents.agentName.title"))) {
 
@@ -39,18 +38,27 @@
 
         @caption(messages("manageAgents.caption"), "govuk-caption-l")
 
-        @govukInput(
-            InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("manageAgents.agentName.heading")).asPageHeading(size = Large)
-            )
-            .withHint(HintViewModel(HtmlContent(Html(messages("manageAgents.agentName.tip"))))
-            .withCssClass("govuk-!-margin-top-6 govuk-body-s"))
-            .withAutocomplete("off")
+        @inputWithMaybeWarning(
+            form("value"),
+            "manageAgents.agentName.heading",
+            "manageAgents.agentName.hint",
+            "manageAgents.agentName.warning",
+            showDuplicateWarning
         )
 
-        @govukButton(Button(
-            content = Text(messages("manageAgents.agentName.button"))
-        ))
+        @if(showDuplicateWarning){
+            @govukButton(Button(
+                content = Text(messages("manageAgents.agentName.button")),
+                name    = Some("continueAnyway"),
+                value   = Some("true")
+            ))
+        } else {
+            @govukButton(Button(
+                content = Text(messages("manageAgents.agentName.button")),
+                name    = Some("continueAnyway"),
+                value   = Some("false")
+            ))
+        }
+
     }
 }

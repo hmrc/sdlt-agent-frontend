@@ -18,6 +18,7 @@ package controllers.manageAgents
 
 import base.SpecBase
 import forms.manageAgents.AgentNameFormProvider
+import models.manageAgents.AgentName
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -37,7 +38,7 @@ import scala.concurrent.Future
 class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetailsTestUtil {
 
   val formProvider = new AgentNameFormProvider()
-  val form: Form[String] = formProvider()
+  val form: Form[AgentName] = formProvider()
 
   val service: StampDutyLandTaxService = mock[StampDutyLandTaxService]
 
@@ -58,7 +59,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
         val view = application.injector.instanceOf[AgentNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, false)(request, messages(application)).toString
       }
     }
 
@@ -67,6 +68,9 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
       val userAnswers = UserAnswers(userAnswersId)
         .set(AgentNamePage, "Test Agent Name").success.value
         .set(StornPage, testStorn).success.value
+
+      when(service.isDuplicate(any(), any())(any()))
+        .thenReturn(Future.successful(false))
 
       val application =
         applicationBuilder(userAnswers = Some(userAnswers))
@@ -83,31 +87,38 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("Test Agent Name"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(AgentName("Test Agent Name")), NormalMode, false)(request, messages(application)).toString
       }
     }
 
-    "must redirect to the warning page when Agent name already exists" in {
+    "must populate the view correctly on a POST when Agent name already exists" in {
 
-      when(service.isDuplicate(any(),any())(any()))
+      val userAnswers = UserAnswers(userAnswersId)
+        .set(StornPage, testStorn).success.value
+
+      when(service.isDuplicate(any(), any())(any()))
         .thenReturn(Future.successful(true))
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[StampDutyLandTaxService].toInstance(service),
-            bind[Navigator].toInstance(new FakeNavigator(AgentNamePageUtils.agentNameDuplicateNameRoute(NormalMode)))
+            bind[StampDutyLandTaxService].toInstance(service)
           )
           .build()
 
       running(application) {
         val request = FakeRequest(POST, agentNameRequestRoute)
-          .withFormUrlEncodedBody(("value", "Duplicate Agent Name"))
+          .withFormUrlEncodedBody(
+            ("value", "Test Agent Name"),
+            ("continueAnyway", "false")
+          )
+
+        val view = application.injector.instanceOf[AgentNameView]
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AgentNamePageUtils.agentNameDuplicateNameRoute(NormalMode).url
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill(AgentName("Test Agent Name")), NormalMode, true)(request, messages(application)).toString
       }
     }
 
@@ -127,7 +138,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, false)(request, messages(application)).toString
       }
     }
 
@@ -160,6 +171,7 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
+
     "must redirect to the next page (address) when Agent name does not already exist" in {
 
       when(service.isDuplicate(any(), any())(any()))
@@ -175,7 +187,37 @@ class AgentNameControllerSpec extends SpecBase with MockitoSugar with AgentDetai
 
       running(application) {
         val request = FakeRequest(POST, agentNameRequestRoute)
-          .withFormUrlEncodedBody(("value", "Unique Agent Name"))
+          .withFormUrlEncodedBody(
+            ("value", "Unique Agent Name"),
+            ("continueAnyway", "false")
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual AgentNamePageUtils.agentNameOnwardRoute(NormalMode).url
+      }
+    }
+
+    "must redirect to the next page (address) when Agent name does already exist and continue anyway is true" in {
+
+      when(service.isDuplicate(any(), any())(any()))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(
+            bind[StampDutyLandTaxService].toInstance(service),
+            bind[Navigator].toInstance(new FakeNavigator(AgentNamePageUtils.agentNameOnwardRoute(NormalMode)))
+          )
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, agentNameRequestRoute)
+          .withFormUrlEncodedBody(
+            ("value", "Unique Agent Name"),
+            ("continueAnyway", "true")
+          )
 
         val result = route(application, request).value
 

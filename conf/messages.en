@@ -123,7 +123,7 @@ manageAgents.agentName.warning = This agent name already exists, are you sure yo
 
 manageAgents.agentName.title = What is the agent’s name? – Manage agents
 manageAgents.agentName.heading = What is the agent’s name?
-manageAgents.agentName.tip = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds
+manageAgents.agentName.hint = Include the branch name if there are multiple office locations, for example, Jones & Co, Leeds
 manageAgents.agentName.button = Continue
 manageAgents.removeAgent.title = Are you sure you want to remove this agent? – Manage agents
 manageAgents.removeAgent.heading = Are you sure you want to remove {0}?

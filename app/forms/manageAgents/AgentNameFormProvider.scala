@@ -18,17 +18,23 @@ package forms.manageAgents
 
 import javax.inject.Inject
 import forms.mappings.Mappings
+import models.manageAgents.AgentName
 import play.api.data.Form
+import play.api.data.Forms.mapping
 
 class AgentNameFormProvider @Inject() extends Mappings {
 
   private val agentNameRegex = "^[A-Za-z0-9 ~!@%&'()*+,\\-./:=?\\[\\]^_{}};]+$"
   private val maxAgentNameLength = 28
 
-  def apply(): Form[String] =
+  def apply(): Form[AgentName] = {
     Form(
-      "value" -> text("manageAgents.agentName.error.required")
-        .verifying(regexp(agentNameRegex, "manageAgents.agentName.error.invalid"))
-        .verifying(maxLength(maxAgentNameLength, "manageAgents.agentName.error.length"))
+      mapping(
+        "value" -> text("manageAgents.agentName.error.required")
+          .verifying(regexp(agentNameRegex, "manageAgents.agentName.error.invalid"))
+          .verifying(maxLength(maxAgentNameLength, "manageAgents.agentName.error.length")),
+        "continueAnyway" -> boolean()
+      )(AgentName.apply)(agentName => Some((agentName.value, agentName.continueAnyway)))
     )
+  }
 }

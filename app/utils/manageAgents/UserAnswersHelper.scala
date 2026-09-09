@@ -32,13 +32,12 @@ trait UserAnswersHelper {
   def updateUserAnswers(agentDetails: CreatedAgent)
                        (implicit request: DataRequest[_]): Try[UserAnswers] = {
     for {
-      userAnswersOne <- request.userAnswers.remove(AgentNameDuplicateWarningPage)
-      userAnswersTwo <- userAnswersOne.set(AgentNamePage, agentDetails.name)
+      userAnswersOne <- request.userAnswers.set(AgentNamePage, agentDetails.name)
       addressLines = Seq(agentDetails.address1, agentDetails.address2.getOrElse(""), agentDetails.address3.getOrElse(""), agentDetails.address4.getOrElse(""))
-      userAnswersThree <- userAnswersTwo.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
-      userAnswersFour <- userAnswersThree.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
-      userAnswersFive <- userAnswersFour.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
-    } yield userAnswersFive
+      userAnswersTwo <- userAnswersOne.set(AgentAddressPage, JourneyResultAddressModel("", Address(addressLines, agentDetails.postcode)))
+      userAnswersThree <- userAnswersTwo.set(AgentContactDetailsPage, AgentContactDetails(agentDetails.phone, agentDetails.email))
+      userAnswersFour <- userAnswersThree.set(AgentReferenceNumberPage, agentDetails.agentResourceReference)
+    } yield userAnswersFour
   }
 
   // Attempt to extract agentName from request.userAnswer
