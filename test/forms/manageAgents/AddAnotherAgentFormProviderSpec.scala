@@ -18,11 +18,13 @@ package forms.manageAgents
 
 import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
+import utils.manageAgents.AgentDetailsTestUtil
 
 
-class AddAnotherAgentFormProviderSpec extends BooleanFieldBehaviours{
-  
-  val formProvider = new AddAnotherAgentFormProvider()()
+class AddAnotherAgentFormProviderSpec extends BooleanFieldBehaviours with AgentDetailsTestUtil {
+
+  val agents22     = getAgentList(22)
+  val formProvider = new AddAnotherAgentFormProvider()(agents22)
   
   val requiredKey = "manageAgents.agentOverview.error.required"
   val invalidKey = "error.boolean"
