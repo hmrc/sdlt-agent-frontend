@@ -61,7 +61,6 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
 
       "selectPageConfig" -> JsObject(
         Seq(
-          "proposalListLimit" -> JsNumber(30),
           "showSearchLinkAgain" -> JsBoolean(true)
         )
       ),
