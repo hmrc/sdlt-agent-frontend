@@ -38,34 +38,35 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
   "AgentOverviewView" - {
 
     "must render the page with correct core html elements" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, false)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, false)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectTitle(doc, "manageAgents.agentOverview.title")
       displaysCorrectHeading(doc, "manageAgents.agentDetails.heading")
       displaysCorrectCaption(doc, "manageAgents.caption")
-      displaysCorrectSubHeading(doc, "manageAgents.agentDetails.addAnotherAgent")
       displaysCorrectLabels(doc, Seq("site.yes", "site.no"))
       hasSubmitButton(doc, "site.continue")
     }
 
     "must render the correct html elements when there are no agents" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, false)
+      val html: Html = view(formNoAgents, None, None, None, paginationIndex, false)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, false)
       paginationDoesNotExist(doc)
+      displaysCorrectSubHeading(doc, "manageAgents.agentDetails.addAnotherAgent.noAgents")
     }
 
     "must render the correct html elements when there are more than 0 but less than 11 agents" in new Setup {
       private val sevenAgents = getAgentList(7)
       private val agentSummary = generateAgentSummary(1, sevenAgents)
 
-      val html: Html = view(form, agentSummary, None, None, paginationIndex, false)
+      val html: Html = view(formAgents, agentSummary, None, None, paginationIndex, false)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, true)
       displaysSummaryListWithCorrectRowsAndValues(doc, sevenAgents)
+      displaysCorrectSubHeading(doc, "manageAgents.agentDetails.addAnotherAgent")
       paginationDoesNotExist(doc)
     }
 
@@ -75,12 +76,13 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
       private val pagination = generatePagination(1, 3)
       private val paginationText = getPaginationInfoText(1, twentyTwoAgents)
 
-      val html: Html = view(form, agentSummary, pagination, paginationText, paginationIndex, false)
+      val html: Html = view(formAgents, agentSummary, pagination, paginationText, paginationIndex, false)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysCorrectInfoText(doc, true)
       displaysCorrectPaginationInfoText(doc, twentyTwoAgents.size)
       displaysSummaryListWithCorrectRowsAndValues(doc, twentyTwoAgents)
+      displaysCorrectSubHeading(doc, "manageAgents.agentDetails.addAnotherAgent")
       paginationExistsAndDisplaysCorrectly(doc)
     }
 
@@ -91,7 +93,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
           .withFlash("agentRemoved" -> messages("manageAgents.agentDetails.removeAgent.notification", "testName"))
           .withFlash("agentCreated" -> messages("manageAgents.agentDetails.submitAgent.notification", "testName"))
 
-      val html: Html = view(form, None, None, None, paginationIndex, false)(requestWithFlash, messages)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, false)(requestWithFlash, messages)
       val doc: Document = Jsoup.parse(html.toString())
 
       displaysFlashes(
@@ -105,7 +107,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     }
 
     "must render the page with notification banner when agent limit is reached" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, true)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, true)
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
 
       val notificationBanner: Elements = doc.select(".govuk-notification-banner")
@@ -114,7 +116,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     }
 
     "must not render the page with notification banner when agent limit is not reached" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, false)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, false)
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
 
       val notificationBanner: Elements = doc.select(".govuk-notification-banner")
@@ -123,24 +125,32 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     }
 
     "must render the add another agent radios when the limit has not been reached" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, false)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, false)
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("input[name='value']") must not be empty
     }
 
     "must not render the add another agent radios when the limit has been reached" in new Setup {
-      val html: Html = view(form, None, None, None, paginationIndex, true)
+      val html: Html = view(formAgents, None, None, None, paginationIndex, true)
       val doc: Document = org.jsoup.Jsoup.parse(html.toString())
 
       doc.select("input[name='value']") mustBe empty
     }
 
-    "must render the error summary when no Yes or No option is not selected for Do you want to add agent?" in new Setup {
-      val formWithErrors: Form[Boolean] = form.bind(Map.empty[String, String])
+    "must render the error summary correctly when radio buttons are not selected and there are no agents" in new Setup {
+      val formWithErrors: Form[Boolean] = formNoAgents.bind(Map.empty[String, String])
       val html: Html = view(formWithErrors, None, None, None, paginationIndex, false)
       val doc:Document = Jsoup.parse(html.toString())
       
+      displaysErrorSummary(doc, Seq("manageAgents.agentOverview.error.required.noAgents"))
+    }
+
+    "must render the error summary correctly when radio buttons are not selected and there are agents" in new Setup {
+      val formWithErrors: Form[Boolean] = formAgents.bind(Map.empty[String, String])
+      val html: Html = view(formWithErrors, None, None, None, paginationIndex, false)
+      val doc: Document = Jsoup.parse(html.toString())
+
       displaysErrorSummary(doc, Seq("manageAgents.agentOverview.error.required"))
     }
   }
@@ -151,7 +161,8 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     implicit def messages: Messages  = play.api.i18n.MessagesImpl(play.api.i18n.Lang.defaultLang, app.injector.instanceOf[play.api.i18n.MessagesApi])
     val view: AgentOverviewView      = app.injector.instanceOf[AgentOverviewView]
     val formProvider                 = new AddAnotherAgentFormProvider()
-    val form: Form[Boolean]          = formProvider()
+    val formNoAgents: Form[Boolean]  = formProvider(Nil)
+    val formAgents: Form[Boolean]    = formProvider(getAgentList(22))
     val paginationIndex              = 1
   }
 

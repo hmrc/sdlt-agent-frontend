@@ -96,7 +96,9 @@
                 @govukRadios(
                     RadiosViewModel.yesNo(
                         field = form("value"),
-                        legend = LegendViewModel(messages("manageAgents.agentDetails.addAnotherAgent")).asPageSubHeading()
+                        legend = LegendViewModel(
+                            if(maybeSummaryList) messages("manageAgents.agentDetails.addAnotherAgent") else messages("manageAgents.agentDetails.addAnotherAgent.noAgents")
+                        ).asPageSubHeading()
                     )
                 )
             }

@@ -285,7 +285,7 @@ class AgentOverviewControllerSpec extends SpecBase with MockitoSugar with AgentD
         .overrides(bind[StampDutyLandTaxService].toInstance(service))
         .build()
 
-    val formProvider = new AddAnotherAgentFormProvider()()
+    val formProvider = new AddAnotherAgentFormProvider()(Nil)
 
     val formWithErrors: Form[Boolean] = formProvider.bind(Map.empty[String, String])
 

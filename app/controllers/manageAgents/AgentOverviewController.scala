@@ -33,7 +33,7 @@ import utils.PaginationHelper
 import views.html.manageAgents.AgentOverviewView
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class AgentOverviewController @Inject()(
@@ -48,14 +48,17 @@ class AgentOverviewController @Inject()(
                                          view: AgentOverviewView
                                       )(implicit executionContext: ExecutionContext, appConfig:FrontendAppConfig) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
 
-  val form: Form[Boolean] = addAgentFormProvider()
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     stampDutyLandTaxService
       .getAllAgentDetails(request.storn).map {
-        case Nil              => Ok(view(form, None, None, None, paginationIndex, false))
+        case Nil              =>
+          val form: Form[Boolean] = addAgentFormProvider(Nil)
+
+          Ok(view(form, None, None, None, paginationIndex, false))
         case agentDetailsList =>
-          val limitReached = agentDetailsList.length >= 25
+          val form: Form[Boolean] = addAgentFormProvider(agentDetailsList)
+          val limitReached        = agentDetailsList.length >= 25
 
           generateAgentSummary(paginationIndex, agentDetailsList)
             .fold(
@@ -78,7 +81,8 @@ class AgentOverviewController @Inject()(
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
 
         stampDutyLandTaxService.getAllAgentDetails(request.storn).map { agentDetailsList =>
-          val limitReached = agentDetailsList.length >= 25
+          val limitReached        = agentDetailsList.length >= 25
+          val form: Form[Boolean] = addAgentFormProvider(agentDetailsList)
 
           if (limitReached) {
             Redirect(appConfig.managementAtAGlanceUrl)

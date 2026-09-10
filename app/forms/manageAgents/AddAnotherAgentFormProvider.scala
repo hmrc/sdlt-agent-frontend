@@ -17,15 +17,18 @@
 package forms.manageAgents
 
 import forms.mappings.Mappings
+import models.responses.organisation.CreatedAgent
 import play.api.data.Form
 
 import javax.inject.Inject
 
 class AddAnotherAgentFormProvider @Inject extends Mappings{
   
-  def apply(): Form[Boolean]= {
+  def apply(agents: Seq[CreatedAgent]): Form[Boolean]= {
+    val errorKey = if(agents.nonEmpty) "manageAgents.agentOverview.error.required" else "manageAgents.agentOverview.error.required.noAgents"
+    
     Form(
-      "value" -> boolean("manageAgents.agentOverview.error.required")
+      "value" -> boolean(errorKey)
     )
   }
 
