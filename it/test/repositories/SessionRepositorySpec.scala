@@ -1,21 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +17,9 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import models.{UserAnswers, UserAnswersEncrypted}
 import org.mockito.Mockito.when
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import org.scalactic.source.Position
 import org.scalatest.OptionValues
@@ -44,18 +29,19 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.slf4j.MDC
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.dispatchers.MDCPropagatingExecutorService
 
-import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, ZoneId}
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 
 class SessionRepositorySpec
   extends AnyFreeSpec
     with Matchers
-    with DefaultPlayMongoRepositorySupport[UserAnswers]
+    with DefaultPlayMongoRepositorySupport[UserAnswersEncrypted]
     with ScalaFutures
     with IntegrationPatience
     with OptionValues
@@ -67,6 +53,9 @@ class SessionRepositorySpec
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
+  private implicit val crypto: Encrypter with Decrypter =
+    SymmetricCryptoFactory.aesGcmCrypto("z9WMSuFsHqfY5F2wgIcEvcnwyRTRB4dyPWfMbCbCXfM=")
+
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
@@ -75,8 +64,15 @@ class SessionRepositorySpec
   protected override val repository: SessionRepository = new SessionRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
-    clock          = stubClock
+    clock          = stubClock,
+    crypto         = crypto
   )
+
+  private def rawDocument(id: String): Future[Option[BsonDocument]] =
+    mongoComponent.database
+      .getCollection[BsonDocument]("user-answers")
+      .find(Filters.equal("_id", id))
+      .headOption()
 
   ".set" - {
 
@@ -87,7 +83,42 @@ class SessionRepositorySpec
       repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-      updatedRecord mustEqual expectedResult
+      updatedRecord.toUserAnswers mustEqual expectedResult
+    }
+
+    "must store the data field as an encrypted string" in {
+
+      repository.set(userAnswers).futureValue
+
+      val document = rawDocument(userAnswers.id).futureValue.value
+
+      document.get("data").isString mustBe true
+    }
+
+    "must not write the plaintext data to the database" in {
+
+      repository.set(userAnswers).futureValue
+
+      val raw = rawDocument(userAnswers.id).futureValue.value.toJson
+
+      raw must not include "foo"
+      raw must not include "bar"
+    }
+
+    "must leave the id in plaintext" in {
+
+      repository.set(userAnswers).futureValue
+
+      rawDocument(userAnswers.id).futureValue.value.getString("_id").getValue mustEqual "id"
+    }
+
+    "must read back what it wrote" in {
+
+      repository.set(userAnswers).futureValue
+
+      val result = repository.get(userAnswers.id).futureValue
+
+      result.value.data mustEqual Json.obj("foo" -> "bar")
     }
 
     mustPreserveMdc(repository.set(userAnswers))
@@ -99,7 +130,7 @@ class SessionRepositorySpec
 
       "must update the lastUpdated time and get the record" in {
 
-        insert(userAnswers).futureValue
+        insert(UserAnswersEncrypted.fromUserAnswers(userAnswers)).futureValue
 
         val result         = repository.get(userAnswers.id).futureValue
         val expectedResult = userAnswers copy (lastUpdated = instant)
@@ -123,7 +154,7 @@ class SessionRepositorySpec
 
     "must remove a record" in {
 
-      insert(userAnswers).futureValue
+      insert(UserAnswersEncrypted.fromUserAnswers(userAnswers)).futureValue
 
       repository.clear(userAnswers.id).futureValue
 
@@ -145,14 +176,23 @@ class SessionRepositorySpec
 
       "must update its lastUpdated to `now` and return true" in {
 
-        insert(userAnswers).futureValue
+        insert(UserAnswersEncrypted.fromUserAnswers(userAnswers)).futureValue
 
         repository.keepAlive(userAnswers.id).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
-        updatedAnswers mustEqual expectedUpdatedAnswers
+        updatedAnswers.toUserAnswers mustEqual expectedUpdatedAnswers
+      }
+
+      "must not disturb the encrypted data field" in {
+
+        insert(UserAnswersEncrypted.fromUserAnswers(userAnswers)).futureValue
+
+        repository.keepAlive(userAnswers.id).futureValue
+
+        repository.get(userAnswers.id).futureValue.value.data mustEqual Json.obj("foo" -> "bar")
       }
     }
 

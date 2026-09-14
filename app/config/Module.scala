@@ -16,10 +16,11 @@
 
 package config
 
-import controllers.actions._
+import controllers.actions.*
 
 import java.time.{Clock, ZoneOffset}
 import com.google.inject.AbstractModule
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 
 class Module extends AbstractModule {
 
@@ -32,6 +33,8 @@ class Module extends AbstractModule {
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
+    bind(classOf[Encrypter]).toProvider(classOf[CryptoProvider]).asEagerSingleton()
+    bind(classOf[Decrypter]).toProvider(classOf[CryptoProvider]).asEagerSingleton()
 
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
   }
