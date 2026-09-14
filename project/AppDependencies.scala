@@ -12,7 +12,8 @@ object AppDependencies {
     "org.typelevel"     %% "cats-core"                     % "2.13.0",
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-30"    % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30"            % hmrcMongoVersion,
-    "org.typelevel" %% "cats-core" % scalaCatsVersion
+    "org.typelevel" %% "cats-core" % scalaCatsVersion,
+    "uk.gov.hmrc"       %% s"crypto-json-play-30"          % "8.4.0"
   )
 
   val test = Seq(

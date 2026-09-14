@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import models.{UserAnswers, UserAnswersEncrypted}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import play.api.libs.json.Format
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
+import uk.gov.hmrc.mdc.Mdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import uk.gov.hmrc.mdc.Mdc
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -35,12 +36,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class SessionRepository @Inject()(
                                    mongoComponent: MongoComponent,
                                    appConfig: FrontendAppConfig,
-                                   clock: Clock
+                                   clock: Clock,
+                                   crypto: Encrypter with Decrypter
                                  )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[UserAnswers](
+  extends PlayMongoRepository[UserAnswersEncrypted](
     collectionName = "user-answers",
     mongoComponent = mongoComponent,
-    domainFormat   = UserAnswers.format,
+    domainFormat   = UserAnswersEncrypted.format(crypto),
     indexes        = Seq(
       IndexModel(
         Indexes.ascending("lastUpdated"),
@@ -71,7 +73,9 @@ class SessionRepository @Inject()(
       _ =>
         collection
           .find(byId(id))
-          .headOption()
+          .headOption().map { result =>
+            result.map(_.toUserAnswers)
+          }
     }
   }
 
@@ -82,7 +86,7 @@ class SessionRepository @Inject()(
     collection
       .replaceOne(
         filter      = byId(updatedAnswers.id),
-        replacement = updatedAnswers,
+        replacement = UserAnswersEncrypted.fromUserAnswers(updatedAnswers),
         options     = ReplaceOptions().upsert(true)
       )
       .toFuture()
