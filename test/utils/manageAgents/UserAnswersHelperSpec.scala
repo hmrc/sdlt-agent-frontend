@@ -21,17 +21,11 @@ import models.UserAnswers
 import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import models.responses.addresslookup.{Address, JourneyResultAddressModel}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import models.responses.organisation.CreatedAgent
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.TryValues
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
-import repositories.SessionRepository
-
-import scala.concurrent.Future
 
 class UserAnswersHelperSpec
   extends SpecBase

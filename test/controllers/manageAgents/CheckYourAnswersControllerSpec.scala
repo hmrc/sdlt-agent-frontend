@@ -59,7 +59,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
       } yield userAnswersFive
   }
 
-  private def convertToUserAnswerAndFail(agentDetails: CreatedAgent): Try[UserAnswers] = {
+  private def convertToUserAnswerAndFail(): Try[UserAnswers] = {
     Try{
       throw new Error("ConversionFailed")
     }
@@ -264,7 +264,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
         when(service.getAgentDetails(any(), any())(any()))
           .thenReturn(Future.successful(Some(testAgentResponse)))
 
-        val userAnswersTry = convertToUserAnswerAndFail(testAgentResponse)
+        val userAnswersTry = convertToUserAnswerAndFail()
         when(service.updateUserAnswers(any())(any()))
           .thenReturn(userAnswersTry)
 
@@ -272,7 +272,6 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
           val request = FakeRequest(GET, checkYourAnswersUrl(Some(testArn)))
 
           val result = route(application, request).value
-          val body = contentAsString(result)
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url

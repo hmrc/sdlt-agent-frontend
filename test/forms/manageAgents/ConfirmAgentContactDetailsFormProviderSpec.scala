@@ -16,12 +16,10 @@
 
 package forms.manageAgents
 
-import forms.behaviours.{BooleanFieldBehaviours, OptionFieldBehaviours, StringFieldBehaviours}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import forms.behaviours.BooleanFieldBehaviours
 import play.api.data.FormError
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
-import utils.manageAgents.AgentDetailsTestUtil
 
 class ConfirmAgentContactDetailsFormProviderSpec extends BooleanFieldBehaviours {
 

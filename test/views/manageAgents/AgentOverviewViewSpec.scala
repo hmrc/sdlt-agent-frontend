@@ -25,7 +25,7 @@ import org.jsoup.select.Elements
 import play.api.Application
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Request
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
@@ -174,7 +174,7 @@ class AgentOverviewViewSpec extends SpecBase with ViewSpecBase with AgentDetails
     }
   }
 
-  private def displaysCorrectPaginationInfoText(doc: Document, numOfAgents: Int)(implicit messages: Messages) = {
+  private def displaysCorrectPaginationInfoText(doc: Document, numOfAgents: Int) = {
     doc.select("p.govuk-body").get(1).text mustBe s"Showing 1 to 10 of $numOfAgents records"
   }
 
