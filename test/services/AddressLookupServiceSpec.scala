@@ -17,31 +17,30 @@
 package services
 
 import connectors.AddressLookupConnector
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
-import models.responses.addresslookup.{Address, JourneyResultAddressModel}
 import models.responses.addresslookup.JourneyInitResponse.{AddressLookupResponse, JourneyInitFailureResponse, JourneyInitSuccessResponse}
 import models.responses.addresslookup.JourneyOutcomeResponse.UnexpectedGetStatusFailure
+import models.responses.addresslookup.{Address, JourneyResultAddressModel}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
+import org.mockito.Mockito.*
+import org.scalactic.TripleEquals.*
+import org.scalatest.EitherValues
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.hmrc.http.HeaderCarrier
-import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, argThat, eq as eqTo}
-import org.scalatest.EitherValues
 import pages.manageAgents.AgentAddressPage
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.i18n.Messages
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessages
 import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.test.Helpers.stubMessages
-import org.scalactic.TripleEquals.*
-import play.api.mvc.RequestHeader
-import play.api.test.FakeRequest
-import scala.util.Try
-import scala.util.*
+import scala.util.Failure
 
 
 class AddressLookupServiceSpec extends AnyWordSpec
@@ -220,16 +219,11 @@ class AddressLookupServiceSpec extends AnyWordSpec
       verify(connector, times(1)).getJourneyOutcome(any())(any[HeaderCarrier])
     }
 
-    // WARNING: we have to remove "final" attribute from the UserAnswer class due to mockito limitation
-    // > - should failed to persist updated userAnswer in MongoDb *** FAILED ***
-    //[info]   org.mockito.exceptions.base.MockitoException: Cannot mock/spy class models.UserAnswers
-    //[info] Mockito cannot mock/spy because :
-    //[info]  - final class
     "failed to persist updated userAnswer in MongoDb" in new Fixture {
 
       val userAnswerMock: UserAnswers = mock(classOf[UserAnswers])
       when(userAnswerMock.set(any(), any())( any() ))
-        .thenReturn( Failure(Error("SomeError")))
+        .thenReturn(Failure(Error("SomeError")))
 
       when(sessionRepository.set(any()))
         .thenReturn(Future.successful(true))

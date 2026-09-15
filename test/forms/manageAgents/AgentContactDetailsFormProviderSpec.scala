@@ -20,7 +20,7 @@ import forms.behaviours.StringFieldBehaviours
 import models.manageAgents.AgentContactDetails
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.data.{Form, FormError}
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.{Messages}
 import play.api.test.Helpers.stubMessages
 
 class AgentContactDetailsFormProviderSpec

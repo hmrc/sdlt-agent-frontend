@@ -17,17 +17,15 @@
 package services
 
 import connectors.StampDutyLandTaxConnector
-import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
-import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
-import models.requests.DeletePredefinedAgentRequest
+import models.requests.{CreatePredefinedAgentRequest, DeletePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.responses.organisation.{CreatedAgent, SdltOrganisationResponse}
+import models.responses.{CreatePredefinedAgentResponse, DeletePredefinedAgentResponse, UpdatePredefinedAgentResponse}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.mockito.Mockito.*
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import uk.gov.hmrc.http.HeaderCarrier
-import viewmodels.InputWidth.Fixed2
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
