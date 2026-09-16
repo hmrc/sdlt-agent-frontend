@@ -21,14 +21,13 @@ import forms.manageAgents.ConfirmAgentContactDetailsFormProvider
 import models.Mode
 import navigation.Navigator
 import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, ConfirmAgentContactDetailsPage}
-import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.LoggerUtil.{logError, logInfo}
+import utils.LoggingUtil
 import views.html.manageAgents.ConfirmAgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
@@ -48,14 +47,14 @@ class ConfirmAgentContactDetailsController @Inject()(
                                                       val controllerComponents: MessagesControllerComponents,
                                                       stampDutyLandTaxService: StampDutyLandTaxService,
                                                       view: ConfirmAgentContactDetailsView
-                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with LoggingUtil {
   
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       stampDutyLandTaxService.getAgentName match {
         case Left(error) =>
-          logError(s"Couldn't find agent in user answers: $error")
+          logger.error("[ConfirmAgentContactDetailsController][onPageLoad] Couldn't find agent in user answers", error)
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Right(agentName) =>
           val form: Form[Boolean] = formProvider(agentName)
@@ -80,24 +79,24 @@ class ConfirmAgentContactDetailsController @Inject()(
                 updatedUserAnswers <- Future.fromTry(request.userAnswers.set(ConfirmAgentContactDetailsPage, value))
                 latestUserAnswers <- Future.fromTry {
                   if !value then
-                    logInfo(s"[ConfirmAgentContactDetailsController][onSubmit][Removing previously filled contact details] User Selected `No` going back in the journey after previously selecting `Yes`")
+                    logger.info(s"[ConfirmAgentContactDetailsController][onSubmit] Removing previously filled contact details: User Selected `No` after previously selecting `Yes`")
                     updatedUserAnswers.remove(AgentContactDetailsPage)
                   else Success(updatedUserAnswers)
                 }
                 _ <- sessionRepository.set(latestUserAnswers)
               } yield {
                 if(value){
-                  logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `Yes` Redirect to AgentContactDetailsController onPageLoad()")
+                  logger.info(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `Yes`: Redirect to AgentContactDetailsController")
                   Redirect(navigator.nextPage(AgentContactDetailsPage, mode, latestUserAnswers))
                 }
                 else {
-                  logInfo(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` First time in the journey")
+                  logger.info(s"[ConfirmAgentContactDetailsController][onSubmit] User selected `No` first time in the journey")
                   Redirect(navigator.nextPage(AgentCheckYourAnswersPage, mode, latestUserAnswers))
                 }
               }
           )
         case Left(error) =>
-          logError(s"Couldn't find agent in user answers: $error")
+          logger.error("[ConfirmAgentContactDetailsController][onSubmit] Couldn't find agent in user answers", error)
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
   }

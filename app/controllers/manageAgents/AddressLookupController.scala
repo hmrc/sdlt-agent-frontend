@@ -27,7 +27,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.AddressLookupService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.LoggerUtil.{logDebug, logError, logInfo}
+import utils.LoggingUtil
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,24 +42,24 @@ class AddressLookupController @Inject()(
                                          requireData: DataRequiredAction,
                                          stornRequiredAction: StornRequiredAction,
                                          navigator: Navigator
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with LoggingUtil {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>
     addressLookupService.initJourney(request.userAnswers, request.storn, mode).map {
       case Right(JourneyInitSuccessResponse(Some(addressLookupLocation))) =>
-        logDebug(s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}")
+        logger.debug(s"[AddressLookupController][onPageLoad] - Journey initiated: ${addressLookupLocation}")
         Redirect(addressLookupLocation)
       case Right(models.responses.addresslookup.JourneyInitResponse.JourneyInitSuccessResponse(None)) =>
-        logError("[AddressLookupController][onPageLoad] - Failed::Location not provided")
+        logger.error("[AddressLookupController][onPageLoad] - Failed::Location not provided")
         Redirect(JourneyRecoveryController.onPageLoad())
       case Left(ex) =>
-        logError(s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex")
+        logger.error(s"[AddressLookupController][onPageLoad] - Failed to Init journey: $ex")
         Redirect(SystemErrorController.onPageLoad())
     }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request => {
-    logDebug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
+    logger.debug(s"[AddressLookupController][onSubmit] - UA: ${request.userAnswers}")
     for {
       id <- EitherT(Future.successful(Try {
         request.queryString.get("id").get(0)
@@ -68,13 +68,13 @@ class AddressLookupController @Inject()(
     } yield journeyOutcome
   }.value.map {
     case Right(updatedAnswer) if mode == NormalMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - address extracted and saved")
+      logger.info(s"[AddressLookupController][onSubmit] - address extracted and saved in normal mode")
       Redirect(navigator.nextPage(ConfirmAgentContactDetailsPage, NormalMode, updatedAnswer))
     case Right(updatedAnswer) if mode == CheckMode =>
-      logInfo(s"[AddressLookupController][onSubmit] - edit::address extracted and saved")
+      logger.info(s"[AddressLookupController][onSubmit] - address extracted and saved in check mode")
       Redirect(navigator.nextPage(AgentCheckYourAnswersPage, CheckMode, updatedAnswer))
     case _ =>
-      logError("[AddressLookupController][onSubmit] - failed to extract address or invalid mode")
+      logger.error("[AddressLookupController][onSubmit] - failed to extract address or invalid mode")
       Redirect(SystemErrorController.onPageLoad())
     }
   }

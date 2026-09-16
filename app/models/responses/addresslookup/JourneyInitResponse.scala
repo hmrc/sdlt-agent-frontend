@@ -18,9 +18,9 @@ package models.responses.addresslookup
 
 import play.api.http.Status.ACCEPTED
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import utils.LoggerUtil.*
+import utils.LoggingUtil
 
-object JourneyInitResponse {
+object JourneyInitResponse extends LoggingUtil {
 
   case class JourneyInitSuccessResponse(location: Option[String])
 
@@ -29,22 +29,18 @@ object JourneyInitResponse {
   type AddressLookupResponse = Either[JourneyInitFailureResponse, JourneyInitSuccessResponse]
 
   implicit def postAddressLookupHttpReads: HttpReads[AddressLookupResponse] =
-    new HttpReads[AddressLookupResponse] {
-
-      override def read(method: String, url: String, response: HttpResponse): AddressLookupResponse = {
-        response.status match {
-          case ACCEPTED => Right(
-            if (response.header(key = "location").isEmpty) {
-              JourneyInitSuccessResponse(response.header(key = "Location"))
-            } else {
-              JourneyInitSuccessResponse(response.header(key = "location"))
-            }
-          )
-          case status =>
-            logError(s"[JourneyInitResponse] - ${response.body}")
-            Left(JourneyInitFailureResponse(status))
-        }
+    (method: String, url: String, response: HttpResponse) => {
+      response.status match {
+        case ACCEPTED => Right(
+          if (response.header(key = "location").isEmpty) {
+            JourneyInitSuccessResponse(response.header(key = "Location"))
+          } else {
+            JourneyInitSuccessResponse(response.header(key = "location"))
+          }
+        )
+        case status =>
+          logger.debug(s"[JourneyInitResponse] - response body: ${response.body}")
+          Left(JourneyInitFailureResponse(status))
       }
-
     }
 }
