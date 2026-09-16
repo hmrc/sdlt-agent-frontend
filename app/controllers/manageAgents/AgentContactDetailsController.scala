@@ -23,11 +23,11 @@ import models.manageAgents.AgentContactDetails
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.manageAgents.{AgentCheckYourAnswersPage, AgentContactDetailsPage, AgentNamePage}
-import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.LoggingUtil
 import views.html.manageAgents.AgentContactDetailsView
 
 import javax.inject.{Inject, Singleton}
@@ -45,7 +45,7 @@ class AgentContactDetailsController @Inject()(
                                                formProvider: AgentContactDetailsFormProvider,
                                                val controllerComponents: MessagesControllerComponents,
                                                view: AgentContactDetailsView
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with LoggingUtil {
 
 
   private def getAgentName(implicit request: DataRequest[AnyContent]): Either[Result, String] =
@@ -53,7 +53,7 @@ class AgentContactDetailsController @Inject()(
       case Some(name) => Right(name)
       case None =>
         Left {
-          logger.error("Agent name not found in user answers")
+          logger.error("[AgentContactDetailsController][getAgentName] Agent name not found in user answers")
           Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

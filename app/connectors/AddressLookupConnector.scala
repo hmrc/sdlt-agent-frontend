@@ -26,7 +26,8 @@ import play.api.libs.json.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
-import utils.LoggerUtil.{logDebug, logInfo}
+import utils.LoggingUtil
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                                         http: HttpClientV2,
-                                        val messagesApi: MessagesApi)(implicit ec: ExecutionContext) {
+                                        val messagesApi: MessagesApi)(implicit ec: ExecutionContext) extends LoggingUtil {
 
   private val baseUrl: String = appConfig.addressLookupBaseUrl
   val addressLookupInitializeUrl : String = s"$baseUrl/api/v2/init"
@@ -157,7 +158,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
                  (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
     import play.api.libs.ws.writeableOf_JsValue
     val payload: JsValue = buildConfig(agentName, mode: Mode)
-    logDebug(s"[AddressLookupConnector] - body: ${Json.stringify(payload)}")
+    logger.debug(s"[AddressLookupConnector][initJourney] - body: ${Json.stringify(payload)}")
+    logger.info("[AddressLookupConnector][initJourney] initializing address lookup journey")
     http.post(url"$addressLookupInitializeUrl")
       .withBody(payload)
       .execute[AddressLookupResponse]
@@ -166,7 +168,8 @@ class AddressLookupConnector @Inject()(val appConfig: FrontendAppConfig,
   // Step 2: Extract journey result/outcome
   def getJourneyOutcome(id: String)
                        (implicit hc: HeaderCarrier): Future[AddressLookupJourneyOutcome] = {
-    logInfo(s"[AddressLookupConnector] - Extract address: ${addressLookupOutcomeUrl(id)}")
+    logger.debug(s"[AddressLookupConnector][getJourneyOutcome] - Extract address: ${addressLookupOutcomeUrl(id)}")
+    logger.info("[AddressLookupConnector][getJourneyOutcome] getting address journey outcome")
     http.get(url"${addressLookupOutcomeUrl(id)}").execute[AddressLookupJourneyOutcome]
   }
 

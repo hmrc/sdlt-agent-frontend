@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.LoggerUtil.{logDebug, logInfo}
+import utils.LoggingUtil
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,12 +35,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class AddressLookupService @Inject()(
                                       addressLookUpConnector: AddressLookupConnector,
                                       sessionRepository: SessionRepository,
-                                    )(implicit ec: ExecutionContext) {
+                                    )(implicit ec: ExecutionContext) extends LoggingUtil {
 
   // Step 1: Init AL journey
   def initJourney(userAnswers: UserAnswers, storn: String, mode: Mode)
                  (implicit hc: HeaderCarrier, messages: Messages, rh: RequestHeader): Future[AddressLookupResponse] = {
-    logInfo(s"[AddressLookupService][initJourney]")
     for {
       agentName <- Future.successful(userAnswers.get(AgentNamePage))
       initJourneyRes <- addressLookUpConnector.initJourney(agentName, mode) // set agentName as empty if nothing found
@@ -52,16 +51,18 @@ class AddressLookupService @Inject()(
                                  addressDetailsMaybe: Option[JourneyResultAddressModel]): Future[Either[Throwable, UserAnswers]] = {
     addressDetailsMaybe match {
       case Some(addressDetails) =>
+        logger.info("[AddressLookupService][saveAddressDetails] - address found, saving details")
         userAnswers.set(AgentAddressPage, addressDetails).toEither match {
           case Right(updatedAnswers) =>
             sessionRepository.set(updatedAnswers)
               .map(res =>
-                logDebug(s"[AddressLookupService] - UpdateStatus: $res")
-                Right(updatedAnswers)) // assume will always succeed
+                Right(updatedAnswers))
           case Left(ex) =>
+            logger.error("[AddressLookupService][saveAddressDetails] - failed to update session", ex)
             Future.successful(Left(Error("Failed to update user session")))
         }
       case None =>
+        logger.error("[AddressLookupService][saveAddressDetails] - no address found")
         Future.successful(Left(Error("No addressDetails found")))
     }
   }
@@ -69,11 +70,9 @@ class AddressLookupService @Inject()(
   def getJourneyOutcome(id: String, userAnswers: UserAnswers)
                        (implicit hc: HeaderCarrier): Future[Either[Throwable, UserAnswers]] = {
     {
-      logInfo(s"[AddressLookupService][getJourneyOutcome]")
       for {
         addressDetails <- EitherT(addressLookUpConnector.getJourneyOutcome(id))
         res <- EitherT({
-          logInfo(s"[AddressLookupService][getJourneyOutcome] - addressDetails: ${addressDetails}")
           saveAddressDetails(userAnswers, addressDetails)
         })
       } yield res

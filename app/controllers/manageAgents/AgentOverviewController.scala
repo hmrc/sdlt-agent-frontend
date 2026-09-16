@@ -22,14 +22,13 @@ import forms.manageAgents.AddAnotherAgentFormProvider
 import models.NormalMode
 import navigation.Navigator
 import pages.manageAgents.AgentOverviewPage
-import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.StampDutyLandTaxService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination.Pagination
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.PaginationHelper
+import utils.{LoggingUtil, PaginationHelper}
 import views.html.manageAgents.AgentOverviewView
 
 import javax.inject.{Inject, Singleton}
@@ -46,7 +45,7 @@ class AgentOverviewController @Inject()(
                                          stornRequiredAction: StornRequiredAction,
                                          navigator: Navigator,
                                          view: AgentOverviewView
-                                      )(implicit executionContext: ExecutionContext, appConfig:FrontendAppConfig) extends FrontendBaseController with PaginationHelper with I18nSupport with Logging {
+                                      )(implicit executionContext: ExecutionContext, appConfig:FrontendAppConfig) extends FrontendBaseController with PaginationHelper with I18nSupport with LoggingUtil {
 
   def onPageLoad(paginationIndex: Int): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen stornRequiredAction).async { implicit request =>

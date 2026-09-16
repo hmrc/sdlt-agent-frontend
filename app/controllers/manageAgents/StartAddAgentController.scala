@@ -20,8 +20,7 @@ import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import play.api.Logging
-
+import utils.LoggingUtil
 import pages.manageAgents.{AgentNamePage, AgentOverviewPage, StornPage}
 
 import javax.inject.{Inject, Singleton}
@@ -41,7 +40,7 @@ class StartAddAgentController @Inject()(
                                      sessionRepository: SessionRepository,
                                      navigator: Navigator
                                    )(implicit appConfig: FrontendAppConfig,
-                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                     executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with LoggingUtil {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
