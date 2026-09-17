@@ -24,8 +24,6 @@ import play.api.mvc.Results.*
 import play.api.mvc.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual, Organisation}
-import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,9 +45,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    val defaultPredicate: Predicate = AuthProviders(GovernmentGateway)
-
-    authorised(defaultPredicate)
+    authorised()
       .retrieve(
         Retrievals.internalId and
           Retrievals.allEnrolments and
@@ -58,24 +54,25 @@ class AuthenticatedIdentifierAction @Inject()(
       ) {
         //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) if enrolments.exists(_.key == orgEnrolment) =>
-          hanldeValidEnrolments(block)(request, internalId, enrolments)
+          handleValidEnrolments(block)(request, internalId, enrolments)
 
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) if enrolments.exists(_.key == agentEnrolment) =>
-          hanldeValidEnrolments(block)(request, internalId, enrolments)
+          handleValidEnrolments(block)(request, internalId, enrolments)
 
         case Some(_) ~ _ ~ Some(Organisation | Agent) ~ Some(Assistant) =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt")
+          logger.debug("[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt")
           Future.successful(
             Redirect(controllers.manageAgents.routes.UnauthorisedOrganisationAffinityController.onPageLoad())
           )
 
         case Some(_) ~ _ ~ Some(Individual) ~ _ =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt")
+          logger.debug("[AuthenticatedIdentifierAction][unauthorised] - Individual login attempt")
           Future.successful(
             Redirect(controllers.manageAgents.routes.UnauthorisedIndividualAffinityController.onPageLoad())
           )
+
         case _ =>
-          logger.error("[AuthenticatedIdentifierAction][unauthorised] - authentication failure")
+          logger.debug("[AuthenticatedIdentifierAction][unauthorised] - authentication failure")
           Future.successful(
             Redirect(routes.AccessDeniedController.onPageLoad()))
       } recover {
@@ -86,7 +83,7 @@ class AuthenticatedIdentifierAction @Inject()(
     }
   }
 
-  private def hanldeValidEnrolments[A](block:IdentifierRequest[A] => Future[Result])
+  private def handleValidEnrolments[A](block:IdentifierRequest[A] => Future[Result])
                                       (request:Request[A], internalId: String, enrollments:Set[Enrolment]) = {
     hasSdltOrgEnrolment(enrollments)
       .map { storn =>
