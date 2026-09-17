@@ -21,11 +21,12 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 
 @this(
-    appConfig: FrontendAppConfig,
-    hmrcTimeoutDialog: HmrcTimeoutDialog,
-    hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
-    alphaBanner: StandardAlphaBanner,
-    hmrcStandardPage: HmrcStandardPage
+        appConfig: FrontendAppConfig,
+        hmrcTimeoutDialog: HmrcTimeoutDialog,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        alphaBanner: StandardAlphaBanner,
+        hmrcUserResearchBanner : HmrcUserResearchBanner,
+        hmrcStandardPage: HmrcStandardPage
 )
 
 @(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
@@ -65,7 +66,9 @@
     ),
     banners = Banners(
         displayHmrcBanner = showHmrcBanner,
-        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
+        phaseBanner = Some(alphaBanner(appConfig.feedbackUrl)),
+        userResearchBanner = if(appConfig.userResearchBannerEnabled) Some(UserResearchBanner(
+            url = appConfig.userResearchBannerUrl)) else None
     ),
     backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None
 ))(content)
