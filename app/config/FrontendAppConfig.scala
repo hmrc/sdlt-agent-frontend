@@ -29,6 +29,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   
   val maxNumberOfAgents: Int = configuration.get[Int]("max-number-of-agents")
 
+  def userResearchBannerEnabled: Boolean =
+    configuration.get[Boolean]("features.user-research-banner")
+
+  def userResearchBannerUrl: String =
+    configuration.get[String]("urls.user-research-banner")
+
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "sdlt-agent-frontend"
 
