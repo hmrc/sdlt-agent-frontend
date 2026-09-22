@@ -33,18 +33,23 @@ class CheckYourAnswersHelperSpec extends Matchers with SpecBase {
   "getSummaryListRows" - {
 
     "include all rows when all answers are present" in new Setup {
-      val result: SummaryList = CheckYourAnswersHelper.getSummaryListRows(populatedUserAnswers)
+      val ua: UserAnswers = UserAnswers("id")
+        .set(AgentNamePage, "Haborview Estates").success.value
+        .set(AgentAddressPage, testAgentAddress).success.value
+        .set(AgentContactDetailsPage, AgentContactDetails(Some("0123456789"), Some("a@b.c"))).success.value
+
+      val result: SummaryList = CheckYourAnswersHelper.getSummaryListRows(ua)
       result.rows.length mustBe 4
     }
 
-    "include all rows when optional answers are empty" in new Setup {
+    "not include contact details row when optional answers are empty" in new Setup {
       val ua: UserAnswers = UserAnswers("id")
         .set(AgentNamePage, "Haborview Estates").success.value
         .set(AgentAddressPage, testAgentAddress).success.value
         .set(AgentContactDetailsPage, AgentContactDetails(None, None)).success.value
 
       val result: SummaryList = CheckYourAnswersHelper.getSummaryListRows(ua)
-      result.rows.length mustBe 4
+      result.rows.length mustBe 3
     }
 
     "include all rows when AgentContactDetailsPage is defined" in new Setup {
@@ -99,6 +104,57 @@ class CheckYourAnswersHelperSpec extends Matchers with SpecBase {
       val result: Either[Result, SummaryList] = validateUserAnswers(emptyUserAnswersWithStorn)
 
       result mustBe Left(Redirect(noSessionDataUrl))
+    }
+  }
+
+  "areAgentContactDetailsDefined" - {
+
+    "must return true when all contact details are defined" in {
+      val agentContactDetailsComplete: AgentContactDetails = AgentContactDetails(
+        phone = Some("0123456"),
+        email = Some("test@test.com")
+      )
+      val ua: UserAnswers = UserAnswers("id")
+        .set(AgentContactDetailsPage, agentContactDetailsComplete).success.value
+
+      val result = areAgentContactDetailsDefined(ua)
+      result mustBe true
+    }
+
+    "must return true when just phone number is defined" in {
+      val agentContactDetails: AgentContactDetails = AgentContactDetails(
+        phone = Some("0123456"),
+        email = None
+      )
+      val ua: UserAnswers = UserAnswers("id")
+        .set(AgentContactDetailsPage, agentContactDetails).success.value
+
+      val result = areAgentContactDetailsDefined(ua)
+      result mustBe true
+    }
+
+    "must return true when just email is defined" in {
+      val agentContactDetails: AgentContactDetails = AgentContactDetails(
+        phone = None,
+        email = Some("test@test.com")
+      )
+      val ua: UserAnswers = UserAnswers("id")
+        .set(AgentContactDetailsPage, agentContactDetails).success.value
+
+      val result = areAgentContactDetailsDefined(ua)
+      result mustBe true
+    }
+
+    "must return false when no contact details are defined" in {
+      val agentContactDetails: AgentContactDetails = AgentContactDetails(
+        phone = None,
+        email = None
+      )
+      val ua: UserAnswers = UserAnswers("id")
+        .set(AgentContactDetailsPage, agentContactDetails).success.value
+
+      val result = areAgentContactDetailsDefined(ua)
+      result mustBe false
     }
   }
 

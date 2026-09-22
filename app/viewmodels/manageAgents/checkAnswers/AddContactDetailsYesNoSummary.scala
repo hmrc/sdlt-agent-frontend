@@ -17,21 +17,21 @@
 package viewmodels.manageAgents.checkAnswers
 
 import models.{CheckMode, UserAnswers}
-import pages.manageAgents.{AgentContactDetailsPage, AgentNamePage}
+import pages.manageAgents.AgentNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
+import utils.manageAgents.CheckYourAnswersHelper._
 
 object AddContactDetailsYesNoSummary {
 
   private def isAgentContactDetailsPageDefined(answers: UserAnswers)(implicit messages: Messages): String = {
-    answers.get(AgentContactDetailsPage) match {
-      case Some(_) =>
-        messages("manageAgents.agentContactDetailsSummary.value.yes")
-      case None =>
-        messages("manageAgents.agentContactDetailsSummary.value.no")
+    if(areAgentContactDetailsDefined(answers)) {
+      messages("manageAgents.agentContactDetailsSummary.value.yes")
+    } else {
+      messages("manageAgents.agentContactDetailsSummary.value.no")
     }
   }
   

@@ -24,7 +24,7 @@ import models.responses.organisation.CreatedAgent
 import models.responses.{CreatePredefinedAgentResponse, UpdatePredefinedAgentResponse}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, argThat}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.manageAgents.*
@@ -68,48 +68,91 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
   "onPageLoad" - {
     "Check Your Answers Controller (with no ARN population)" - {
 
-      "must return OK and the correct view for a GET with all SummaryListRows when all pages are populated " in {
+      "must return OK and the correct view for a GET with all SummaryListRows when all pages are populated and set ConfirmAgentContactDetailsPage to true" in {
 
-        val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+        val ua: UserAnswers = UserAnswers("id")
+          .set(AgentReferenceNumberPage, "ARN001").success.value
+          .set(StornPage, testStorn).success.value
+          .set(AgentNamePage, "Haborview Estates").success.value
+          .set(AgentAddressPage, testAgentAddress).success.value
+          .set(AgentContactDetailsPage, AgentContactDetails(Some("0123456789"), Some("a@b.c"))).success.value
 
-        val application = applicationBuilder(userAnswers = Some(ua)).build()
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+
+        val application = applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ).build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersUrl(None))
+          val request = FakeRequest(GET, checkYourAnswersUrl(Some("ARN001")))
 
           val result = route(application, request).value
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
 
+          val expectedUserAnswers =
+            ua.set(ConfirmAgentContactDetailsPage, true).success.value
+
           status(result) mustEqual OK
+          verify(mockSessionRepository).set(
+            argThat[UserAnswers] { answers =>
+              answers.get(ConfirmAgentContactDetailsPage).contains(true)
+            }
+          )
 
           contentAsString(result) mustEqual
             view(
               list = SummaryListViewModel(
                 Seq(
-                  AgentNameSummary.row(ua)(messages(application)),
-                  AddressSummary.row(ua)(messages(application)),
-                  AddContactDetailsYesNoSummary.row(ua)(messages(application)),
-                  AgentContactDetailsSummary.row(ua)(messages(application))
+                  AgentNameSummary.row(expectedUserAnswers)(messages(application)),
+                  AddressSummary.row(expectedUserAnswers)(messages(application)),
+                  AddContactDetailsYesNoSummary.row(expectedUserAnswers)(messages(application)),
+                  AgentContactDetailsSummary.row(expectedUserAnswers)(messages(application))
                 ).flatten
               ),
-              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some("ARN001"))
             )(request, messages(application)).toString
         }
       }
-      "must return OK and the correct view for a GET without AgentContactDetailsSummary row when AgentContactDetails is not populated " in {
-        val ua = UserAnswers("id", testUserAnswers).set(StornPage, testStorn).success.value
+      "must return OK and the correct view for a GET without AgentContactDetailsSummary row when AgentContactDetails is not populated and set ConfirmAgentContactDetailsPage to false" in {
 
-        val userAnswersWithoutAgentContactDetailsPage = ua.remove(AgentContactDetailsPage).success.value
+        val ua: UserAnswers = UserAnswers("id")
+          .set(AgentReferenceNumberPage, "ARN001").success.value
+          .set(StornPage, testStorn).success.value
+          .set(AgentNamePage, "Haborview Estates").success.value
+          .set(AgentAddressPage, testAgentAddress).success.value
+          .set(AgentContactDetailsPage, AgentContactDetails(None, None)).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersWithoutAgentContactDetailsPage)).build()
+        val mockSessionRepository = mock[SessionRepository]
+
+        when(mockSessionRepository.set(any()))
+          .thenReturn(Future.successful(true))
+
+        val application = applicationBuilder(userAnswers = Some(ua))
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository)
+          ).build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersUrl(None))
+          val request = FakeRequest(GET, checkYourAnswersUrl(Some("ARN001")))
 
           val result = route(application, request).value
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
+
+          val expectedUserAnswers =
+            ua.set(ConfirmAgentContactDetailsPage, true).success.value
+
+          status(result) mustEqual OK
+          verify(mockSessionRepository).set(
+            argThat[UserAnswers] { answers =>
+              answers.get(ConfirmAgentContactDetailsPage).contains(false)
+            }
+          )
 
           status(result) mustEqual OK
 
@@ -117,12 +160,12 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
             view(
               list = SummaryListViewModel(
                 Seq(
-                  AgentNameSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
-                  AddressSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application)),
-                  AddContactDetailsYesNoSummary.row(userAnswersWithoutAgentContactDetailsPage)(messages(application))
+                  AgentNameSummary.row(expectedUserAnswers)(messages(application)),
+                  AddressSummary.row(expectedUserAnswers)(messages(application)),
+                  AddContactDetailsYesNoSummary.row(expectedUserAnswers)(messages(application))
                 ).flatten
               ),
-              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(None)
+              postAction = controllers.manageAgents.routes.CheckYourAnswersController.onSubmit(Some("ARN001"))
             )(request, messages(application)).toString
         }
       }
@@ -393,7 +436,7 @@ class CheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency wi
 
             status(result) mustEqual OK
 
-            verify(mockSessionRepository, never()).set(any())
+            verify(mockSessionRepository, times(1)).set(any())
             verify(mockService, never()).getAgentDetails(any(), any())(any())
           }
         }
