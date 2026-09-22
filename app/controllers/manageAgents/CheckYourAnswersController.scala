@@ -20,7 +20,7 @@ import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierA
 import models.requests.{CreatePredefinedAgentRequest, UpdatePredefinedAgent}
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, StornPage}
+import pages.manageAgents.{AgentOverviewPage, AgentReferenceNumberPage, ConfirmAgentContactDetailsPage, StornPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import repositories.SessionRepository
@@ -57,7 +57,10 @@ class CheckYourAnswersController @Inject()(
 
       (storedArn, agentReferenceNumber) match {
         case (Some(storedArn), Some(paramArn)) if storedArn == paramArn =>
-          Future.successful(Ok(view(getSummaryListRows(request.userAnswers), postAction)))
+          val updatedUserAnswers: UserAnswers = setConfirmAgentContactDetails(request.userAnswers)
+          sessionRepository.set(updatedUserAnswers).map {_ =>
+            Ok(view(getSummaryListRows(updatedUserAnswers), postAction))
+          }
         case (_, Some(paramArn)) =>
           stampDutyLandTaxService.getAgentDetails(request.storn, paramArn) flatMap {
             case Some(agentDetails) =>
@@ -66,8 +69,9 @@ class CheckYourAnswersController @Inject()(
                   logger.error(s"[CheckYourAnswersController][onPageLoad] failed to build UserAnswers: ${error.getMessage}")
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
                 }, { userAnswers =>
-                  sessionRepository.set(userAnswers).map { _ =>
-                    Ok(view(getSummaryListRows(userAnswers), postAction))
+                  val updatedUserAnswers: UserAnswers = setConfirmAgentContactDetails(userAnswers)
+                  sessionRepository.set(updatedUserAnswers).map { _ =>
+                    Ok(view(getSummaryListRows(updatedUserAnswers), postAction))
                   }
                 })
 
@@ -134,7 +138,33 @@ class CheckYourAnswersController @Inject()(
 
           }
       }
-
   }
 
+  def setConfirmAgentContactDetails(userAnswers: UserAnswers): UserAnswers = {
+    if (areAgentContactDetailsDefined(userAnswers)) {
+      userAnswers
+        .set(ConfirmAgentContactDetailsPage, true)
+        .fold(
+          error => {
+            logger.error(
+              s"[CheckYourAnswersController] Failed to set ConfirmAgentContactDetailsPage: ${error.getMessage}"
+            )
+            userAnswers
+          },
+          identity
+        )
+    } else {
+      userAnswers
+        .set(ConfirmAgentContactDetailsPage, false)
+        .fold(
+          error => {
+            logger.error(
+              s"[CheckYourAnswersController] Failed to set ConfirmAgentContactDetailsPage: ${error.getMessage}"
+            )
+            userAnswers
+          },
+          identity
+        )
+    }
+  }
 }

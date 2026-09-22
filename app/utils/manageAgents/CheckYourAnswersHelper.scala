@@ -18,6 +18,7 @@ package utils.manageAgents
 
 import controllers.routes.NoSessionDataController
 import models.UserAnswers
+import models.manageAgents.AgentContactDetails
 import pages.manageAgents.{AgentAddressPage, AgentContactDetailsPage, AgentNamePage}
 import play.api.i18n.Messages
 import play.api.mvc.Result
@@ -29,7 +30,7 @@ import viewmodels.manageAgents.checkAnswers.{AddContactDetailsYesNoSummary, Addr
 object CheckYourAnswersHelper {
 
   def getSummaryListRows(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = SummaryListViewModel(
-    if(userAnswers.get(AgentContactDetailsPage).isDefined) {
+    if(userAnswers.get(AgentContactDetailsPage).exists(details => details.email.isDefined || details.phone.isDefined)) {
       Seq(
         AgentNameSummary.row(userAnswers),
         AddressSummary.row(userAnswers),
@@ -58,4 +59,13 @@ object CheckYourAnswersHelper {
     }
   }
 
+  def areAgentContactDetailsDefined(userAnswers: UserAnswers): Boolean = {
+    userAnswers.get(AgentContactDetailsPage) match {
+      case Some(AgentContactDetails(Some(_), _)) |
+        Some(AgentContactDetails(_, Some(_))) =>
+        true
+      case _ =>
+        false
+    }
+  }
 }
