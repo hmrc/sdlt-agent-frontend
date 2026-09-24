@@ -21,7 +21,7 @@ import controllers.actions.IdentifierAction
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
 import utils.LoggingUtil
-import pages.manageAgents.{AgentNamePage, AgentOverviewPage, StornPage}
+import pages.manageAgents.{AgentOverviewPage, StornPage}
 
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
@@ -66,7 +66,7 @@ class StartAddAgentController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AgentNamePage, NormalMode, emptiedUserAnswers))
+          } yield Redirect(controllers.manageAgents.routes.BeforeYouStartController.onPageLoad())
       } recover {
       case ex =>
         logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)

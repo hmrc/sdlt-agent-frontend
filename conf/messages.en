@@ -159,3 +159,12 @@ manageAgents.addressLookup.confirm.title            = Review and confirm the age
 manageAgents.addressLookup.choose.title             = Choose the agent’s address – Manage agents
 manageAgents.addressLookup.find.title               = Find the agent’s address – Manage agents
 manageAgents.addressLookup.enter.title              = Enter the agent’s address – Manage agents
+
+manageAgents.beforeYouStart.title                   = Before you start - Manage agents
+manageAgents.beforeYouStart.caption                 = Manage agents
+manageAgents.beforeYouStart.heading                 = Before you start
+manageAgents.beforeYouStart.p1                      = Create a permanent list of agents that can be linked to any purchaser on every SDLT return.
+manageAgents.beforeYouStart.p2                      = You will need to know:
+manageAgents.beforeYouStart.l1                      = the agent’s name
+manageAgents.beforeYouStart.l2                      = the agent’s address
+manageAgents.beforeYouStart.p3                      = You can also provide contact details if required.
