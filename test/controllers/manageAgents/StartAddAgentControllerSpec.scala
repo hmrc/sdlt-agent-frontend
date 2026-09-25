@@ -50,7 +50,7 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          routes.AgentNameController.onPageLoad(mode = models.NormalMode).url
+          routes.BeforeYouStartController.onPageLoad().url
       }
     }
 

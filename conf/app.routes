@@ -52,6 +52,9 @@ GET        /system-error/there-is-a-problem              controllers.SystemError
 GET        /cannot-reach-this-page                       controllers.NoSessionDataController.onPageLoad()
 POST       /cannot-reach-this-page                       controllers.NoSessionDataController.onSubmit()
 
+GET        /manage-agents/before-you-start               controllers.manageAgents.BeforeYouStartController.onPageLoad()
+
+
 # auth routes
 GET         /manage-agents/unauthorised                 controllers.UnauthorisedController.onPageLoad()
 GET         /manage-agents/unauthorised/individual       controllers.manageAgents.UnauthorisedIndividualAffinityController.onPageLoad()
