@@ -54,10 +54,10 @@ class AuthenticatedIdentifierAction @Inject()(
       ) {
         //TODO: Add more cases to log and handle error response for missing items eg missing Organisation
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Organisation) ~ Some(User) if enrolments.exists(_.key == orgEnrolment) =>
-          handleValidEnrolments(block)(request, internalId, enrolments)
+          handleValidEnrolments(block)(request, internalId, enrolments, Organisation)
 
         case Some(internalId) ~ Enrolments(enrolments) ~ Some(Agent) ~ Some(User) if enrolments.exists(_.key == agentEnrolment) =>
-          handleValidEnrolments(block)(request, internalId, enrolments)
+          handleValidEnrolments(block)(request, internalId, enrolments, Agent)
 
         case Some(_) ~ _ ~ Some(Organisation | Agent) ~ Some(Assistant) =>
           logger.debug("[AuthenticatedIdentifierAction][unauthorised] - [Organisation|Agent]: Assistant login attempt")
@@ -84,10 +84,10 @@ class AuthenticatedIdentifierAction @Inject()(
   }
 
   private def handleValidEnrolments[A](block:IdentifierRequest[A] => Future[Result])
-                                      (request:Request[A], internalId: String, enrollments:Set[Enrolment]) = {
+                                      (request:Request[A], internalId: String, enrollments:Set[Enrolment], affinityGroup: AffinityGroup) = {
     hasSdltOrgEnrolment(enrollments)
       .map { storn =>
-        block(IdentifierRequest(request, internalId, storn))
+        block(IdentifierRequest(request, internalId, storn, affinityGroup))
       }
       .getOrElse(
         Future.successful(
