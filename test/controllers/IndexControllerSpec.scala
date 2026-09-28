@@ -17,9 +17,10 @@
 package controllers
 
 import base.SpecBase
+import connectors.RateLimitedAllowListConnector
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.{any, argThat}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -33,6 +34,37 @@ class IndexControllerSpec extends SpecBase with MockitoSugar {
   "Index Controller" - {
 
     "onPageLoad" - {
+
+      "redirect to legacy sdlt service url when user is not on the allow list" in {
+
+        val mockSessionRepository             = mock[SessionRepository]
+        val mockRateLimitedAllowListConnector = mock[RateLimitedAllowListConnector]
+
+        when(mockRateLimitedAllowListConnector.checkAllowList(any(), any())(using any()))
+          .thenReturn(Future.successful(false))
+
+        val application = applicationBuilder(userAnswers = None)
+          .configure(
+            "splitter.trafficSplitEnabled" -> true,
+            "splitter.allowListName"       -> "beta-test",
+            "urls.legacySdltServiceUrl"    -> "http://localhost:9020/stamp-taxes-legacy"
+          )
+          .overrides(
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[RateLimitedAllowListConnector].toInstance(mockRateLimitedAllowListConnector)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual "http://localhost:9020/stamp-taxes-legacy/org/STN001"
+          verify(mockSessionRepository, never()).set(any[UserAnswers])
+        }
+      }
       s"must redirect to the Landing page with the userId added to the session" in {
 
         val mockSessionRepository = mock[SessionRepository]

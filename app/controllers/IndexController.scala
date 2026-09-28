@@ -16,6 +16,8 @@
 
 package controllers
 
+import config.FrontendAppConfig
+import connectors.RateLimitedAllowListConnector
 import controllers.actions.IdentifierAction
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -23,6 +25,7 @@ import pages.manageAgents.{AgentOverviewPage, StornPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.{Inject, Singleton}
@@ -33,18 +36,35 @@ class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
                                  sessionRepository: SessionRepository,
-                                 navigator: Navigator
+                                 navigator: Navigator,
+                                 config: FrontendAppConfig,
+                                 rateLimitedAllowListConnector: RateLimitedAllowListConnector
                                )(implicit ec: ExecutionContext)
   extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
+    checkAllowList(config.useRateLimitedAllowList, config.splitterAllowListName, request.storn)
+      .flatMap {
+        case false =>
+          Future.successful(Redirect(config.legacySdltServiceUrl(request)))
 
-    val userAnswers = UserAnswers(id = request.userId)
+        case true =>
+          val userAnswers = UserAnswers(id = request.userId)
 
-    for {
-      updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-      _              <- sessionRepository.set(updatedAnswers)
-    } yield Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers))
+          for {
+            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(AgentOverviewPage, NormalMode, userAnswers))
+      }
   }
+
+  private def checkAllowList(useRateLimitedAllowList: Boolean, allowListName: String, storn: String)(
+    implicit hc: HeaderCarrier
+  ): Future[Boolean] =
+    if (useRateLimitedAllowList) {
+      rateLimitedAllowListConnector.checkAllowList(allowListName, storn)
+    } else {
+      Future.successful(true)
+    }
 }

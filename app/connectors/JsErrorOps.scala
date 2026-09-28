@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package models.requests
+package connectors
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.AffinityGroup
+import play.api.libs.json.JsError
 
-case class IdentifierRequest[A] (
-  request: Request[A],
-  userId: String,
-  storn: String,
-  affinityGroup: AffinityGroup
-) extends WrappedRequest[A](request)
+object JsErrorOps {
+
+  extension (error: JsError) {
+
+    def prettyPrint(): String =
+      error.errors
+        .map { case (jsPath, validationErrors) =>
+          jsPath.toString + ": [" + validationErrors
+            .map(_.message)
+            .mkString(",") + "]"
+        }
+        .mkString("; ")
+  }
+
+}

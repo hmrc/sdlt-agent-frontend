@@ -17,12 +17,15 @@
 package controllers.manageAgents
 
 import base.SpecBase
+import connectors.RateLimitedAllowListConnector
+import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import services.StampDutyLandTaxService
 import utils.manageAgents.AgentDetailsTestUtil
 
@@ -34,6 +37,37 @@ class StartAddAgentControllerSpec extends SpecBase with MockitoSugar with AgentD
 
   private def postUrl: String = routes.StartAddAgentController.onPageLoad().url
   "StartAddAgentController.onPageLoad" - {
+
+    "redirect to legacy sdlt service url when user is not on the allow list" in {
+
+      val mockSessionRepository             = mock[SessionRepository]
+      val mockRateLimitedAllowListConnector = mock[RateLimitedAllowListConnector]
+
+      when(mockRateLimitedAllowListConnector.checkAllowList(any(), any())(using any()))
+        .thenReturn(Future.successful(false))
+
+      val application = applicationBuilder(userAnswers = None)
+        .configure(
+          "splitter.trafficSplitEnabled" -> true,
+          "splitter.allowListName"       -> "beta-test",
+          "urls.legacySdltServiceUrl"    -> "http://localhost:9020/stamp-taxes-legacy"
+        )
+        .overrides(
+          bind[SessionRepository].toInstance(mockSessionRepository),
+          bind[RateLimitedAllowListConnector].toInstance(mockRateLimitedAllowListConnector)
+        )
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, postUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual "http://localhost:9020/stamp-taxes-legacy/org/STN001"
+        verify(mockSessionRepository, never()).set(any[UserAnswers])
+      }
+    }
 
     "must redirect to AgentNameController when the number of agents is below the max" in {
       val application =

@@ -20,6 +20,8 @@ import play.api.Configuration
 import play.api.mvc.RequestHeader
 
 import javax.inject.{Inject, Singleton}
+import models.requests.IdentifierRequest
+import uk.gov.hmrc.auth.core.AffinityGroup
 
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
@@ -70,4 +72,16 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val addressLookupBaseUrl: String = s"$addressLookupProtocol://$addressLookupHost:$addressLookupPort"
   val addressLookupTimeoutUrl: String = configuration.get[String]("address-lookup-frontend.timeoutUrl")
   val signOutUrlForAddressLookupFrontend = s"$host/stamp-duty-land-tax-agent${controllers.auth.routes.AuthController.signOut().url}"
+
+  lazy val useRateLimitedAllowList: Boolean = configuration.get[Boolean]("splitter.trafficSplitEnabled")
+  lazy val splitterServiceName: String      = configuration.get[String]("splitter.serviceName")
+  lazy val splitterAllowListName: String    = configuration.get[String]("splitter.allowListName")
+
+  def legacySdltServiceUrl(request: IdentifierRequest[?]): String =
+    val urlBase      = configuration.get[String]("urls.legacySdltServiceUrl")
+    val userTypeText = request.affinityGroup match {
+      case AffinityGroup.Agent => "agent"
+      case _                   => "org"
+    }
+    s"$urlBase/$userTypeText/${request.storn}"
 }
