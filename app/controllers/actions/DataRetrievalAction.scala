@@ -16,23 +16,49 @@
 
 package controllers.actions
 
-import javax.inject.Inject
+import config.FrontendAppConfig
+import connectors.RateLimitedAllowListConnector
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import play.api.mvc.ActionTransformer
+import play.api.mvc.{ActionRefiner, Result, Results}
 import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject()(
-                                         val sessionRepository: SessionRepository
+                                         val sessionRepository: SessionRepository,
+                                         config: FrontendAppConfig,
+                                         rateLimitedAllowListConnector: RateLimitedAllowListConnector
                                        )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] = {
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request.request, request.request.session)
 
-    sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.userId, request.storn, _)
+    sessionRepository.get(request.userId).flatMap {
+      case None =>
+        checkAllowList(config.useRateLimitedAllowList, config.splitterAllowListName, request.storn)
+          .map {
+            case false =>
+              Left(Results.Redirect(config.legacySdltServiceUrl(request)))
+
+            case true =>
+              Right(OptionalDataRequest(request.request, request.userId, request.storn, None))
+          }
+      case userAnswers =>
+        Future.successful(Right(OptionalDataRequest(request.request, request.userId, request.storn, userAnswers)))
     }
   }
+
+  private def checkAllowList(useRateLimitedAllowList: Boolean, allowListName: String, storn: String)(
+    implicit hc: HeaderCarrier
+  ): Future[Boolean] =
+    if (useRateLimitedAllowList) {
+      rateLimitedAllowListConnector.checkAllowList(allowListName, storn)
+    } else {
+      Future.successful(true)
+    }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, OptionalDataRequest]

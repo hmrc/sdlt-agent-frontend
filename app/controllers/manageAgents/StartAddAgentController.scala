@@ -17,6 +17,7 @@
 package controllers.manageAgents
 
 import config.FrontendAppConfig
+import connectors.RateLimitedAllowListConnector
 import controllers.actions.IdentifierAction
 import models.{NormalMode, UserAnswers}
 import navigation.Navigator
@@ -28,6 +29,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.StampDutyLandTaxService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,39 +40,56 @@ class StartAddAgentController @Inject()(
                                      identify: IdentifierAction,
                                      stampDutyLandTaxService: StampDutyLandTaxService,
                                      sessionRepository: SessionRepository,
-                                     navigator: Navigator
+                                     navigator: Navigator,
+                                     rateLimitedAllowListConnector: RateLimitedAllowListConnector
                                    )(implicit appConfig: FrontendAppConfig,
                                      executionContext: ExecutionContext) extends FrontendBaseController with I18nSupport with LoggingUtil {
 
   private val MAX_AGENTS = appConfig.maxNumberOfAgents
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
-    stampDutyLandTaxService
-      .getAllAgentDetails(request.storn)
+    checkAllowList(appConfig.useRateLimitedAllowList, appConfig.splitterAllowListName, request.storn)
       .flatMap {
-        case agents if agents.size >= MAX_AGENTS =>
+        case false =>
+          Future.successful(Redirect(appConfig.legacySdltServiceUrl(request)))
 
-          val userAnswers = UserAnswers(id = request.userId)
+        case true =>
+          stampDutyLandTaxService
+            .getAllAgentDetails(request.storn)
+            .flatMap {
+              case agents if agents.size >= MAX_AGENTS =>
 
-          for {
-            updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
-                         _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(
-            navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers))
-            .flashing("agentsLimitReached" -> "true")
+                val userAnswers = UserAnswers(id = request.userId)
 
-        case _ =>
+                for {
+                  updatedAnswers <- Future.fromTry(userAnswers.set(StornPage, request.storn))
+                               _ <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(AgentOverviewPage, NormalMode, updatedAnswers))
+                  .flashing("agentsLimitReached" -> "true")
 
-          val emptiedUserAnswers = UserAnswers(id = request.userId)
+              case _ =>
 
-          for {
-            updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(controllers.manageAgents.routes.BeforeYouStartController.onPageLoad())
+                val emptiedUserAnswers = UserAnswers(id = request.userId)
+
+                for {
+                  updatedAnswers <- Future.fromTry(emptiedUserAnswers.set(StornPage, request.storn))
+                  _              <- sessionRepository.set(updatedAnswers)
+                } yield Redirect(controllers.manageAgents.routes.BeforeYouStartController.onPageLoad())
+            }
       } recover {
       case ex =>
         logger.error("[StartAddAgentController][onPageLoad] Unexpected failure", ex)
         Redirect(controllers.routes.SystemErrorController.onPageLoad())
     }
   }
+
+  private def checkAllowList(useRateLimitedAllowList: Boolean, allowListName: String, storn: String)(
+    implicit hc: HeaderCarrier
+  ): Future[Boolean] =
+    if (useRateLimitedAllowList) {
+      rateLimitedAllowListConnector.checkAllowList(allowListName, storn)
+    } else {
+      Future.successful(true)
+    }
 }
